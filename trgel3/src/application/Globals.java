@@ -4,5 +4,6 @@ public class Globals {
 	static int MODE;
 	static User user;
 	static City city;
-	static String link;
+	static Map map;
+	static String backLink;
 }
