@@ -19,7 +19,6 @@ public class EmployeePageController  {
     @FXML
     private Button btn_message;
     
-
     @FXML
     private Button Back;
 
