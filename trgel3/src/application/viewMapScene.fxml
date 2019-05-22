@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+
+<AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.ViewController">
+   <children>
+      <ImageView fx:id="map" fitHeight="289.0" fitWidth="572.0" layoutX="156.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@Haifa1.png" />
+         </image>
+      </ImageView>
+      <Pane fx:id="paneView" layoutX="163.0" layoutY="336.0" prefHeight="299.0" prefWidth="515.0" />
+   </children>
+</AnchorPane>

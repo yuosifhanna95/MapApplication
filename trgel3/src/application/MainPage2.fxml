@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="720" prefWidth="1280" style="-fx-background-color: #33435d;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.Controller">
+   <children>
+      <Button fx:id="Login" layoutX="537.0" layoutY="371.0" mnemonicParsing="false" onAction="#LoginFunc" prefHeight="25.0" prefWidth="85.0" style="-fx-background-color: #3ebdb3; -fx-background-radius: 100; -fx-text-fill: white;" text="Log in" />
+      <Button fx:id="SignUp" layoutX="627.0" layoutY="371.0" mnemonicParsing="false" onAction="#SignUpFunc" prefHeight="25.0" prefWidth="85.0" style="-fx-background-color: #3ebdb3; -fx-background-radius: 100; -fx-text-fill: white;" text="Sign up" />
+      <TextField fx:id="Username" layoutX="541.0" layoutY="301.0" prefHeight="27.0" prefWidth="166.0" promptText="Username" style="-fx-background-color: transparent; -fx-border-color: white; -fx-border-width: 0px 0px 2px 0px; -fx-text-fill: white;" />
+      <TextField fx:id="Password" layoutX="541.0" layoutY="333.0" prefHeight="27.0" prefWidth="166.0" promptText="Password" style="-fx-background-color: transparent; -fx-border-color: white; -fx-border-width: 0px 0px 2px 0px; -fx-text-fill: white;" />
+      <Button fx:id="Catalog" layoutX="538.0" layoutY="412.0" mnemonicParsing="false" onAction="#CatalogFunc" prefHeight="26.0" prefWidth="173.0" style="-fx-background-color: #3e86bd; -fx-background-radius: 100; -fx-text-fill: white;" text="Catalog" />
+      <Label fx:id="Messege" layoutX="626.0" layoutY="438.0" textFill="RED" />
+   </children>
+</AnchorPane>
