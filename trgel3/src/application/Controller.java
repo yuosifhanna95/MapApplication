@@ -100,7 +100,8 @@ public class Controller {
         	 {
         		
        			Globals.user = (User)((Object[])(data))[1];
-      			if(Globals.user.getType().equals("member"))
+       			URL url = getClass().getResource("DefaultPage.fxml");
+       			if(Globals.user.getType().equals("member"))
       			{
       				Globals.MODE=2;
       			}
@@ -111,9 +112,11 @@ public class Controller {
       			else if(Globals.user.getType().equals("employee"))
       			{
       				Globals.MODE=3;
+      				url = getClass().getResource("EmployeePage.fxml");
       			}
       			
-        		URL url = getClass().getResource("DefaultPage.fxml");
+      			
+      			
      			AnchorPane pane =FXMLLoader.load(url);
 
      			Scene scene = new Scene(pane);
