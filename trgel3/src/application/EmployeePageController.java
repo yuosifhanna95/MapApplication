@@ -24,15 +24,17 @@ public class EmployeePageController  {
 
 
     @FXML
-    private Button btn_AddLoc;
+    private Button btn_editMaps;
     
 	    
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() throws IOException, Exception {
     	
+    	
+
 		if(Globals.MODE<3)
 		{
-			btn_AddLoc.setVisible(false);
+			btn_editMaps.setVisible(false);
 		}
 
     	
@@ -75,7 +77,7 @@ public class EmployeePageController  {
       	Stage primaryStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
     	URL url = getClass().getResource("EditMaps.fxml");
 			AnchorPane pane =FXMLLoader.load(url);
-
+	    	Globals.backLink="EmployeePage.fxml";
 			Scene scene = new Scene(pane);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
@@ -90,7 +92,7 @@ public class EmployeePageController  {
       	Stage primaryStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
     	URL url = getClass().getResource("Messages.fxml");
 			AnchorPane pane =FXMLLoader.load(url);
-
+	    	Globals.backLink="EmployeePage.fxml";
 			Scene scene = new Scene(pane);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);

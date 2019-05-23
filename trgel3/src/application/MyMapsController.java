@@ -63,7 +63,7 @@ public class MyMapsController {
     @FXML
     void backFunc(ActionEvent event) throws IOException {
     	Stage primaryStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
-    	URL url = getClass().getResource("DefaultPage.fxml");
+    	URL url = getClass().getResource(Globals.backLink);
 		AnchorPane pane =FXMLLoader.load(url);
 
 		Scene scene = new Scene(pane);
@@ -74,8 +74,11 @@ public class MyMapsController {
     
     @FXML
     public void initialize() throws UnknownHostException, IOException {
-    	Globals.backLink = "MyMapsScene.fxml";
-    	
+    	if(Globals.MODE<3)
+    		Globals.backLink="DefaultPage.fxml";
+    	else
+    		Globals.backLink="EmployeePage.fxml";
+    		
     	buildData();
     	
     	mapTable.getColumns().clear();
@@ -91,6 +94,7 @@ public class MyMapsController {
 				try {
 					Stage primaryStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
 		 	        URL url = getClass().getResource("viewMapScene.fxml");
+		 	    	Globals.backLink = "MyMapsScene.fxml";		 	    	
 		 			AnchorPane pane;
 					pane = FXMLLoader.load(url);
 					Scene scene = new Scene(pane);

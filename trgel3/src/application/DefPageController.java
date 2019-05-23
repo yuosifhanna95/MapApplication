@@ -90,7 +90,7 @@ public class DefPageController  {
       	Stage primaryStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
     	URL url = getClass().getResource("MyMapsScene.fxml");
 		AnchorPane pane =FXMLLoader.load(url);
-
+		Globals.backLink="DefaultPage.fxml";
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
@@ -107,6 +107,7 @@ public class DefPageController  {
     	
     	Stage primaryStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
     	URL url = getClass().getResource("mapCatalogScene.fxml");
+    	Globals.backLink="DefaultPage.fxml";
 		AnchorPane pane;
 		try {
 			pane = FXMLLoader.load(url);
@@ -123,11 +124,11 @@ public class DefPageController  {
     }
 
 	    
-    @FXML // This method is called by the FXMLLoader when initialization is complete
+    @SuppressWarnings("unchecked")
+	@FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() throws IOException, Exception {
     	
-
-
+    	Globals.backLink="MainPage.fxml";
     	purchase.setVisible(false);
     	purchase.setDisable(true);
     	
@@ -274,7 +275,6 @@ public class DefPageController  {
       	Stage primaryStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
     	URL url = getClass().getResource("MainPage.fxml");
 			AnchorPane pane =FXMLLoader.load(url);
-
 			Scene scene = new Scene(pane);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
@@ -288,7 +288,7 @@ public class DefPageController  {
       	Stage primaryStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
     	URL url = getClass().getResource("AddLocations.fxml");
 			AnchorPane pane =FXMLLoader.load(url);
-
+	    	Globals.backLink="DefaultPage.fxml";
 			Scene scene = new Scene(pane);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
@@ -301,7 +301,7 @@ public class DefPageController  {
       	Stage primaryStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
     	URL url = getClass().getResource("Messages.fxml");
 			AnchorPane pane =FXMLLoader.load(url);
-
+	    	Globals.backLink="DefaultPage.fxml";
 			Scene scene = new Scene(pane);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);

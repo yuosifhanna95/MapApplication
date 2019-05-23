@@ -30,7 +30,7 @@ public class MessagesController {
     void backFunc(ActionEvent event) throws IOException {
     	
       	Stage primaryStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
-    	URL url = getClass().getResource("DefaultPage.fxml");
+    	URL url = getClass().getResource(Globals.backLink);
 			AnchorPane pane =FXMLLoader.load(url);
 
 			Scene scene = new Scene(pane);

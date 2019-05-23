@@ -247,7 +247,7 @@ public class Server {
         	                e.printStackTrace();
         	            } 
                 	}
-                    else if(((String[])(data))[0].equals("getMap")) { 
+                    else if(((String[])(data))[0].equals("getMaps")) { 
         	            ObservableList<Map> mapList = getMapFromDB(((String[])(data))[1]);
         	           
         	            Object[] data = new Object[mapList.size()+1];

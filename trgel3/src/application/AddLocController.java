@@ -36,6 +36,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 public class AddLocController {
+	private int Mode;
 	private Label[] labels= new Label[10];
 	private ImageView[] locations = new ImageView[10];
 	private Place[] Places= new Place[10];
@@ -78,6 +79,7 @@ public class AddLocController {
     
     @FXML
     void AddLocation(ActionEvent event) {
+    	Mode=0;
     	if(!NewLocation.getText().equals("") && Counter<10)
     	{
     		EventHandler<MouseEvent> OkEventHandler = new EventHandler<MouseEvent>() {
@@ -144,16 +146,24 @@ public class AddLocController {
     
     @FXML
     void changeMode(ActionEvent event) {
-
+    	if(((Node)event.getSource()).getId()=="btn_EditMode")
+    	{
+    		Mode=1;
+    	}
+    	else if (((Node)event.getSource()).getId()=="btn_ViewMode") {
+    		Mode=0;
+    	}    	
     }
 
     
     @FXML
     void initialize() throws IOException, Exception {
 
-    	
-    	raninImage = new ImageView(new Image("https://i.ibb.co/JsJP3r1/Haifa1.png"));
+    	Image LinkedImage= new Image(Globals.map.getLinkCustomer());
+    	raninImage = new ImageView(LinkedImage);
     	raninImage.relocate(162 , 50);
+    	raninImage.setFitWidth(LinkedImage.getWidth());
+    	raninImage.setFitHeight(LinkedImage.getHeight());
     	mainPane.getChildren().add(raninImage);
     	Label label= new Label();
     	label.setText("مش دارنا");
@@ -200,7 +210,7 @@ public class AddLocController {
     void backFunc(ActionEvent event) throws IOException {
     	
       	Stage primaryStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
-    	URL url = getClass().getResource("DefaultPage.fxml");
+    	URL url = getClass().getResource("SingleEditMap.fxml");
 			AnchorPane pane =FXMLLoader.load(url);
 
 			Scene scene = new Scene(pane);
@@ -223,11 +233,11 @@ public class AddLocController {
           if(file != null){
               try {
                   //Pad the capture area
-            	  WritableImage writableImage = new WritableImage((int)MapImage.getFitWidth() , (int)MapImage.getFitHeight());
+            	  WritableImage writableImage = new WritableImage((int)raninImage.getFitWidth() , (int)raninImage.getFitHeight());
             	  //WritableImage writableImage = new WritableImage((int)2000 , (int)2000);
                   SnapshotParameters params = new SnapshotParameters();
                   
-                  params.setViewport(new Rectangle2D(MapImage.getLayoutX(), MapImage.getLayoutY(), MapImage.getFitWidth() ,MapImage.getFitHeight()));
+                  params.setViewport(new Rectangle2D(raninImage.getLayoutX(), raninImage.getLayoutY(), raninImage.getFitWidth() ,raninImage.getFitHeight()));
                   ((Node)mainPane).snapshot(params, writableImage);
                   //writableImage= pixelScaleAwareCanvasSnapshot(mainPane,params,2);
                   //((Node)mainPane).snapshot()
