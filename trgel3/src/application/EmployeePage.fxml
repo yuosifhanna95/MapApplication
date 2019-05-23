@@ -7,7 +7,7 @@
    <children>
       <Button fx:id="btn_message" layoutX="606.0" layoutY="208.0" mnemonicParsing="false" onAction="#messageFunc" text="Messeges" />
       <Button fx:id="Back" layoutX="614.0" layoutY="174.0" mnemonicParsing="false" onAction="#backFunc" text="Back" />
-      <Button fx:id="btn_AddLoc" layoutX="684.0" layoutY="208.0" mnemonicParsing="false" onAction="#addLoc" text="Add Locations" />
+      <Button fx:id="btn_AddLoc" layoutX="684.0" layoutY="208.0" mnemonicParsing="false" onAction="#editmaps" text="Edit Maps" />
       
    </children>
 </AnchorPane>

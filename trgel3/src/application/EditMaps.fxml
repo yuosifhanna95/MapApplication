@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+
+<AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.EditmapsController">
+   <children>
+      <Button fx:id="btn_message" layoutX="455.0" layoutY="599.0" mnemonicParsing="false" onAction="#messageFunc" text="Messages" />
+      <Button fx:id="Back" layoutX="413.0" layoutY="131.0" mnemonicParsing="false" onAction="#backFunc" text="Back" />
+      <HBox layoutX="490.0" layoutY="129.0" prefHeight="30.0" prefWidth="320.0">
+         <children>
+            <ComboBox fx:id="comboBox" prefWidth="130.0" promptText="Search by" />
+            <TextField fx:id="searchText" prefWidth="200.0" />
+         </children>
+      </HBox>
+      <TableView fx:id="searchTable" layoutX="390.0" layoutY="192.0" prefHeight="400.0" prefWidth="500.0">
+        <columns>
+          <TableColumn fx:id="CityCol" prefWidth="75.0" text="City" />
+          <TableColumn fx:id="DescriptionCol" prefWidth="75.0" text="Desctription" />
+            <TableColumn fx:id="mapCol" prefWidth="75.0" text="#Maps" />
+             <TableColumn fx:id="placeCol" prefWidth="75.0" text="#Places" />
+             <TableColumn fx:id="pathCol" prefWidth="75.0" text="#Paths" />
+        </columns>
+      </TableView>
+      <Button fx:id="myMaps" layoutX="625.0" layoutY="599.0" mnemonicParsing="false" onAction="#showMymaps" text="My maps" />
+      <Button fx:id="purchase" layoutX="779.0" layoutY="599.0" mnemonicParsing="false" onAction="#oneTimePurchase" text="Purchase" />
+ 
+   </children>
+</AnchorPane>

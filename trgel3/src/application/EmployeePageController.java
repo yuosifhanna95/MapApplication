@@ -68,12 +68,12 @@ public class EmployeePageController  {
 			primaryStage.show();
     }
 
-    
+
     @FXML
-    void addLoc(ActionEvent event) throws IOException {
-    	
+    void editmaps(ActionEvent event) throws IOException {
+
       	Stage primaryStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
-    	URL url = getClass().getResource("AddLocations.fxml");
+    	URL url = getClass().getResource("EditMaps.fxml");
 			AnchorPane pane =FXMLLoader.load(url);
 
 			Scene scene = new Scene(pane);
@@ -81,6 +81,8 @@ public class EmployeePageController  {
 			primaryStage.setScene(scene);
 			primaryStage.show();
     }
+    
+    
     
     @FXML
     void messageFunc(ActionEvent event) throws IOException {

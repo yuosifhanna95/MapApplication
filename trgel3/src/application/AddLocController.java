@@ -151,6 +151,7 @@ public class AddLocController {
     @FXML
     void initialize() throws IOException, Exception {
 
+    	
     	raninImage = new ImageView(new Image("https://i.ibb.co/JsJP3r1/Haifa1.png"));
     	raninImage.relocate(162 , 50);
     	mainPane.getChildren().add(raninImage);
