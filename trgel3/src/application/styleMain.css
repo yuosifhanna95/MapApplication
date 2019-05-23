@@ -1,5 +1,42 @@
 /* JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
 .text-input {
     -fx-text-fill: white;
-
+    -fx-font-family: Quicksand;
+    -fx-font-size: 20;
+}
+.text {
+	-fx-font-family: Quicksand;
+	-fx-font-size: 20;
+}
+.button {
+	-fx-background-color: #3ebdb3;
+	-fx-background-radius: 100;
+	-fx-text-fill: white;
+}
+.button:hover {
+	-fx-background-color: #5de8de;
+}
+.button:pressed {
+	-fx-background-color: #297c75;
+}
+#Catalog {	
+	-fx-background-color: #3e86bd;
+	-fx-background-radius: 100;
+	-fx-text-fill: white;
+}
+#Catalog:hover {	
+	-fx-background-color: #5cabe7;
+}
+#Catalog:pressed {	
+	-fx-background-color: #2d6189;
+}
+.text-field {	
+	-fx-background-color:  transparent;
+	-fx-border-color:  white;
+	-fx-border-width:  0px 0px 2px 0px;
+	-fx-text-fill: white;
+	-fx-font-size: 20;
+}
+.label{
+	-fx-text-alignment: right; 
 }

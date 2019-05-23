@@ -14,7 +14,7 @@ public class Main extends Application {
 	public void start(Stage primaryStage) {
 		try {
 			Globals.MODE = 0;
-			URL url = getClass().getResource("MainPage2.fxml");
+			URL url = getClass().getResource("MainPage.fxml");
 			AnchorPane pane =FXMLLoader.load(url);
 
 			Scene scene = new Scene(pane);

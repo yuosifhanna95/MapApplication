@@ -63,7 +63,7 @@ public class EmployeePageController  {
 			AnchorPane pane =FXMLLoader.load(url);
 
 			Scene scene = new Scene(pane);
-			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			scene.getStylesheets().add(getClass().getResource("styleMain.css").toExternalForm());
 			primaryStage.setScene(scene);
 			primaryStage.show();
     }
