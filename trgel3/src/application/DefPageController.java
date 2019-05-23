@@ -88,41 +88,44 @@ public class DefPageController  {
     void showMymaps(ActionEvent event) throws IOException {
     	
       	Stage primaryStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
-    	URL url = getClass().getResource("Messages.fxml");
-			AnchorPane pane =FXMLLoader.load(url);
+    	URL url = getClass().getResource("MyMapsScene.fxml");
+		AnchorPane pane =FXMLLoader.load(url);
 
-			Scene scene = new Scene(pane);
-			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-			primaryStage.setScene(scene);
-			primaryStage.show();
+		Scene scene = new Scene(pane);
+		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		primaryStage.setScene(scene);
+		primaryStage.show();
     	
     }
     
     @FXML
-    void oneTimePurchase(ActionEvent event) {
+    void Purchase(ActionEvent event) throws UnknownHostException, IOException {
+    	
+    	if(Globals.MODE == 2) {
+    		addDataBasetoMember();
+    	}
+    	
     	Stage primaryStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
     	URL url = getClass().getResource("mapCatalogScene.fxml");
-			AnchorPane pane;
-			try {
-				pane = FXMLLoader.load(url);
-				Scene scene = new Scene(pane);
-    			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-    			primaryStage.setScene(scene);
-    			primaryStage.show();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}	
+		AnchorPane pane;
+		try {
+			pane = FXMLLoader.load(url);
+			Scene scene = new Scene(pane);
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			primaryStage.setScene(scene);
+			primaryStage.show();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+	    
+    	
     }
 
 	    
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() throws IOException, Exception {
     	
-		//if(Globals.MODE<3)
-		//{
-		//	btn_AddLoc.setVisible(false);
-		//}
 
 
     	purchase.setVisible(false);
@@ -213,7 +216,23 @@ public class DefPageController  {
     }
     
     
-
+    public void addDataBasetoMember() throws UnknownHostException, IOException {
+	   @SuppressWarnings("resource")
+	Socket socket = new Socket("localhost",5555);
+       data = FXCollections.observableArrayList();
+      
+       String[] set = new String[3];
+       set[0] = "addCityToMember";
+       set[1] = Globals.user.getUserName(); 
+       set[2] = Globals.city.getCity();   
+       try {
+          ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
+          objectOutput.writeObject(set); 
+       } catch (IOException e) 
+       {
+          e.printStackTrace();
+       }
+    }
     
 	public void buildData() throws UnknownHostException, IOException {
        @SuppressWarnings("resource")

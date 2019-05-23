@@ -27,7 +27,7 @@ public class Server {
 	   static private final String PASS = "eSS7xZeTpg";
 	   static private Object data;
 	
-	   public static void main(String[] args) throws ClassNotFoundException, SQLException   {
+	   public static void main(String[] args) throws ClassNotFoundException, SQLException {
 		   
 	        try
 	        {
@@ -154,7 +154,6 @@ public class Server {
                     else if(((String[])(data))[0].equals("Login"))
                 	{
                 		
-                		///////////////////
                 		
                 		int k = ((String[])(data)).length;               		
                         			   
@@ -267,12 +266,76 @@ public class Server {
         	                e.printStackTrace();
         	            } 
                 	}
+                    
+                    else if(((String[])(data))[0].equals("getMyMaps")) { 
+        	            ObservableList<Map> mapList = getMyMapsFromDB(((String[])(data))[1]);
+        	           
+        	            Object[] data = new Object[mapList.size()+1];
+        	            data[0] = mapList.size();
+        	            int counter = 1;
+        	            for(Map tu: mapList) {
+        	                data[counter] = tu;
+        	                counter++;
+        	            }
+        	            try {
+        	                ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
+        	                objectOutput.writeObject(data);       
+        	            } 
+        	            catch (IOException e) 
+        	            {
+        	                e.printStackTrace();
+        	            } 
+                	}
+                    
+                    else if(((String[])(data))[0].equals("addCityToMember")) { 
+                    	Connection conn = null;
+            			Statement stmt = null;
+            			try {
+            				Class.forName(JDBC_DRIVER);
+            				conn = DriverManager.getConnection(DB_URL, USER, PASS);
+              				System.out.println(((String[])(data))[1]);
+              				System.out.println(((String[])(data))[2]);
+              				PreparedStatement pr;
+              				String sql = "INSERT INTO memberMap (`member`, `city`) VALUES (?,?)"; 
+              				
+              			
+              				if(conn!=null) {
+              		    		try {
+              		    			
+              						pr=conn.prepareStatement(sql);
+              						pr.setString(1, ((String[])(data))[1]);
+              						pr.setString(2, ((String[])(data))[2]);
+              						pr.executeUpdate();
+              					} catch (SQLException e) {
+              						// TODO Auto-generated catch block
+              						e.printStackTrace();
+              					}
+              		    	}
+            			    
+            				stmt.close();
+            				conn.close();
+            				
+            			}
+            			catch (SQLException se) {
+            				se.printStackTrace();
+            				System.out.println("SQLException: " + se.getMessage());
+            			    System.out.println("SQLState: " + se.getSQLState());
+            			    System.out.println("VendorError: " + se.getErrorCode());
+            			} catch (Exception e) {
+            				e.printStackTrace();
+            			} finally {
+            				try {
+            					if (stmt != null)
+            						stmt.close();
+            					if (conn != null)
+            						conn.close();
+            				} catch (SQLException se) {
+            					se.printStackTrace();
+            				}
+            			}
+                	}
                 }
 	            
-	            
-	            //ObservableList<City> cityList = getFromDB();	           
-
-	            //Object[] data = new Object[cityList.size()+1];
 	        	}
 	        }
 	        catch (IOException e) 
@@ -386,7 +449,71 @@ public class Server {
 	   return data;
 	}
 	   
-	
+	@SuppressWarnings("null")
+	static ObservableList<Map> getMyMapsFromDB(String user){
+		ObservableList<Map> data = FXCollections.observableArrayList();
+		String[] Cities = new String[100] ;
+		int count = 0;
+	    
+		Connection conn = null;
+		Statement stmt = null;
+		Statement stmt2 = null;
+		try {
+			Class.forName(JDBC_DRIVER);
+			 
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			stmt = conn.createStatement();
+			stmt2 = conn.createStatement();
+			
+			String sql = "SELECT * FROM memberMap WHERE member ='" + user + "'"  ;
+			ResultSet rs = stmt.executeQuery(sql);
+		
+			while (rs.next()) {			  
+			   String city = rs.getString("city");
+			   //Cities[count] = city;			    
+			   //count++;
+			   
+			   String sql2 = "SELECT * FROM maps WHERE city ='" + city + "'"  ;
+			   ResultSet rs2 = stmt2.executeQuery(sql2);
+			   
+				while (rs2.next()) {
+				  int id = rs2.getInt("id");
+				  String description = rs2.getString("description");
+				  String linkC = rs2.getString("linkCustomer");
+				  String linkE = rs2.getString("linkEmployee");
+				 
+				  data.add(new Map(id, city,description, linkC , linkE ));
+				}
+				
+			}
+
+			stmt2.close();
+			stmt.close();
+			conn.close();
+			
+			return data;
+		}
+		catch (SQLException se) {
+			se.printStackTrace();
+			System.out.println("SQLException: " + se.getMessage());
+		    System.out.println("SQLState: " + se.getSQLState());
+		    System.out.println("VendorError: " + se.getErrorCode());
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			}
+		}
+	   
+	   
+	   return data;
+	}
 	   
 	   
 	public static int checkuser(String user2,Connection	conn) {

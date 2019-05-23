@@ -28,7 +28,7 @@
         </columns>
       </TableView>
       <Button fx:id="myMaps" layoutX="625.0" layoutY="599.0" mnemonicParsing="false" onAction="#showMymaps" text="My maps" />
-      <Button fx:id="purchase" layoutX="779.0" layoutY="599.0" mnemonicParsing="false" onAction="#oneTimePurchase" text="Purchase" />
+      <Button fx:id="purchase" layoutX="779.0" layoutY="599.0" mnemonicParsing="false" onAction="#Purchase" text="Purchase" />
  
    </children>
 </AnchorPane>

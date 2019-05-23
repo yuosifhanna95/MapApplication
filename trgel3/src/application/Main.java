@@ -13,7 +13,7 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			Globals.MODE=0;
+			Globals.MODE = 0;
 			URL url = getClass().getResource("MainPage2.fxml");
 			AnchorPane pane =FXMLLoader.load(url);
 
