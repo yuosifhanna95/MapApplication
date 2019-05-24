@@ -3,3 +3,26 @@
     -fx-text-fill: white;
 
 }
+.button {
+	-fx-background-color: #3ebdb3;
+	-fx-background-radius: 100;
+	-fx-text-fill: white;
+}
+
+.button:hover{
+	-fx-background-color: #4deadd;
+}
+.button:pressed{
+	-fx-background-color: #2c857e;
+}
+#Catalog{
+	-fx-background-color: #3e86bd;
+	-fx-background-radius: 100;
+	-fx-text-fill: white; 
+}
+#Catalog:hover{
+	-fx-background-color: #4da6eb;
+}
+#Catalog:pressed{
+	-fx-background-color: #3e86bd;
+}
