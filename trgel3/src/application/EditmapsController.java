@@ -33,10 +33,6 @@ import javafx.event.EventHandler;
 
 
 
-
-
-
-
 public class EditmapsController  {
 
 
@@ -50,7 +46,7 @@ public class EditmapsController  {
     private Button Back;
 
     @FXML
-    private Button purchase;
+    private Button edit;
     
     @FXML
     private ComboBox<String> comboBox;
@@ -82,15 +78,13 @@ public class EditmapsController  {
     @FXML
     private Button btn_AddLoc;
     
-    
-
     @FXML 
     void showMymaps(ActionEvent event) throws IOException {
     	
       	Stage primaryStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
-    	URL url = getClass().getResource("Messages.fxml");
+    	URL url = getClass().getResource("MyMapsScene.fxml");
 			AnchorPane pane =FXMLLoader.load(url);
-
+ 	    	Globals.backLink = "EditMaps.fxml";		
 			Scene scene = new Scene(pane);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
@@ -104,9 +98,10 @@ public class EditmapsController  {
     
     
     @FXML
-    void oneTimePurchase(ActionEvent event) {
+    void editMaps(ActionEvent event) {
     	Stage primaryStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
-    	URL url = getClass().getResource("mapCatalogScene.fxml");
+    	URL url = getClass().getResource("SingleEditMap.fxml");
+    	Globals.backLink="EditMaps.fxml";
 			AnchorPane pane;
 			try {
 				pane = FXMLLoader.load(url);
@@ -121,7 +116,8 @@ public class EditmapsController  {
     }
 
 	    
-    @FXML // This method is called by the FXMLLoader when initialization is complete
+    @SuppressWarnings("unchecked")
+	@FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() throws IOException, Exception {
     	
 		//if(Globals.MODE<3)
@@ -130,8 +126,8 @@ public class EditmapsController  {
 		//}
 
 
-    	purchase.setVisible(false);
-    	purchase.setDisable(true);
+    	edit.setVisible(false);
+    	edit.setDisable(true);
     	
     	if(Globals.user.getType().equals("oneTime")) {
     		myMaps.setDisable(true);
@@ -152,8 +148,8 @@ public class EditmapsController  {
     	        	City cityRow = searchTable.getSelectionModel().getSelectedItem();
     	        	Globals.city = (City) cityRow;
     	        	
-    	        	purchase.setVisible(true);
-    	        	purchase.setDisable(false);
+    	        	edit.setVisible(true);
+    	        	edit.setDisable(false);
     	        	
 
     	        }
@@ -258,7 +254,7 @@ public class EditmapsController  {
     void backFunc(ActionEvent event) throws IOException {
     	
       	Stage primaryStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
-    	URL url = getClass().getResource("MainPage.fxml");
+    	URL url = getClass().getResource("EmployeePage.fxml");
 			AnchorPane pane =FXMLLoader.load(url);
 
 			Scene scene = new Scene(pane);
@@ -274,7 +270,7 @@ public class EditmapsController  {
       	Stage primaryStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
     	URL url = getClass().getResource("AddLocations.fxml");
 			AnchorPane pane =FXMLLoader.load(url);
-
+	    	Globals.backLink="EditMaps.fxml";
 			Scene scene = new Scene(pane);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
@@ -287,7 +283,7 @@ public class EditmapsController  {
       	Stage primaryStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
     	URL url = getClass().getResource("Messages.fxml");
 			AnchorPane pane =FXMLLoader.load(url);
-
+			Globals.backLink="EditMaps.fxml";
 			Scene scene = new Scene(pane);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
@@ -296,8 +292,3 @@ public class EditmapsController  {
     }
 
 }
-
-
-
-
-

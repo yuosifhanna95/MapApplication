@@ -79,7 +79,7 @@ public class MapController {
 	@FXML
     public void initialize() throws UnknownHostException, IOException {
     	
-    	
+    	Globals.backLink="DefaultPage.fxml";
     	buildData();
     	
     	mapTable.getColumns().clear();
@@ -144,7 +144,7 @@ public class MapController {
         data = FXCollections.observableArrayList();
         
         String[] get = new String[2];
-        get[0] = "getMap";
+        get[0] = "getMaps";
         get[1] = Globals.city.getCity();
         try {
             ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
