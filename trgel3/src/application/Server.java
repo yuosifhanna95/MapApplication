@@ -405,7 +405,7 @@ public class Server {
 				}
 			    
 				stmt2.close();
-				stmt.close();
+				stmt.close();	
 				conn.close();
 				
 				return data;
