@@ -1,26 +1,60 @@
 package application;
 
-public class Place {
+import java.io.Serializable;
 
+@SuppressWarnings("serial")
+public class Place implements Serializable {
+
+	/**
+	 * 
+	 */
 	private long serialID;
+	private String MapId;
 	private String CityName;
 	private String PlaceName;
 	private String Description;
 	private String Classification;
 	private int Accessibility;
+	private int LocX;
+	private int LocY;
+	private String Type;
 
 	public Place() {
 
 	}
 
-	public Place(String CityName, String PlaceName, String Description, String Classification, int Accessibility,
-			long serialID) {
+	public Place(String MapId, String CityName, String PlaceName, String Description, String Classification,
+			int Accessibility, int LocX, int LocY, String Type) {
+		this.MapId = MapId;
+		this.CityName = CityName;
+		this.PlaceName = PlaceName;
+		this.Description = Description;
+		this.Classification = Classification;
+		this.Accessibility = Accessibility;
+		this.Type = Type;
+	}
+
+	public Place(String MapId, String CityName, String PlaceName, String Description, String Classification,
+			int Accessibility, long serialID, int LocX, int LocY) {
+		this.MapId = MapId;
 		this.CityName = CityName;
 		this.PlaceName = PlaceName;
 		this.Description = Description;
 		this.Classification = Classification;
 		this.Accessibility = Accessibility;
 		this.serialID = serialID;
+	}
+
+	public Place(String MapId, String CityName, String PlaceName, String Description, String Classification,
+			int Accessibility, long serialID, int LocX, int LocY, String Type) {
+		this.MapId = MapId;
+		this.CityName = CityName;
+		this.PlaceName = PlaceName;
+		this.Description = Description;
+		this.Classification = Classification;
+		this.Accessibility = Accessibility;
+		this.serialID = serialID;
+		this.Type = Type;
 	}
 
 	public void setCityName(String cityName) {
@@ -66,4 +100,37 @@ public class Place {
 	public long getSerialID() {
 		return serialID;
 	}
+
+	public void setLocX(int locX) {
+		LocX = locX;
+	}
+
+	public int getLocX() {
+		return LocX;
+	}
+
+	public void setLocY(int locY) {
+		LocY = locY;
+	}
+
+	public int getLocY() {
+		return LocY;
+	}
+
+	public void setMapId(String mapId) {
+		MapId = mapId;
+	}
+
+	public String getMapId() {
+		return MapId;
+	}
+
+	public String getType() {
+		return Type;
+	}
+
+	public void setType(String type) {
+		Type = type;
+	}
+
 }

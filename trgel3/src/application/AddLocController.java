@@ -3,6 +3,8 @@ package application;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.URL;
 
@@ -77,17 +79,171 @@ public class AddLocController {
 	private ImageView raninImage;
 
 	@FXML
-	void UpdateMap(ActionEvent event) throws IOException {
+	void UpdateMap(ActionEvent event) throws IOException, ClassNotFoundException {
 
 		@SuppressWarnings("resource")
 		Socket socket = new Socket("localhost", 5555);
+		String[] array = new String[2];
+		Object[] array2 = new Object[2];
+		array[0] = "getPlaces";
+		// get[1] = "" + ImagePlaces[i].getPlace().getCityName();
+		array[1] = "" + Globals.map.getId();
+
+		ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
+		objectOutput.writeObject(array);
+
+		Object data;
+		ObjectInputStream objectInput = new ObjectInputStream(socket.getInputStream());
+		data = objectInput.readObject();
+		System.out.println(((Object[]) data)[0]);
+		Place[] list = (Place[]) ((Object[]) data)[1];
 		for (int i = 0; i < ImagePlaces.length; i++) {
 			if (ImagePlaces[i] != null) {
+				int flagnew = 1;
+				for (Place pl : list) {
 
-				String[] get = new String[1];
-				get[0] = "getPlace";
-				get[1] = "" + ImagePlaces[i].getPlace().getSerialID();
+					if (ImagePlaces[i].getPlace().getSerialID() == pl.getSerialID()) {
+						long serialid = ImagePlaces[i].getPlace().getSerialID();
+						String MapId = ImagePlaces[i].getPlace().getMapId();
+						String CityName = ImagePlaces[i].getPlace().getPlaceName();
+						String PlaceName = ImagePlaces[i].getPlace().getPlaceName();
+						String description = ImagePlaces[i].getPlace().getDescription();
+						String classification = ImagePlaces[i].getPlace().getClassification();
+						int accessibility = ImagePlaces[i].getPlace().getAccessibility();
+						int LocX = ImagePlaces[i].getPlace().getLocX();
+						int LocY = ImagePlaces[i].getPlace().getLocY();
+						String type = "UPDATE";
+						array2[0] = "UpdatePlace";
+						array2[1] = new Place(MapId, CityName, PlaceName, description, classification, accessibility,
+								serialid, LocX, LocY, type);
+						// objectOutput = new ObjectOutputStream(socket.getOutputStream());
+						array2[2] = serialid;
+						@SuppressWarnings("resource")
+						Socket socket2 = new Socket("localhost", 5555);
+						objectOutput = new ObjectOutputStream(socket2.getOutputStream());
+						objectOutput.writeObject(array2);
+						flagnew = 0;
+						break;
 
+					}
+
+				}
+				if (flagnew == 1) {
+					long serialid = ImagePlaces[i].getPlace().getSerialID();
+					String MapId = ImagePlaces[i].getPlace().getMapId();
+					String CityName = ImagePlaces[i].getPlace().getPlaceName();
+					String PlaceName = ImagePlaces[i].getPlace().getPlaceName();
+					String description = ImagePlaces[i].getPlace().getDescription();
+					String classification = ImagePlaces[i].getPlace().getClassification();
+					int accessibility = ImagePlaces[i].getPlace().getAccessibility();
+					int LocX = ImagePlaces[i].getPlace().getLocX();
+					int LocY = ImagePlaces[i].getPlace().getLocY();
+					String type = "NEW";
+					array2[0] = "UpdatePlace";
+					Place pp = new Place(MapId, CityName, PlaceName, description, classification, accessibility, LocX,
+							LocY, type);
+					array2[1] = pp;
+					@SuppressWarnings("resource")
+					Socket socket2 = new Socket("localhost", 5555);
+					objectOutput = new ObjectOutputStream(socket2.getOutputStream());
+					objectOutput.writeObject(array2);
+				}
+			}
+		}
+
+	}
+
+	void InitializeImagePlaces() {
+
+	}
+
+	void DrawPlaces() throws IOException, ClassNotFoundException {
+
+		@SuppressWarnings("resource")
+		Socket socket = new Socket("localhost", 5555);
+		String[] array = new String[2];
+		String[] array2 = new String[2];
+		array[0] = "getPlaces";
+		// get[1] = "" + ImagePlaces[i].getPlace().getCityName();
+		array[1] = "" + Globals.map.getId();
+
+		ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
+		objectOutput.writeObject(array);
+
+		Object data;
+		ObjectInputStream objectInput = new ObjectInputStream(socket.getInputStream());
+		data = objectInput.readObject();
+		System.out.println(((Object[]) data)[0]);
+		Place[] list = (Place[]) ((Object[]) data)[1];
+
+		array2[0] = "getUPlaces";
+		// get[1] = "" + ImagePlaces[i].getPlace().getCityName();
+		array2[1] = "" + Globals.map.getId();
+		Socket socket2 = new Socket("localhost", 5555);
+		objectOutput = new ObjectOutputStream(socket2.getOutputStream());
+		objectOutput.writeObject(array2);
+
+		Object data2;
+		ObjectInputStream objectInput2 = new ObjectInputStream(socket.getInputStream());
+		data2 = objectInput2.readObject();
+		System.out.println(((Object[]) data2)[0]);
+		UPlace[] list2 = (UPlace[]) ((Object[]) data2)[1];
+
+		int counter = 0;
+		int flag = 0;
+		for (int i = 0; i < list.length; i++) {
+			for (int c = 0; c < list2.length; c++) {
+				// if (Globals.map.getId() == list2[c].getSerialID()) {
+				if (list[i].getSerialID() == list2[c].getPlaceId()) {
+					Image im = new Image("File:loc.png");
+					ImageView newLoc = new ImageView(im);
+					newLoc.relocate(list2[c].getLocX(), list2[c].getLocY());
+					Label label = new Label();
+					label.setText(NewLocation.getText());
+					label.setFont(new Font("Quicksand", 20));
+					Place p = new Place("" + Globals.map.getId(), list2[c].getCityName(), list2[c].getPlaceName(),
+							list2[c].getDescription(), list2[c].getClassification(), list2[c].getAccessibility(),
+							list2[c].getSerialID(), list2[c].getLocX(), list2[c].getLocY(), list2[c].getType());
+					ImagePlaces[counter] = new ImagePlace(counter, newLoc, label, p, (int) newLoc.getX(),
+							(int) newLoc.getY());
+					counter++;
+					flag = 1;
+					break;
+				}
+				if (flag == 0) {
+					Image im = new Image("File:loc.png");
+					ImageView newLoc = new ImageView(im);
+					newLoc.relocate(list2[c].getLocX(), list2[c].getLocY());
+					Label label = new Label();
+					label.setText(NewLocation.getText());
+					label.setFont(new Font("Quicksand", 20));
+					Place p = new Place("" + Globals.map.getId(), list2[c].getCityName(), list2[c].getPlaceName(),
+							list2[c].getDescription(), list2[c].getClassification(), list2[c].getAccessibility(),
+							list2[c].getSerialID(), list2[c].getLocX(), list2[c].getLocY(), list2[c].getType());
+					ImagePlaces[counter] = new ImagePlace(counter, newLoc, label, p, (int) newLoc.getX(),
+							(int) newLoc.getY());
+					counter++;
+				}
+				flag = 0;
+
+				// }
+			}
+		}
+
+		for (int c = 0; c < list2.length; c++) {
+			if (list2[c].getPlaceId() == -1) {
+				Image im = new Image("File:loc.png");
+				ImageView newLoc = new ImageView(im);
+				newLoc.relocate(list2[c].getLocX(), list2[c].getLocY());
+				Label label = new Label();
+				label.setText(NewLocation.getText());
+				label.setFont(new Font("Quicksand", 20));
+				Place p = new Place("" + Globals.map.getId(), list2[c].getCityName(), list2[c].getPlaceName(),
+						list2[c].getDescription(), list2[c].getClassification(), list2[c].getAccessibility(),
+						list2[c].getSerialID(), list2[c].getLocX(), list2[c].getLocY(), list2[c].getType());
+				ImagePlaces[counter] = new ImagePlace(counter, newLoc, label, p, (int) newLoc.getX(),
+						(int) newLoc.getY());
+				counter++;
 			}
 		}
 
@@ -126,7 +282,9 @@ public class AddLocController {
 			newLoc.setId("imv" + Counter);
 			labels[Counter] = label;
 			locations[Counter] = newLoc;
-			Places[Counter] = new Place();
+			Places[Counter] = new Place("" + Globals.map.getId(), Globals.map.getCity(), label.getText(), "", "", 1,
+					(int) newLoc.getX(), (int) newLoc.getY(), "NEW");
+
 			ImagePlaces[Counter] = new ImagePlace(Counter, locations[Counter], labels[Counter], Places[Counter],
 					(int) MapImage.getLayoutX(), (int) MapImage.getLayoutY());
 
