@@ -35,9 +35,9 @@ public class Server {
 				Socket skt = myServerSocket.accept();
 				ObjectInputStream objectInput = new ObjectInputStream(skt.getInputStream());
 				data = objectInput.readObject();
-				System.out.println("this is sparta");
 				if (data instanceof Object[] && !(data instanceof String[])) {
 					if (((String) ((Object[]) (data))[0]).equals("Register")) {
+						
 						User client = ((User) ((Object[]) (data))[1]);
 						String fname1 = client.getFirstName();
 						String lname1 = client.getLastName();
@@ -299,7 +299,28 @@ public class Server {
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
-					} else if (((String[]) (data))[0].equals("getMaps")) {
+					} 
+					   else if(((String[])(data))[0].equals("getPlaceCatalog"))
+		                {   
+		                   ObservableList<Place> placeList = getPlaceFromDB();
+		                  
+		                   Object[] data = new Object[placeList.size()+1];
+		                   data[0] = placeList.size();
+		                   int counter = 1;
+		                   for(Place tu: placeList) {
+		                       data[counter] = tu;
+		                       counter++;
+		                   }
+		                   try {
+		                       ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
+		                       objectOutput.writeObject(data);       
+		                   } 
+		                   catch (IOException e) 
+		                   {
+		                       e.printStackTrace();
+		                   } 
+		                }
+					else if (((String[]) (data))[0].equals("getMaps")) {
 						ObservableList<Map> mapList = getMapFromDB(((String[]) (data))[1]);
 
 						Object[] data = new Object[mapList.size() + 1];
@@ -456,9 +477,9 @@ public class Server {
 							}
 						}
 
-					} else if (((String[]) (data))[0].equals("getPlaces")) {
+					} else if (((String[]) (data))[0].equals("getUPlaces")) {
 
-						Place[] list;
+						UPlace[] list;
 						int k = ((String[]) (data)).length;
 
 						Connection conn = null;
@@ -479,7 +500,7 @@ public class Server {
 							rs.first();
 							rs.previous();
 							Object[] result = new Object[2];
-							list = new Place[index];
+							list = new UPlace[index];
 							index = 0;
 							while (rs.next()) {
 
@@ -487,6 +508,7 @@ public class Server {
 
 								int id = rs.getInt("id");
 								String MapId = rs.getString("MapId");
+								int PlaceId = rs.getInt("PlaceId");
 								String Name = rs.getString("Name");
 								String Place = rs.getString("Place");
 								String description = rs.getString("description");
@@ -494,11 +516,12 @@ public class Server {
 								int accessibility = rs.getInt("accessibility");
 								int LocX = rs.getInt("LocX");
 								int LocY = rs.getInt("LocY");
+								String Type = rs.getString("Type");
 								// rs.getString("pathNum");
 
 								// data.add(new User(username, description, mapsnum , placesnum, pathnum ));
-								Place place = new Place(MapId, Name, Place, description, classification, accessibility,
-										id, LocX, LocY);
+								UPlace place = new UPlace(MapId,Name, Place, description, classification, accessibility,
+										id, LocX, LocY,Type,PlaceId);
 								list[index] = (place);
 								index++;
 
@@ -543,28 +566,40 @@ public class Server {
 		}
 	}
 
-	static ObservableList<City> getCityFromDB() {
+	static ObservableList<City> getCityFromDB(){
 		ObservableList<City> data = FXCollections.observableArrayList();
 
-		Connection conn = null;
+		   
+	    Connection conn = null;
 		Statement stmt = null;
+		Statement stmt2 = null;
+		
 		try {
 			Class.forName(JDBC_DRIVER);
-
+			 
 			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			stmt = conn.createStatement();
-
-			String sql = "SELECT * FROM CityCatalog";
+			stmt2 = conn.createStatement();
+			
+			String sql = "SELECT * FROM CityCatalog"   ;
 			ResultSet rs = stmt.executeQuery(sql);
-
+		
 			while (rs.next()) {
-				String city = rs.getString("name");
-				String description = rs.getString("description");
-				String mapsnum = rs.getString("mapsNum");
-				String placesnum = rs.getString("placesNum");
-				String pathnum = rs.getString("pathNum");
-
-				data.add(new City(city, description, mapsnum, placesnum, pathnum));
+			  String city = rs.getString("name");
+			  String description = rs.getString("description");
+			  String mapsnum = rs.getString("mapsNum");
+			  String placesnum = rs.getString("placesNum");
+			  String pathnum = rs.getString("pathNum");
+			  String places = null;			  
+			  String sql2 = "SELECT * FROM places WHERE Name ='" + city + "'"  ;
+			  ResultSet rs2 = stmt2.executeQuery(sql2);
+			   
+			  while (rs2.next()) {		
+			    String place = rs2.getString("Place");
+			    places += (" + " + place);
+			  }
+			 
+			  data.add(new City(city, description, mapsnum , placesnum, pathnum, places));
 			}
 
 			stmt.close();
@@ -581,7 +616,7 @@ public class Server {
 		} finally {
 			try {
 				if (stmt != null)
-					stmt.close();
+					stmt.close();	
 				if (conn != null)
 					conn.close();
 			} catch (SQLException se) {
@@ -592,6 +627,64 @@ public class Server {
 		return data;
 	}
 
+	   static ObservableList<Place> getPlaceFromDB(){
+		   ObservableList<Place> data = FXCollections.observableArrayList();
+
+		     
+		      Connection conn = null;
+		   Statement stmt = null;
+
+
+		   try {
+		   Class.forName(JDBC_DRIVER);
+
+		   conn = DriverManager.getConnection(DB_URL, USER, PASS);
+		   stmt = conn.createStatement();
+
+
+		   String sql = "SELECT * FROM places"   ;
+		   ResultSet rs = stmt.executeQuery(sql);
+
+		   while (rs.next()) {
+		    String city = rs.getString("Name");
+		    String description = rs.getString("description");
+		    String place = rs.getString("Place");
+		    String Classification = rs.getString("Classification");
+		    int Accessibility = rs.getInt("Accessibility");
+		    int numOfMaps = rs.getInt("mapsNum");
+
+		    data.add(new Place(city, place, description, Classification , Accessibility, numOfMaps ));
+		   }
+		      
+
+		   stmt.close();
+		   conn.close();
+
+		   return data;
+		   }
+		   catch (SQLException se) {
+		   se.printStackTrace();
+		   System.out.println("SQLException: " + se.getMessage());
+		      System.out.println("SQLState: " + se.getSQLState());
+		      System.out.println("VendorError: " + se.getErrorCode());
+		   } catch (Exception e) {
+		   e.printStackTrace();
+		   } finally {
+		   try {
+		   if (stmt != null)
+		   stmt.close();
+		   if (conn != null)
+		   conn.close();
+		   } catch (SQLException se) {
+		   se.printStackTrace();
+		   }
+		   }
+		     
+		     
+		     return data;
+		   }
+		     
+	
 	static ObservableList<Map> getMapFromDB(String city) {
 		ObservableList<Map> data = FXCollections.observableArrayList();
 

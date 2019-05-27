@@ -2,12 +2,12 @@ package application;
 
 import java.io.Serializable;
 
+
 @SuppressWarnings("serial")
 public class Place implements Serializable {
 
-	/**
-	 * 
-	 */
+
+	private static final long serialVersionUID = 1L;
 	private long serialID;
 	private String MapId;
 	private String CityName;
@@ -18,10 +18,12 @@ public class Place implements Serializable {
 	private int LocX;
 	private int LocY;
 	private String Type;
+	private int numOfmaps;
 
 	public Place() {
 
 	}
+
 
 	public Place(String MapId, String CityName, String PlaceName, String Description, String Classification,
 			int Accessibility, int LocX, int LocY, String Type) {
@@ -31,6 +33,8 @@ public class Place implements Serializable {
 		this.Description = Description;
 		this.Classification = Classification;
 		this.Accessibility = Accessibility;
+		this.LocX=LocX;
+		this.LocY=LocY;
 		this.Type = Type;
 	}
 
@@ -42,7 +46,19 @@ public class Place implements Serializable {
 		this.Description = Description;
 		this.Classification = Classification;
 		this.Accessibility = Accessibility;
-		this.serialID = serialID;
+		this.serialID=serialID;
+		this.LocX=LocX;
+		this.LocY=LocY;
+		
+	}
+	public Place(String CityName, String PlaceName, String Description, String Classification, int Accessibility, int numOfmaps) {
+		this.CityName = CityName;
+		this.PlaceName = PlaceName;
+		this.Description = Description;
+		this.Classification = Classification;
+		this.Accessibility = Accessibility;
+		this.numOfmaps = numOfmaps;		
+		
 	}
 
 	public Place(String MapId, String CityName, String PlaceName, String Description, String Classification,
@@ -55,6 +71,8 @@ public class Place implements Serializable {
 		this.Accessibility = Accessibility;
 		this.serialID = serialID;
 		this.Type = Type;
+		this.LocX=LocX;
+		this.LocY=LocY;
 	}
 
 	public void setCityName(String cityName) {
@@ -131,6 +149,14 @@ public class Place implements Serializable {
 
 	public void setType(String type) {
 		Type = type;
+	}
+
+	public int getNumOfmaps() {
+		return numOfmaps;
+	}
+
+	public void setNumOfmaps(int numOfmaps) {
+		this.numOfmaps = numOfmaps;
 	}
 
 }

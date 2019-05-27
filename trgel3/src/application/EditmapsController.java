@@ -72,11 +72,101 @@ public class EditmapsController  {
     @FXML
     private TableColumn<City, String> pathCol;
     
-    private ObservableList<City> data = null;
+    @FXML
+    private TableView<Place> searchTable1 ;
+    
+    @FXML
+    private TableColumn<Place, String>  PlaceCol1;
+    
+    @FXML
+    private TableColumn<Place, String>  CityCol1;
 
+    @FXML
+    private TableColumn<Place, String>  DescriptionCol1;
+    
+    @FXML
+    private TableColumn<Place, String>  mapCol1;
+    
+    private ObservableList<City> dataCity = FXCollections.observableArrayList();
+  
+    
+    private ObservableList<Place> dataPlace = FXCollections.observableArrayList();
+   
+    @FXML
+    private Button searchCity;
+
+    @FXML
+    private Button searchPlace;
+    
+    FilteredList<City> flCity = null;
+    
+    FilteredList<Place> flPlace = null;
+    
 
     @FXML
     private Button btn_AddLoc;
+    
+    @FXML
+    void searchCityBtn(ActionEvent event) {
+		searchPlace.getStyleClass().remove("addBobOk");
+		searchCity.getStyleClass().removeAll("addBobOk, focus"); 
+		searchCity.getStyleClass().add("addBobOk");
+	    
+    
+		searchTable1.setVisible(false);
+    	searchTable1.setDisable(true);
+    	
+    	searchTable.setVisible(true);
+    	searchTable.setDisable(false);
+    	
+    	searchText.setOnKeyReleased(new EventHandler<KeyEvent>() {
+            public void handle(KeyEvent ke) {
+          	  switch (comboBox.getValue()) {
+                case "City":
+                    flCity.setPredicate(p -> p.getCity().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
+                    break;
+                case "Place":
+                    flCity.setPredicate(p -> p.getPlaces().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
+                    break;
+                case "Description":
+                    flCity.setPredicate(p -> p.getDescription().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
+                    break;
+            } 	  
+            }
+          });
+      
+    }
+
+	@FXML
+    void searchPlaceBtn(ActionEvent event) throws UnknownHostException, IOException {
+		searchCity.getStyleClass().remove("addBobOk");
+		searchPlace.getStyleClass().removeAll("addBobOk, focus"); 
+    	searchPlace.getStyleClass().add("addBobOk");
+    	
+    	searchTable.setVisible(false);
+    	searchTable.setDisable(true);
+    	
+    	searchTable1.setVisible(true);
+    	searchTable1.setDisable(false);
+    	
+        searchText.setOnKeyReleased(new EventHandler<KeyEvent>() {
+            public void handle(KeyEvent ke) {
+          	  switch (comboBox.getValue()) {
+                case "City":
+                	flPlace.setPredicate(p -> p.getCityName().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
+                    break;
+                case "Place":
+                	flPlace.setPredicate(p -> p.getPlaceName().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
+                    break;
+                case "Description":
+                	flPlace.setPredicate(p -> p.getDescription().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
+                    break;
+            } 	  
+            }
+          });
+    	
+
+    }
     
     @FXML 
     void showMymaps(ActionEvent event) throws IOException {
@@ -93,9 +183,6 @@ public class EditmapsController  {
     }
     
 	
-	
-
-    
     
     @FXML
     void editMaps(ActionEvent event) {
@@ -134,9 +221,54 @@ public class EditmapsController  {
     		myMaps.setVisible(false);
     	}    	
     	
-    	buildData();
+    	
+    	searchCity.getStyleClass().removeAll("addBobOk, focus"); 
+		searchCity.getStyleClass().add("addBobOk");
+		
+    	buildData("city");
+    	buildData("place");
+    	
     	comboBox.getItems().addAll("City", "Place", "Description");
     	searchText.setPromptText("Write here");
+    	
+    	searchTable1.getColumns().clear();
+    	searchTable1.setEditable(true);
+    	
+      	PlaceCol1.setStyle( "-fx-alignment: CENTER;");
+      	PlaceCol1.setMinWidth(100);
+      	PlaceCol1.setCellValueFactory( new PropertyValueFactory<Place, String>("PlaceName"));
+    	
+    	CityCol1.setStyle( "-fx-alignment: CENTER;");
+    	CityCol1.setMinWidth(100);
+        CityCol1.setCellValueFactory( new PropertyValueFactory<Place, String>("CityName"));
+
+        DescriptionCol1.setCellFactory(tc -> {
+            TableCell<Place, String> cell = new TableCell<>();
+            Text text = new Text();
+            cell.setGraphic(text);
+            cell.setPrefHeight(Control.USE_COMPUTED_SIZE);
+            text.wrappingWidthProperty().bind(DescriptionCol.widthProperty());
+            text.textProperty().bind(cell.itemProperty());
+            return cell ;
+        });
+      
+        DescriptionCol1.setStyle( "-fx-alignment: CENTER;");
+        DescriptionCol1.setMinWidth(150);
+        DescriptionCol1.setCellValueFactory(
+                new PropertyValueFactory<Place, String>("Description"));
+
+        mapCol1.setStyle( "-fx-alignment: CENTER;");
+        mapCol1.setMinWidth(50);
+        mapCol1.setCellValueFactory(
+              new PropertyValueFactory<Place, String>("numOfmaps"));
+        
+        flPlace = new FilteredList<Place>(dataPlace, p -> true);//Pass the dataCity to a filtered list
+        searchTable1.setItems(flPlace);//Set the table's items using the filtered list
+        searchTable1.getColumns().addAll(PlaceCol1, CityCol1, DescriptionCol1, mapCol1 );
+
+    	
+    	searchTable1.setVisible(false);
+    	searchTable1.setDisable(true);
     	
     	searchTable.getColumns().clear();
     	searchTable.setEditable(true);
@@ -190,7 +322,7 @@ public class EditmapsController  {
         pathCol.setCellValueFactory(
                 new PropertyValueFactory<City, String>("numOfPaths"));
         
-        FilteredList<City> flCity = new FilteredList<City>(data, p -> true);//Pass the data to a filtered list
+        flCity = new FilteredList<City>(dataCity, p -> true);//Pass the data to a filtered list
         searchTable.setItems(flCity);//Set the table's items using the filtered list
         searchTable.getColumns().addAll(CityCol, DescriptionCol, mapCol, placeCol, pathCol);
         
@@ -201,7 +333,7 @@ public class EditmapsController  {
                   flCity.setPredicate(p -> p.getCity().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
                   break;
               case "Place":
-                  //flCity.setPredicate(p -> p.getPlace().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
+                  flCity.setPredicate(p -> p.getPlaces().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
                   break;
               case "Description":
                   flCity.setPredicate(p -> p.getDescription().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
@@ -210,45 +342,54 @@ public class EditmapsController  {
           }
         });
 
-
+    	comboBox.getSelectionModel().selectFirst();
     }
     
     
+    public void buildData(String type) throws UnknownHostException, IOException {
+        @SuppressWarnings("resource")
+        Socket socket = new Socket("localhost",5555);
 
-    
-	public void buildData() throws UnknownHostException, IOException {
-       @SuppressWarnings("resource")
-       Socket socket = new Socket("localhost",5555);
-       data = FXCollections.observableArrayList();
-       
-       String[] get = new String[1];
-       get[0] = "getCatalog";
-       try {
-           ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
-           objectOutput.writeObject(get); 
-           try {
-               ObjectInputStream objectInput = new ObjectInputStream(socket.getInputStream());
-               try {
-                   Object[] object = (Object[]) objectInput.readObject();
-                   for(int i=1 ; i <= (int) object[0] ; i++) {
-                	  data.add((City) object[i]);
-                   }
-              
-               } catch (ClassNotFoundException e) {
-                   System.out.println("The title list has not come from the server");
-                   e.printStackTrace();
-               }
-           } catch (IOException e) {
-               System.out.println("The socket for reading the object has problem");
-               e.printStackTrace();
-           }   
-       } 
-       catch (IOException e) 
-       {
-           e.printStackTrace();
-       } 
+        String[] get = new String[1];
+        get[0] = "getCatalog";
+        if(type.equals("place")){
+     	   get[0] = "getPlaceCatalog"; 
+        }
+        try {
+            ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
+            objectOutput.writeObject(get); 
+            try {
+                ObjectInputStream objectInput = new ObjectInputStream(socket.getInputStream());
+                try {
+                    Object[] object = (Object[]) objectInput.readObject();
+                    if(type.equals("city")) {
+ 	                   for(int i = 1 ; i <= (int) object[0] ; i++) {
+ 	                	  dataCity.add((City) object[i]);
+ 	                   }
+                    }
+                    else {
+                 	   for(int i = 1 ; i <= (int) object[0] ; i++) {	 
+  	                	  dataPlace.add((Place) object[i]);
+  	                   }
+                    }
+                 	   
+                    
+               
+                } catch (ClassNotFoundException e) {
+                    System.out.println("The title list has not come from the server");
+                    e.printStackTrace();
+                }
+            } catch (IOException e) {
+                System.out.println("The socket for reading the object has problem");
+                e.printStackTrace();
+            }   
+        } 
+        catch (IOException e) 
+        {
+            e.printStackTrace();
+        } 
 
-    }
+     }
     
     @FXML
     void backFunc(ActionEvent event) throws IOException {
