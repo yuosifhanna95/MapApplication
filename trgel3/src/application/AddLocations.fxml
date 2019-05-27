@@ -15,7 +15,7 @@
             <Font name="Andalus" size="64.0" />
          </font></Label>
       <Button fx:id="back" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#backFunc" prefHeight="25.0" prefWidth="97.0" text="Back" />
-      <ImageView fx:id="MapImage" fitHeight="621.0" fitWidth="956.0" layoutX="162.0" layoutY="50.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="MapImage" fitHeight="621.0" fitWidth="956.0" layoutX="162.0" layoutY="50.0" pickOnBounds="true" preserveRatio="true" >
       </ImageView>
       <Button fx:id="btn_save" layoutX="651.0" layoutY="14.0" mnemonicParsing="false" onAction="#saveImage" text="Save Map" />
       <Button fx:id="btn_EditMode" layoutX="162.0" layoutY="14.0" mnemonicParsing="false" onAction="#changeMode" text="Edit Mode" />

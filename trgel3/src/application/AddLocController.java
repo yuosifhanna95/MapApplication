@@ -41,6 +41,7 @@ public class AddLocController {
 	private ImagePlace CurImagePlace;
 	private int Counter = 0;
 	private int current = 0;
+	private double aspect = 0.75f;
 
 	@FXML
 	private Button btn_UpdateMap;
@@ -156,10 +157,6 @@ public class AddLocController {
 	void InitializeImagePlaces() {
 
 	}
-	 
-    @FXML // This method is called by the FXMLLoader when initialization is complete
-
-	
 
 	void DrawPlaces() throws IOException, ClassNotFoundException {
 
@@ -201,36 +198,63 @@ public class AddLocController {
 				if (list[i].getSerialID() == list2[c].getPlaceId()) {
 					Image im = new Image("File:loc.png");
 					ImageView newLoc = new ImageView(im);
-					newLoc.relocate(list2[c].getLocX(), list2[c].getLocY());
+					// newLoc.relocate((double) list2[c].getLocX(), (double) list2[c].getLocY());
 					Label label = new Label();
-					label.setText(NewLocation.getText());
+					// label.relocate((double) list2[c].getLocX(), (double) list2[c].getLocY());
+
+					newLoc.relocate(list2[c].getLocX() - (im.getWidth() / 2) * aspect,
+							list2[c].getLocY() - (im.getHeight() / 2) * aspect);
+
 					label.setFont(new Font("Quicksand", 20));
 					Place p = new Place("" + Globals.map.getId(), list2[c].getCityName(), list2[c].getPlaceName(),
 							list2[c].getDescription(), list2[c].getClassification(), list2[c].getAccessibility(),
 							list2[c].getSerialID(), list2[c].getLocX(), list2[c].getLocY(), list2[c].getType());
-					ImagePlaces[counter] = new ImagePlace(counter, newLoc, label, p, (int) newLoc.getX(),
-							(int) newLoc.getY());
+					label.setText(p.getPlaceName());
+
+					label.relocate(list2[c].getLocX() - (label.getWidth() / 2),
+							list2[c].getLocY() - (label.getHeight() + (im.getHeight() / 2) * aspect));
+
+					newLoc.setFitHeight(im.getHeight() * aspect);
+					newLoc.setFitWidth(im.getWidth() * aspect);
+					newLoc.setId("imv" + Counter);
+
+					ImagePlaces[counter] = new ImagePlace(counter, newLoc, label, p, list2[c].getLocX(),
+							list2[c].getLocY());
 					counter++;
+					Counter++;
 					flag = 1;
 					break;
 				}
-				
 
 				// }
 			}
 			if (flag == 0) {
 				Image im = new Image("File:loc.png");
 				ImageView newLoc = new ImageView(im);
-				newLoc.relocate(list[i].getLocX(), list[i].getLocY());
+				double X = list[i].getLocX(), Y = list[i].getLocY();
+				// newLoc1.relocate(X, Y);
 				Label label = new Label();
-				label.setText(NewLocation.getText());
+				// label.relocate(X, Y);
+
+				newLoc.relocate(list[i].getLocX() - (im.getWidth() / 2) * aspect,
+						list[i].getLocY() - (im.getHeight() / 2) * aspect);
+
 				label.setFont(new Font("Quicksand", 20));
 				Place p = new Place("" + Globals.map.getId(), list[i].getCityName(), list[i].getPlaceName(),
 						list[i].getDescription(), list[i].getClassification(), list[i].getAccessibility(),
 						list[i].getSerialID(), list[i].getLocX(), list[i].getLocY(), list[i].getType());
-				ImagePlaces[counter] = new ImagePlace(counter, newLoc, label, p, (int) newLoc.getX(),
-						(int) newLoc.getY());
+				label.setText(p.getPlaceName());
+
+				label.relocate(list[i].getLocX() - (label.getWidth() / 2),
+						list[i].getLocY() - (label.getHeight() + (im.getHeight() / 2) * aspect));
+
+				newLoc.setFitHeight(im.getHeight() * aspect);
+				newLoc.setFitWidth(im.getWidth() * aspect);
+				newLoc.setId("imv" + Counter);
+
+				ImagePlaces[counter] = new ImagePlace(counter, newLoc, label, p, list[i].getLocX(), list[i].getLocY());
 				counter++;
+				Counter++;
 			}
 			flag = 0;
 		}
@@ -239,35 +263,108 @@ public class AddLocController {
 			if (list2[c].getType().equals("NEW")) {
 				Image im = new Image("File:loc.png");
 				ImageView newLoc = new ImageView(im);
-				newLoc.relocate(list2[c].getLocX(), list2[c].getLocY());
+				// newLoc.relocate((double) list2[c].getLocX(), (double) list2[c].getLocY());
 				Label label = new Label();
-				label.setText(NewLocation.getText());
+				// label.relocate((double) list2[c].getLocX(), (double) list2[c].getLocY());
+
+				newLoc.relocate(list2[c].getLocX() - (im.getWidth() / 2) * aspect,
+						list2[c].getLocY() - (im.getHeight() / 2) * aspect);
+
 				label.setFont(new Font("Quicksand", 20));
 				Place p = new Place("" + Globals.map.getId(), list2[c].getCityName(), list2[c].getPlaceName(),
 						list2[c].getDescription(), list2[c].getClassification(), list2[c].getAccessibility(),
 						list2[c].getSerialID(), list2[c].getLocX(), list2[c].getLocY(), list2[c].getType());
-				ImagePlaces[counter] = new ImagePlace(counter, newLoc, label, p, (int) newLoc.getX(),
-						(int) newLoc.getY());
+				label.setText(p.getPlaceName());
+				label.relocate(list2[c].getLocX() - (label.getWidth() / 2),
+						list2[c].getLocY() - (label.getHeight() + (im.getHeight() / 2) * aspect));
+
+				newLoc.setFitHeight(im.getHeight() * aspect);
+				newLoc.setFitWidth(im.getWidth() * aspect);
+				newLoc.setId("imv" + Counter);
+				ImagePlaces[counter] = new ImagePlace(counter, newLoc, label, p, list2[c].getLocX(),
+						list2[c].getLocY());
 				counter++;
+				Counter++;
 			}
 		}
 
-		
-		
-		
-		for(int i =0;i<ImagePlaces.length;i++)
-		{
+		for (int i = 0; i < ImagePlaces.length; i++) {
 
-			if(ImagePlaces[i]!=null)
-			{
+			if (ImagePlaces[i] != null) {
+
 				mainPane.getChildren().addAll(ImagePlaces[i].getImageview());
 				mainPane.getChildren().addAll(ImagePlaces[i].getLabel());
+
 			}
-			
+
 		}
 
-		
-		
+		AddMethodsForIP();
+
+	}
+
+	void updateLocations() {
+		Image im = new Image("File:loc.png");
+		for (int i = 0; i < ImagePlaces.length; i++)
+			if (ImagePlaces[i] != null) {
+				ImagePlaces[i].getImageview().relocate(
+						ImagePlaces[i].getPlace().getLocX() - (im.getWidth() / 2) * aspect,
+						ImagePlaces[i].getPlace().getLocY() - (im.getHeight() / 2) * aspect);
+				ImagePlaces[i].getLabel().relocate(
+						ImagePlaces[i].getPlace().getLocX() - (ImagePlaces[i].getLabel().getWidth() / 2),
+						ImagePlaces[i].getPlace().getLocY()
+								- (ImagePlaces[i].getLabel().getHeight() + (im.getHeight() / 2) * aspect));
+			}
+	}
+
+	void AddMethodsForIP() {
+		Image im = new Image("File:loc.png");
+		EventHandler<MouseEvent> EditTouchEvent = new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event) {
+				if (Mode == 1) {
+					if (event.getEventType() == MouseEvent.MOUSE_DRAGGED) {
+
+						CurImagePlace = new ImagePlace();
+						CurImagePlace.setImageview((ImageView) event.getSource());
+						String ID = CurImagePlace.getImageview().getId();
+						ID = ID.replace("imv", "");
+						CurImagePlace.setId(Integer.parseInt(ID));
+						CurImagePlace.setLabel(ImagePlaces[Integer.parseInt(ID)].getLabel());
+
+						if (event.getSource() instanceof ImageView) {
+							ImageView imView = (ImageView) event.getSource();
+							imView.relocate(event.getSceneX() - (im.getWidth() / 2) * aspect,
+									event.getSceneY() - (im.getHeight() / 2) * aspect);
+							CurImagePlace.getLabel().relocate(
+									event.getSceneX() - (CurImagePlace.getLabel().getWidth() / 2), event.getSceneY()
+											- (CurImagePlace.getLabel().getHeight() + (im.getHeight() / 2) * aspect));
+							CurImagePlace.setX((int) event.getSceneX());
+							CurImagePlace.setY((int) event.getSceneY());
+
+						}
+					} else if (event.getEventType() == MouseEvent.MOUSE_CLICKED) {
+						CurImagePlace = new ImagePlace();
+						CurImagePlace.setImageview((ImageView) event.getSource());
+						String ID = CurImagePlace.getImageview().getId();
+						ID = ID.replace("imv", "");
+						CurImagePlace.setId(Integer.parseInt(ID));
+						CurImagePlace.setLabel(ImagePlaces[Integer.parseInt(ID)].getLabel());
+						CurImagePlace.setPlace(ImagePlaces[Integer.parseInt(ID)].getPlace());
+
+					}
+					// TODO Auto-generated method stub
+				}
+
+			}
+		};
+
+		for (int i = 0; i < ImagePlaces.length; i++)
+			if (ImagePlaces[i] != null) {
+				ImagePlaces[i].getImageview().addEventFilter(MouseEvent.MOUSE_CLICKED, EditTouchEvent);
+				ImagePlaces[i].getImageview().addEventFilter(MouseEvent.MOUSE_DRAGGED, EditTouchEvent);
+			}
 	}
 
 	@FXML
@@ -297,7 +394,7 @@ public class AddLocController {
 			ImageView newLoc = new ImageView(im);
 			newLoc.relocate(MapImage.getLayoutX(), MapImage.getLayoutY());
 			label.relocate(MapImage.getLayoutX(), MapImage.getLayoutY());
-			double aspect = 0.75f;
+
 			newLoc.setFitHeight(im.getHeight() * aspect);
 			newLoc.setFitWidth(im.getWidth() * aspect);
 			newLoc.setId("imv" + Counter);
@@ -399,13 +496,13 @@ public class AddLocController {
 
 	@FXML
 	void initialize() throws IOException, Exception {
-		DrawPlaces();
-		
+
 		Image LinkedImage = new Image(Globals.map.getLinkCustomer());
 		raninImage = new ImageView(LinkedImage);
 		raninImage.relocate(162, 50);
 		raninImage.setFitWidth(LinkedImage.getWidth());
 		raninImage.setFitHeight(LinkedImage.getHeight());
+
 		mainPane.getChildren().add(raninImage);
 		Label label = new Label();
 		label.setText("مش دارنا");
@@ -446,6 +543,8 @@ public class AddLocController {
 				locations[i].addEventFilter(MouseEvent.MOUSE_CLICKED, EditTouchEvent);
 			}
 		}
+		DrawPlaces();
+		updateLocations();
 
 	}
 
