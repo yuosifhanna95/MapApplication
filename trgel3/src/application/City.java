@@ -11,14 +11,16 @@ public class City implements Serializable{
     private String Description;
     private String  numOfMaps;
     private String  numOfPlaces;
+    private String  Places;
     private final String  numOfPaths;
 
-    City(String city, String Description, String numOfMaps, String numOfPlaces, String numOfPaths) {
+    City(String city, String Description, String numOfMaps, String numOfPlaces, String numOfPaths, String Places) {
         this.city = city;
         this.Description = Description;
         this.numOfMaps = numOfMaps;
         this.numOfPlaces =numOfPlaces;
         this.numOfPaths = numOfPaths;
+        this.Places = Places;
     }
 
     public String getCity() {
@@ -60,6 +62,14 @@ public class City implements Serializable{
     public void setNumOfPaths(String str) {
     	this.numOfMaps = str;
     }
+
+	public String getPlaces() {
+		return Places;
+	}
+
+	public void setPlaces(String places) {
+		Places = places;
+	}
     
   
 

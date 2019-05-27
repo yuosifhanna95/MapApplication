@@ -1,26 +1,33 @@
 package application;
 
-public class Place {
+import java.io.Serializable;
 
+public class Place implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private long serialID;
 	private String CityName;
 	private String PlaceName;
 	private String Description;
 	private String Classification;
 	private int Accessibility;
+	private int numOfmaps;
 
 	public Place() {
 
 	}
 
-	public Place(String CityName, String PlaceName, String Description, String Classification, int Accessibility,
-			long serialID) {
+	public Place(String CityName, String PlaceName, String Description, String Classification, int Accessibility, int numOfmaps) {
 		this.CityName = CityName;
 		this.PlaceName = PlaceName;
 		this.Description = Description;
 		this.Classification = Classification;
 		this.Accessibility = Accessibility;
-		this.serialID = serialID;
+		this.numOfmaps = numOfmaps;
+		
 	}
 
 	public void setCityName(String cityName) {
@@ -65,5 +72,13 @@ public class Place {
 
 	public long getSerialID() {
 		return serialID;
+	}
+
+	public int getNumOfmaps() {
+		return numOfmaps;
+	}
+
+	public void setNumOfmaps(int numOfmaps) {
+		this.numOfmaps = numOfmaps;
 	}
 }

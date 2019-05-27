@@ -247,6 +247,28 @@ public class Server {
         	                e.printStackTrace();
         	            } 
                 	}
+                    
+                    else if(((String[])(data))[0].equals("getPlaceCatalog"))
+                	{   
+        	            ObservableList<Place> placeList = getPlaceFromDB();
+        	           
+        	            Object[] data = new Object[placeList.size()+1];
+        	            data[0] = placeList.size();
+        	            int counter = 1;
+        	            for(Place tu: placeList) {
+        	                data[counter] = tu;
+        	                counter++;
+        	            }
+        	            try {
+        	                ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
+        	                objectOutput.writeObject(data);       
+        	            } 
+        	            catch (IOException e) 
+        	            {
+        	                e.printStackTrace();
+        	            } 
+                	}
+                    
                     else if(((String[])(data))[0].equals("getMaps")) { 
         	            ObservableList<Map> mapList = getMapFromDB(((String[])(data))[1]);
         	           
@@ -351,11 +373,14 @@ public class Server {
 			   
 		    Connection conn = null;
 			Statement stmt = null;
+			Statement stmt2 = null;
+			
 			try {
 				Class.forName(JDBC_DRIVER);
 				 
 				conn = DriverManager.getConnection(DB_URL, USER, PASS);
 				stmt = conn.createStatement();
+				stmt2 = conn.createStatement();
 				
 				String sql = "SELECT * FROM CityCatalog"   ;
 				ResultSet rs = stmt.executeQuery(sql);
@@ -366,10 +391,20 @@ public class Server {
 				  String mapsnum = rs.getString("mapsNum");
 				  String placesnum = rs.getString("placesNum");
 				  String pathnum = rs.getString("pathNum");
+				  String places = null;
 				  
-				  data.add(new City(city, description, mapsnum , placesnum, pathnum ));
+				  String sql2 = "SELECT * FROM places WHERE Name ='" + city + "'"  ;
+				  ResultSet rs2 = stmt2.executeQuery(sql2);
+				   
+				  while (rs2.next()) {		
+				    String place = rs2.getString("Place");
+				    places += (" + " + place);
+				  }
+				 
+				  data.add(new City(city, description, mapsnum , placesnum, pathnum, places ));
 				}
 			    
+				stmt2.close();
 				stmt.close();
 				conn.close();
 				
@@ -395,9 +430,65 @@ public class Server {
 		   
 		   
 		   return data;
-	   }
+	 }
 	   
+     static ObservableList<Place> getPlaceFromDB(){
+		ObservableList<Place> data = FXCollections.observableArrayList();
 
+		   
+	    Connection conn = null;
+		Statement stmt = null;
+		
+		
+		try {
+			Class.forName(JDBC_DRIVER);
+			 
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			stmt = conn.createStatement();
+		
+			
+			String sql = "SELECT * FROM places"   ;
+			ResultSet rs = stmt.executeQuery(sql);
+		
+			while (rs.next()) {
+			  String city = rs.getString("Name");
+			  String description = rs.getString("description");
+			  String place = rs.getString("Place");
+			  String Classification = rs.getString("Classification");
+			  int Accessibility = rs.getInt("Accessibility");
+			  int numOfMaps = rs.getInt("mapsNum");
+			
+			  data.add(new Place(city, place, description, Classification , Accessibility, numOfMaps ));
+			}
+		    
+			
+			stmt.close();
+			conn.close();
+			
+			return data;
+		}
+		catch (SQLException se) {
+			se.printStackTrace();
+			System.out.println("SQLException: " + se.getMessage());
+		    System.out.println("SQLState: " + se.getSQLState());
+		    System.out.println("VendorError: " + se.getErrorCode());
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			}
+		}
+	   
+	   
+	   return data;
+	}
+	   
 	static ObservableList<Map> getMapFromDB(String city){
 		ObservableList<Map> data = FXCollections.observableArrayList();
 		
@@ -414,7 +505,6 @@ public class Server {
 		
 			while (rs.next()) {
 			  int id = rs.getInt("id");
-			  //String city = rs.getString("city");
 			  String description = rs.getString("description");
 			  String linkC = rs.getString("linkCustomer");
 			  String linkE = rs.getString("linkEmployee");
@@ -452,8 +542,7 @@ public class Server {
 	@SuppressWarnings("null")
 	static ObservableList<Map> getMyMapsFromDB(String user){
 		ObservableList<Map> data = FXCollections.observableArrayList();
-		String[] Cities = new String[100] ;
-		int count = 0;
+		
 	    
 		Connection conn = null;
 		Statement stmt = null;
@@ -470,9 +559,7 @@ public class Server {
 		
 			while (rs.next()) {			  
 			   String city = rs.getString("city");
-			   //Cities[count] = city;			    
-			   //count++;
-			   
+			 
 			   String sql2 = "SELECT * FROM maps WHERE city ='" + city + "'"  ;
 			   ResultSet rs2 = stmt2.executeQuery(sql2);
 			   

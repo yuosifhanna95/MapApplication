@@ -27,6 +27,16 @@
              <TableColumn fx:id="pathCol" prefWidth="75.0" text="#Paths" />
         </columns>
       </TableView>
+      <Button fx:id="searchCity" layoutX="390.0" layoutY="166.0" mnemonicParsing="false" onAction="#searchCityBtn" prefHeight="26.0" prefWidth="250.0" text="Search City" />
+      <Button fx:id="searchPlace" layoutX="640.0" layoutY="166.0" mnemonicParsing="false" onAction="#searchPlaceBtn" prefHeight="26.0" prefWidth="250.0" text="Search Place" />
+      <TableView fx:id="searchTable1" layoutX="390.0" layoutY="192.0" prefHeight="400.0" prefWidth="500.0">
+         <columns>
+         	<TableColumn fx:id="PlaceCol1" prefWidth="100.0" text="Place" />
+            <TableColumn fx:id="CityCol1" prefWidth="100.0" text="City" />
+            <TableColumn fx:id="DescriptionCol1" prefWidth="200.0" text="Desctription" />
+            <TableColumn fx:id="mapCol1" prefWidth="100.0" text="#Maps" />
+         </columns>
+      </TableView>
       <Button fx:id="myMaps" layoutX="625.0" layoutY="599.0" mnemonicParsing="false" onAction="#showMymaps" text="My maps" />
       <Button fx:id="purchase" layoutX="779.0" layoutY="599.0" mnemonicParsing="false" onAction="#Purchase" text="Purchase" />
  
