@@ -156,6 +156,10 @@ public class AddLocController {
 	void InitializeImagePlaces() {
 
 	}
+	 
+    @FXML // This method is called by the FXMLLoader when initialization is complete
+
+	
 
 	void DrawPlaces() throws IOException, ClassNotFoundException {
 
@@ -184,7 +188,7 @@ public class AddLocController {
 		objectOutput.writeObject(array2);
 
 		Object data2;
-		ObjectInputStream objectInput2 = new ObjectInputStream(socket.getInputStream());
+		ObjectInputStream objectInput2 = new ObjectInputStream(socket2.getInputStream());
 		data2 = objectInput2.readObject();
 		System.out.println(((Object[]) data2)[0]);
 		UPlace[] list2 = (UPlace[]) ((Object[]) data2)[1];
@@ -210,28 +214,29 @@ public class AddLocController {
 					flag = 1;
 					break;
 				}
-				if (flag == 0) {
-					Image im = new Image("File:loc.png");
-					ImageView newLoc = new ImageView(im);
-					newLoc.relocate(list2[c].getLocX(), list2[c].getLocY());
-					Label label = new Label();
-					label.setText(NewLocation.getText());
-					label.setFont(new Font("Quicksand", 20));
-					Place p = new Place("" + Globals.map.getId(), list2[c].getCityName(), list2[c].getPlaceName(),
-							list2[c].getDescription(), list2[c].getClassification(), list2[c].getAccessibility(),
-							list2[c].getSerialID(), list2[c].getLocX(), list2[c].getLocY(), list2[c].getType());
-					ImagePlaces[counter] = new ImagePlace(counter, newLoc, label, p, (int) newLoc.getX(),
-							(int) newLoc.getY());
-					counter++;
-				}
-				flag = 0;
+				
 
 				// }
 			}
+			if (flag == 0) {
+				Image im = new Image("File:loc.png");
+				ImageView newLoc = new ImageView(im);
+				newLoc.relocate(list[i].getLocX(), list[i].getLocY());
+				Label label = new Label();
+				label.setText(NewLocation.getText());
+				label.setFont(new Font("Quicksand", 20));
+				Place p = new Place("" + Globals.map.getId(), list[i].getCityName(), list[i].getPlaceName(),
+						list[i].getDescription(), list[i].getClassification(), list[i].getAccessibility(),
+						list[i].getSerialID(), list[i].getLocX(), list[i].getLocY(), list[i].getType());
+				ImagePlaces[counter] = new ImagePlace(counter, newLoc, label, p, (int) newLoc.getX(),
+						(int) newLoc.getY());
+				counter++;
+			}
+			flag = 0;
 		}
 
 		for (int c = 0; c < list2.length; c++) {
-			if (list2[c].getPlaceId() == -1) {
+			if (list2[c].getType().equals("NEW")) {
 				Image im = new Image("File:loc.png");
 				ImageView newLoc = new ImageView(im);
 				newLoc.relocate(list2[c].getLocX(), list2[c].getLocY());
@@ -247,6 +252,22 @@ public class AddLocController {
 			}
 		}
 
+		
+		
+		
+		for(int i =0;i<ImagePlaces.length;i++)
+		{
+
+			if(ImagePlaces[i]!=null)
+			{
+				mainPane.getChildren().addAll(ImagePlaces[i].getImageview());
+				mainPane.getChildren().addAll(ImagePlaces[i].getLabel());
+			}
+			
+		}
+
+		
+		
 	}
 
 	@FXML
@@ -378,7 +399,8 @@ public class AddLocController {
 
 	@FXML
 	void initialize() throws IOException, Exception {
-
+		DrawPlaces();
+		
 		Image LinkedImage = new Image(Globals.map.getLinkCustomer());
 		raninImage = new ImageView(LinkedImage);
 		raninImage.relocate(162, 50);
