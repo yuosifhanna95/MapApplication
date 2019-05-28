@@ -12,6 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Calendar;
 
 import javax.swing.JOptionPane;
 
@@ -74,7 +75,6 @@ public class Server {
               		    			}
               		    			else {
               						pr=conn.prepareStatement(sql);
-              						pr.setString(1, fname1);
               						pr.setString(2, lname1);
               						pr.setString(3, phone);
               						pr.setString(4, email);
@@ -309,16 +309,36 @@ public class Server {
         	            } 
                 	}
                     
+                    else if(((String[])(data))[0].equals("getFixedPurchase")) { 
+        	            ObservableList<FixedPurchase> FixedPurchaseList = getFixedPurchaseFromDB(((String[])(data))[1]);
+        	           
+        	            Object[] data = new Object[FixedPurchaseList.size()+1];
+        	            data[0] = FixedPurchaseList.size();
+        	            int counter = 1;
+        	            for(FixedPurchase tu: FixedPurchaseList) {
+        	                data[counter] = tu;
+        	                counter++;
+        	            }
+        	            try {
+        	                ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
+        	                objectOutput.writeObject(data);       
+        	            } 
+        	            catch (IOException e) 
+        	            {
+        	                e.printStackTrace();
+        	            } 
+                	}
+                    
+                    
+                    
                     else if(((String[])(data))[0].equals("addCityToMember")) { 
                     	Connection conn = null;
             			Statement stmt = null;
             			try {
             				Class.forName(JDBC_DRIVER);
-            				conn = DriverManager.getConnection(DB_URL, USER, PASS);
-              				System.out.println(((String[])(data))[1]);
-              				System.out.println(((String[])(data))[2]);
+            				conn = DriverManager.getConnection(DB_URL, USER, PASS);             				
               				PreparedStatement pr;
-              				String sql = "INSERT INTO memberMap (`member`, `city`) VALUES (?,?)"; 
+              				String sql = "INSERT INTO fixedPurchase (`user`, `city`, `startDate`, `endDate`) VALUES (?,?,?,?)"; 
               				
               			
               				if(conn!=null) {
@@ -327,6 +347,8 @@ public class Server {
               						pr=conn.prepareStatement(sql);
               						pr.setString(1, ((String[])(data))[1]);
               						pr.setString(2, ((String[])(data))[2]);
+              						pr.setDate(3, java.sql.Date.valueOf("2013-09-04"));
+              						pr.setDate(4, java.sql.Date.valueOf("2013-09-04"));
               						pr.executeUpdate();
               					} catch (SQLException e) {
               						// TODO Auto-generated catch block
@@ -334,7 +356,7 @@ public class Server {
               					}
               		    	}
             			    
-            				stmt.close();
+            			
             				conn.close();
             				
             			}
@@ -366,7 +388,66 @@ public class Server {
 	        }
 	    }
 	   
-	  
+	   
+	   
+   static ObservableList<FixedPurchase> getFixedPurchaseFromDB(String user){
+		ObservableList<FixedPurchase> data = FXCollections.observableArrayList();
+		
+	    Connection conn = null;
+		Statement stmt = null;
+		
+		try {
+			Class.forName(JDBC_DRIVER);
+			 
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY,
+			        ResultSet.CONCUR_UPDATABLE);
+		
+			String sql = "SELECT * FROM fixedPurchase WHERE user ='" + user + "'"  ;
+			ResultSet rs = stmt.executeQuery(sql);
+			java.util.Date currentDate = Calendar.getInstance().getTime();
+			
+			while (rs.next()) {
+			  String city = rs.getString("city"); 
+			  java.sql.Date startDate = rs.getDate("startDate");
+			  java.sql.Date endDate = rs.getDate("endDate");
+			  
+			  if (currentDate.compareTo(endDate) > 0) {
+				  System.out.println(currentDate);
+				  rs.deleteRow();
+			  }
+			  else
+				  data.add(new FixedPurchase(user, city, startDate, endDate));
+			}
+		    
+			
+			stmt.close();
+			conn.close();
+			
+			return data;
+		}
+		catch (SQLException se) {
+			se.printStackTrace();
+			System.out.println("SQLException: " + se.getMessage());
+		    System.out.println("SQLState: " + se.getSQLState());
+		    System.out.println("VendorError: " + se.getErrorCode());
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			}
+		}
+	   
+	   
+	   return data;
+	 }
+   
 	static ObservableList<City> getCityFromDB(){
 			ObservableList<City> data = FXCollections.observableArrayList();
 	
@@ -540,7 +621,7 @@ public class Server {
 	}
 	   
 	@SuppressWarnings("null")
-	static ObservableList<Map> getMyMapsFromDB(String user){
+	static ObservableList<Map> getMyMapsFromDB(String city){
 		ObservableList<Map> data = FXCollections.observableArrayList();
 		
 	    
@@ -554,27 +635,20 @@ public class Server {
 			stmt = conn.createStatement();
 			stmt2 = conn.createStatement();
 			
-			String sql = "SELECT * FROM memberMap WHERE member ='" + user + "'"  ;
-			ResultSet rs = stmt.executeQuery(sql);
-		
-			while (rs.next()) {			  
-			   String city = rs.getString("city");
-			 
-			   String sql2 = "SELECT * FROM maps WHERE city ='" + city + "'"  ;
-			   ResultSet rs2 = stmt2.executeQuery(sql2);
+
+			String sql = "SELECT * FROM maps WHERE city ='" + city + "'"  ;
+			   ResultSet rs = stmt2.executeQuery(sql);
 			   
-				while (rs2.next()) {
-				  int id = rs2.getInt("id");
-				  String description = rs2.getString("description");
-				  String linkC = rs2.getString("linkCustomer");
-				  String linkE = rs2.getString("linkEmployee");
+				while (rs.next()) {
+				  int id = rs.getInt("id");
+				  String description = rs.getString("description");
+				  String linkC = rs.getString("linkCustomer");
+				  String linkE = rs.getString("linkEmployee");
 				 
 				  data.add(new Map(id, city,description, linkC , linkE ));
 				}
-				
-			}
 
-			stmt2.close();
+			
 			stmt.close();
 			conn.close();
 			
