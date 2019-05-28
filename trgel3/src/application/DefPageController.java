@@ -42,7 +42,10 @@ public class DefPageController {
 	private Button Back;
 
 	@FXML
-	private Button purchase;
+	private Button OneTimePurchase;
+	
+	@FXML
+    private Button FixedTimePurchase;
 
 	@FXML
 	private ComboBox<String> comboBox;
@@ -99,6 +102,10 @@ public class DefPageController {
 
 	@FXML
 	private Button btn_AddLoc;
+	
+	
+
+    
 	
 	@FXML
     void searchCityBtn(ActionEvent event) {
@@ -177,12 +184,17 @@ public class DefPageController {
 	}
 
 	@FXML
-	void Purchase(ActionEvent event) throws UnknownHostException, IOException {
+	void OnePurchase(ActionEvent event) {
 
-		if (Globals.MODE == 2) {
-			addDataBasetoMember();
-		}
+		
 
+	}
+	
+	@FXML
+    void FixedPurchase(ActionEvent event) throws UnknownHostException, IOException {
+		
+	    addDataBasetoMember();
+		
 		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 		URL url = getClass().getResource("mapCatalogScene.fxml");
 		Globals.backLink = "DefaultPage.fxml";
@@ -197,21 +209,12 @@ public class DefPageController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-	}
+    }
 
 	@SuppressWarnings("unchecked")
 	@FXML // This method is called by the FXMLLoader when initialization is complete
 	void initialize() throws IOException, Exception {
-
 		Globals.backLink = "MainPage.fxml";
-		purchase.setVisible(false);
-		purchase.setDisable(true);
-
-		if (Globals.user.getType().equals("oneTime")) {
-			myMaps.setDisable(true);
-			myMaps.setVisible(false);
-		}
 		
 		searchCity.getStyleClass().removeAll("addBobOk, focus"); 
 		searchCity.getStyleClass().add("addBobOk");
@@ -269,9 +272,6 @@ public class DefPageController {
 				if (event.getClickCount() == 1 && (!row.isEmpty())) {
 					City cityRow = searchTable.getSelectionModel().getSelectedItem();
 					Globals.city = (City) cityRow;
-
-					purchase.setVisible(true);
-					purchase.setDisable(false);
 
 				}
 			});
