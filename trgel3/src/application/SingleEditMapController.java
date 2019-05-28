@@ -1,9 +1,16 @@
 package application;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.text.Text;
-import javafx.stage.Stage;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+import java.net.URL;
+import java.net.UnknownHostException;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -14,162 +21,142 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
-import java.net.URL;
-import java.net.UnknownHostException;
-
-
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
-import javafx.event.ActionEvent;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
 public class SingleEditMapController {
 
-
-    @FXML
-    private ImageView map;
-
-    @FXML
-    private TableView<Map> mapTable;
-    
-    @FXML
-    private TableColumn<Map, String> idCol;
-
-    @FXML
-    private TableColumn<Map, String> DescriptionCol;
-
-   
-    @FXML
-    private Button Back;
-    
-    private ObservableList<Map> data = null;
-    
-    @FXML
-    void backFunc(ActionEvent event) throws IOException {
-    	
-      	Stage primaryStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
-    	URL url = getClass().getResource("EditMaps.fxml");
-			AnchorPane pane =FXMLLoader.load(url);
-
-			Scene scene = new Scene(pane);
-			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-			primaryStage.setScene(scene);
-			primaryStage.show();
-    }
-    
-   
-    @SuppressWarnings("unchecked")
 	@FXML
-    public void initialize() throws UnknownHostException, IOException {
-    	
-    	
-    	
-    	buildData();
-    	
-    	mapTable.getColumns().clear();
-    	mapTable.setEditable(true);
-    	
-    	mapTable.setRowFactory( tv -> {
-    	    TableRow<Map> row = new TableRow<>();
-    	    row.setOnMouseClicked(event -> {
-   	        if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
-	        	Map mapRow = mapTable.getSelectionModel().getSelectedItem();
+	private ImageView map;
 
-   	        	String urll = mapRow.getLinkCustomer();
- 	            System.out.println(urll);
- 	            Globals.backLink = urll;
- 	            Globals.map = mapRow;
- 	            
- 	            
-				try {
-					Stage primaryStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
-		 	           URL url = getClass().getResource("AddLocations.fxml");
-		 				AnchorPane pane;
-					pane = FXMLLoader.load(url);
-					Scene scene = new Scene(pane);
-	 				scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-	 				primaryStage.setScene(scene);
-	 				primaryStage.show();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+	@FXML
+	private TableView<Map> mapTable;
 
- 				
- 	    	
+	@FXML
+	private TableColumn<Map, String> idCol;
+
+	@FXML
+	private TableColumn<Map, String> DescriptionCol;
+
+	@FXML
+	private Button Back;
+
+	private ObservableList<Map> data = null;
+
+	@FXML
+	void backFunc(ActionEvent event) throws IOException {
+
+		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+		URL url = getClass().getResource("EditMaps.fxml");
+		AnchorPane pane = FXMLLoader.load(url);
+
+		Scene scene = new Scene(pane);
+		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		primaryStage.setScene(scene);
+		primaryStage.show();
+	}
+
+	@SuppressWarnings("unchecked")
+	@FXML
+	public void initialize() throws UnknownHostException, IOException {
+
+		buildData();
+
+		mapTable.getColumns().clear();
+		mapTable.setEditable(true);
+
+		mapTable.setRowFactory(tv -> {
+			TableRow<Map> row = new TableRow<>();
+			row.setOnMouseClicked(event -> {
+				if (event.getClickCount() == 2 && (!row.isEmpty())) {
+					Map mapRow = mapTable.getSelectionModel().getSelectedItem();
+
+					String urll = mapRow.getLinkCustomer();
+					System.out.println(urll);
+					Globals.backLink = urll;
+					Globals.map = mapRow;
+
+					try {
+						Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+						URL url = getClass().getResource("AddLocations.fxml");
+						AnchorPane pane;
+						pane = FXMLLoader.load(url);
+						Scene scene = new Scene(pane);
+						scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+						primaryStage.setScene(scene);
+						primaryStage.show();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
 //   	        	boolean backgroundLoading = true;
 //   	        	 
 //   	        	// The image is being loaded in the background
 //   	        	Image image = new Image(url, backgroundLoading);
 //    	        	
 //   	        	map.ImageView(image);
-   	        	}
-    	    });
-    	    return row ;
-     	});
-    	
-    	idCol.setStyle( "-fx-alignment: CENTER;");
-    	idCol.setMinWidth(100);
-        idCol.setCellValueFactory( new PropertyValueFactory<Map, String>("id"));
+				}
+			});
+			return row;
+		});
 
-        DescriptionCol.setCellFactory(tc -> {
-            TableCell<Map, String> cell = new TableCell<>();
-            Text text = new Text();
-            cell.setGraphic(text);
-            cell.setPrefHeight(Control.USE_COMPUTED_SIZE);
-            text.wrappingWidthProperty().bind(DescriptionCol.widthProperty());
-            text.textProperty().bind(cell.itemProperty());
-            return cell ;
-        });
-        DescriptionCol.setStyle( "-fx-alignment: CENTER;");
-        DescriptionCol.setMinWidth(150);
-        DescriptionCol.setCellValueFactory(
-                new PropertyValueFactory<Map, String>("Description"));
+		idCol.setStyle("-fx-alignment: CENTER;");
+		idCol.setMinWidth(100);
+		idCol.setCellValueFactory(new PropertyValueFactory<Map, String>("id"));
 
-        
-        
-        FilteredList<Map> flCity = new FilteredList<Map>(data, p -> true);//Pass the data to a filtered list
-        mapTable.setItems(flCity);//Set the table's items using the filtered list
-        mapTable.getColumns().addAll(idCol, DescriptionCol);
-        	
-    }
-    
-    public void buildData() throws UnknownHostException, IOException { 
-        @SuppressWarnings("resource")
-        Socket socket = new Socket("localhost",5555);
-        data = FXCollections.observableArrayList();
-        
-        String[] get = new String[2];
-        get[0] = "getMaps";
-        get[1] = Globals.city.getCity();
-        try {
-            ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
-            objectOutput.writeObject(get); 
-            try {
-                ObjectInputStream objectInput = new ObjectInputStream(socket.getInputStream());
-                try {
-                    Object[] object = (Object[]) objectInput.readObject();
-                    for(int i=1 ; i <= (int) object[0] ; i++) {
-                 	  data.add((Map) object[i]);
-                    }
-               
-                } catch (ClassNotFoundException e) {
-                    System.out.println("The title list has not come from the server");
-                    e.printStackTrace();
-                }
-            } catch (IOException e) {
-                System.out.println("The socket for reading the object has problem");
-                e.printStackTrace();
-            }   
-        } 
-        catch (IOException e) 
-        {
-            e.printStackTrace();
-        } 
+		DescriptionCol.setCellFactory(tc -> {
+			TableCell<Map, String> cell = new TableCell<>();
+			Text text = new Text();
+			cell.setGraphic(text);
+			cell.setPrefHeight(Control.USE_COMPUTED_SIZE);
+			text.wrappingWidthProperty().bind(DescriptionCol.widthProperty());
+			text.textProperty().bind(cell.itemProperty());
+			return cell;
+		});
+		DescriptionCol.setStyle("-fx-alignment: CENTER;");
+		DescriptionCol.setMinWidth(150);
+		DescriptionCol.setCellValueFactory(new PropertyValueFactory<Map, String>("Description"));
 
-     }
+		FilteredList<Map> flCity = new FilteredList<Map>(data, p -> true);// Pass the data to a filtered list
+		mapTable.setItems(flCity);// Set the table's items using the filtered list
+		mapTable.getColumns().addAll(idCol, DescriptionCol);
+
+	}
+
+	public void buildData() throws UnknownHostException, IOException {
+		@SuppressWarnings("resource")
+		Socket socket = new Socket("localhost", 5555);
+		data = FXCollections.observableArrayList();
+
+		String[] get = new String[2];
+		get[0] = "getMaps";
+		get[1] = Globals.city.getCity();
+		try {
+			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
+			objectOutput.writeObject(get);
+			try {
+				ObjectInputStream objectInput = new ObjectInputStream(socket.getInputStream());
+				try {
+					Object[] object = (Object[]) objectInput.readObject();
+					for (int i = 1; i <= (int) object[0]; i++) {
+						data.add((Map) object[i]);
+					}
+
+				} catch (ClassNotFoundException e) {
+					System.out.println("The title list has not come from the server");
+					e.printStackTrace();
+				}
+			} catch (IOException e) {
+				System.out.println("The socket for reading the object has problem");
+				e.printStackTrace();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
 }

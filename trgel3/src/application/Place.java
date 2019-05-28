@@ -2,32 +2,77 @@ package application;
 
 import java.io.Serializable;
 
+
+@SuppressWarnings("serial")
 public class Place implements Serializable {
 
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 1L;
 	private long serialID;
+	private String MapId;
 	private String CityName;
 	private String PlaceName;
 	private String Description;
 	private String Classification;
 	private int Accessibility;
+	private int LocX;
+	private int LocY;
+	private String Type;
 	private int numOfmaps;
 
 	public Place() {
 
 	}
 
+
+	public Place(String MapId, String CityName, String PlaceName, String Description, String Classification,
+			int Accessibility, int LocX, int LocY, String Type) {
+		this.MapId = MapId;
+		this.CityName = CityName;
+		this.PlaceName = PlaceName;
+		this.Description = Description;
+		this.Classification = Classification;
+		this.Accessibility = Accessibility;
+		this.LocX=LocX;
+		this.LocY=LocY;
+		this.Type = Type;
+	}
+
+	public Place(String MapId, String CityName, String PlaceName, String Description, String Classification,
+			int Accessibility, long serialID, int LocX, int LocY) {
+		this.MapId = MapId;
+		this.CityName = CityName;
+		this.PlaceName = PlaceName;
+		this.Description = Description;
+		this.Classification = Classification;
+		this.Accessibility = Accessibility;
+		this.serialID=serialID;
+		this.LocX=LocX;
+		this.LocY=LocY;
+		
+	}
 	public Place(String CityName, String PlaceName, String Description, String Classification, int Accessibility, int numOfmaps) {
 		this.CityName = CityName;
 		this.PlaceName = PlaceName;
 		this.Description = Description;
 		this.Classification = Classification;
 		this.Accessibility = Accessibility;
-		this.numOfmaps = numOfmaps;
+		this.numOfmaps = numOfmaps;		
 		
+	}
+
+	public Place(String MapId, String CityName, String PlaceName, String Description, String Classification,
+			int Accessibility, long serialID, int LocX, int LocY, String Type) {
+		this.MapId = MapId;
+		this.CityName = CityName;
+		this.PlaceName = PlaceName;
+		this.Description = Description;
+		this.Classification = Classification;
+		this.Accessibility = Accessibility;
+		this.serialID = serialID;
+		this.Type = Type;
+		this.LocX=LocX;
+		this.LocY=LocY;
 	}
 
 	public void setCityName(String cityName) {
@@ -74,6 +119,38 @@ public class Place implements Serializable {
 		return serialID;
 	}
 
+	public void setLocX(int locX) {
+		LocX = locX;
+	}
+
+	public int getLocX() {
+		return LocX;
+	}
+
+	public void setLocY(int locY) {
+		LocY = locY;
+	}
+
+	public int getLocY() {
+		return LocY;
+	}
+
+	public void setMapId(String mapId) {
+		MapId = mapId;
+	}
+
+	public String getMapId() {
+		return MapId;
+	}
+
+	public String getType() {
+		return Type;
+	}
+
+	public void setType(String type) {
+		Type = type;
+	}
+
 	public int getNumOfmaps() {
 		return numOfmaps;
 	}
@@ -81,4 +158,5 @@ public class Place implements Serializable {
 	public void setNumOfmaps(int numOfmaps) {
 		this.numOfmaps = numOfmaps;
 	}
+
 }
