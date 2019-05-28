@@ -85,8 +85,8 @@ public class AddLocController {
 		@SuppressWarnings("resource")
 		Socket socket = new Socket("localhost", 5555);
 		String[] array = new String[2];
-		Object[] array2 = new Object[2];
-		array[0] = "getPlaces";
+		Object[] array2 = new Object[3];
+		array[0] = "getUPlaces";
 		// get[1] = "" + ImagePlaces[i].getPlace().getCityName();
 		array[1] = "" + Globals.map.getId();
 
@@ -97,57 +97,83 @@ public class AddLocController {
 		ObjectInputStream objectInput = new ObjectInputStream(socket.getInputStream());
 		data = objectInput.readObject();
 		System.out.println(((Object[]) data)[0]);
-		Place[] list = (Place[]) ((Object[]) data)[1];
+		UPlace[] list = (UPlace[]) ((Object[]) data)[1];
 		for (int i = 0; i < ImagePlaces.length; i++) {
 			if (ImagePlaces[i] != null) {
 				int flagnew = 1;
-				for (Place pl : list) {
-
-					if (ImagePlaces[i].getPlace().getSerialID() == pl.getSerialID()) {
-						long serialid = ImagePlaces[i].getPlace().getSerialID();
-						String MapId = ImagePlaces[i].getPlace().getMapId();
-						String CityName = ImagePlaces[i].getPlace().getPlaceName();
-						String PlaceName = ImagePlaces[i].getPlace().getPlaceName();
-						String description = ImagePlaces[i].getPlace().getDescription();
-						String classification = ImagePlaces[i].getPlace().getClassification();
-						int accessibility = ImagePlaces[i].getPlace().getAccessibility();
-						int LocX = ImagePlaces[i].getPlace().getLocX();
-						int LocY = ImagePlaces[i].getPlace().getLocY();
-						String type = "UPDATE";
-						array2[0] = "UpdatePlace";
-						array2[1] = new Place(MapId, CityName, PlaceName, description, classification, accessibility,
-								serialid, LocX, LocY, type);
-						// objectOutput = new ObjectOutputStream(socket.getOutputStream());
-						array2[2] = serialid;
-						@SuppressWarnings("resource")
-						Socket socket2 = new Socket("localhost", 5555);
-						objectOutput = new ObjectOutputStream(socket2.getOutputStream());
-						objectOutput.writeObject(array2);
-						flagnew = 0;
-						break;
-
-					}
-
-				}
-				if (flagnew == 1) {
+				if (ImagePlaces[i].getPlace() instanceof UPlace) {
 					long serialid = ImagePlaces[i].getPlace().getSerialID();
 					String MapId = ImagePlaces[i].getPlace().getMapId();
-					String CityName = ImagePlaces[i].getPlace().getPlaceName();
+					int PlaceId = ((UPlace) (ImagePlaces[i].getPlace())).getPlaceId();
+					String CityName = ImagePlaces[i].getPlace().getCityName();
 					String PlaceName = ImagePlaces[i].getPlace().getPlaceName();
 					String description = ImagePlaces[i].getPlace().getDescription();
 					String classification = ImagePlaces[i].getPlace().getClassification();
 					int accessibility = ImagePlaces[i].getPlace().getAccessibility();
-					int LocX = ImagePlaces[i].getPlace().getLocX();
-					int LocY = ImagePlaces[i].getPlace().getLocY();
-					String type = "NEW";
+					int LocX = ImagePlaces[i].getX();
+					int LocY = ImagePlaces[i].getY();
+					String type = ImagePlaces[i].getPlace().getType();
 					array2[0] = "UpdatePlace";
-					Place pp = new Place(MapId, CityName, PlaceName, description, classification, accessibility, LocX,
-							LocY, type);
-					array2[1] = pp;
+					array2[1] = new UPlace(MapId, CityName, PlaceName, description, classification, accessibility,
+							serialid, LocX, LocY, type, PlaceId);
+					// objectOutput = new ObjectOutputStream(socket.getOutputStream());
+					array2[2] = "" + serialid;
 					@SuppressWarnings("resource")
 					Socket socket2 = new Socket("localhost", 5555);
 					objectOutput = new ObjectOutputStream(socket2.getOutputStream());
 					objectOutput.writeObject(array2);
+					flagnew = 0;
+
+				} else {
+
+					for (Place pl : list) {
+
+						if (ImagePlaces[i].getPlace().getSerialID() == pl.getSerialID()) {
+							long serialid = ImagePlaces[i].getPlace().getSerialID();
+							String MapId = ImagePlaces[i].getPlace().getMapId();
+							String CityName = ImagePlaces[i].getPlace().getCityName();
+							String PlaceName = ImagePlaces[i].getPlace().getPlaceName();
+							String description = ImagePlaces[i].getPlace().getDescription();
+							String classification = ImagePlaces[i].getPlace().getClassification();
+							int accessibility = ImagePlaces[i].getPlace().getAccessibility();
+							int LocX = ImagePlaces[i].getX();
+							int LocY = ImagePlaces[i].getY();
+							String type = "UPDATE";
+							array2[0] = "UpdatePlace";
+							array2[1] = new Place(MapId, CityName, PlaceName, description, classification,
+									accessibility, serialid, LocX, LocY, type);
+							// objectOutput = new ObjectOutputStream(socket.getOutputStream());
+							array2[2] = "" + serialid;
+							@SuppressWarnings("resource")
+							Socket socket2 = new Socket("localhost", 5555);
+							objectOutput = new ObjectOutputStream(socket2.getOutputStream());
+							objectOutput.writeObject(array2);
+							flagnew = 0;
+							break;
+
+						}
+
+					}
+					if (flagnew == 1) {
+						long serialid = ImagePlaces[i].getPlace().getSerialID();
+						String MapId = ImagePlaces[i].getPlace().getMapId();
+						String CityName = ImagePlaces[i].getPlace().getCityName();
+						String PlaceName = ImagePlaces[i].getPlace().getPlaceName();
+						String description = ImagePlaces[i].getPlace().getDescription();
+						String classification = ImagePlaces[i].getPlace().getClassification();
+						int accessibility = ImagePlaces[i].getPlace().getAccessibility();
+						int LocX = ImagePlaces[i].getX();
+						int LocY = ImagePlaces[i].getY();
+						String type = "NEW";
+						array2[0] = "UpdatePlace";
+						Place pp = new Place(MapId, CityName, PlaceName, description, classification, accessibility,
+								LocX, LocY, type);
+						array2[1] = pp;
+						@SuppressWarnings("resource")
+						Socket socket2 = new Socket("localhost", 5555);
+						objectOutput = new ObjectOutputStream(socket2.getOutputStream());
+						objectOutput.writeObject(array2);
+					}
 				}
 			}
 		}
@@ -206,9 +232,10 @@ public class AddLocController {
 							list2[c].getLocY() - (im.getHeight() / 2) * aspect);
 
 					label.setFont(new Font("Quicksand", 20));
-					Place p = new Place("" + Globals.map.getId(), list2[c].getCityName(), list2[c].getPlaceName(),
+					UPlace p = new UPlace("" + Globals.map.getId(), list2[c].getCityName(), list2[c].getPlaceName(),
 							list2[c].getDescription(), list2[c].getClassification(), list2[c].getAccessibility(),
-							list2[c].getSerialID(), list2[c].getLocX(), list2[c].getLocY(), list2[c].getType());
+							list2[c].getSerialID(), list2[c].getLocX(), list2[c].getLocY(), list2[c].getType(),
+							list2[c].getPlaceId());
 					label.setText(p.getPlaceName());
 
 					label.relocate(list2[c].getLocX() - (label.getWidth() / 2),
@@ -260,7 +287,7 @@ public class AddLocController {
 		}
 
 		for (int c = 0; c < list2.length; c++) {
-			if (list2[c].getType().equals("NEW")) {
+			if (list2[c].getType().equals("NEW") || list2[c].getType().equals("UNEW")) {
 				Image im = new Image("File:loc.png");
 				ImageView newLoc = new ImageView(im);
 				// newLoc.relocate((double) list2[c].getLocX(), (double) list2[c].getLocY());
@@ -271,9 +298,10 @@ public class AddLocController {
 						list2[c].getLocY() - (im.getHeight() / 2) * aspect);
 
 				label.setFont(new Font("Quicksand", 20));
-				Place p = new Place("" + Globals.map.getId(), list2[c].getCityName(), list2[c].getPlaceName(),
+				UPlace p = new UPlace("" + Globals.map.getId(), list2[c].getCityName(), list2[c].getPlaceName(),
 						list2[c].getDescription(), list2[c].getClassification(), list2[c].getAccessibility(),
-						list2[c].getSerialID(), list2[c].getLocX(), list2[c].getLocY(), list2[c].getType());
+						list2[c].getSerialID(), list2[c].getLocX(), list2[c].getLocY(), list2[c].getType(),
+						list2[c].getPlaceId());
 				label.setText(p.getPlaceName());
 				label.relocate(list2[c].getLocX() - (label.getWidth() / 2),
 						list2[c].getLocY() - (label.getHeight() + (im.getHeight() / 2) * aspect));
@@ -340,8 +368,11 @@ public class AddLocController {
 							CurImagePlace.getLabel().relocate(
 									event.getSceneX() - (CurImagePlace.getLabel().getWidth() / 2), event.getSceneY()
 											- (CurImagePlace.getLabel().getHeight() + (im.getHeight() / 2) * aspect));
-							CurImagePlace.setX((int) event.getSceneX());
-							CurImagePlace.setY((int) event.getSceneY());
+
+							// CurImagePlace.setX((int) event.getSceneX());
+							// CurImagePlace.setY((int) event.getSceneY());
+							ImagePlaces[Integer.parseInt(ID)].setX((int) event.getSceneX());
+							ImagePlaces[Integer.parseInt(ID)].setY((int) event.getSceneY());
 
 						}
 					} else if (event.getEventType() == MouseEvent.MOUSE_CLICKED) {

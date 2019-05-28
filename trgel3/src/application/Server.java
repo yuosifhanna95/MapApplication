@@ -20,10 +20,10 @@ import javafx.collections.ObservableList;
 public class Server {
 
 	static private final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
-	static private final String DB = "eCp4XWJvNw";
-	static private final String DB_URL = "jdbc:mysql://remotemysql.com/" + DB + "?useSSL=false";
-	static private final String USER = "eCp4XWJvNw";
-	static private final String PASS = "eSS7xZeTpg";
+	static private final String DB = "eCp4XWJvNw";// sql2293675
+	static private final String DB_URL = "jdbc:mysql://remotemysql.com/" + DB + "?useSSL=false";// sql2.freemysqlhosting.net:3306///
+	static private final String USER = "eCp4XWJvNw";// sql2293675
+	static private final String PASS = "eSS7xZeTpg";// bW3%jS1%
 	static private Object data;
 
 	public static void main(String[] args) throws ClassNotFoundException, SQLException {
@@ -37,7 +37,7 @@ public class Server {
 				data = objectInput.readObject();
 				if (data instanceof Object[] && !(data instanceof String[])) {
 					if (((String) ((Object[]) (data))[0]).equals("Register")) {
-						
+
 						User client = ((User) ((Object[]) (data))[1]);
 						String fname1 = client.getFirstName();
 						String lname1 = client.getLastName();
@@ -53,7 +53,7 @@ public class Server {
 							Class.forName(JDBC_DRIVER);
 
 							conn = DriverManager.getConnection(DB_URL, USER, PASS);
-							// stmt = conn.createStatement();
+							stmt = conn.createStatement();
 
 							PreparedStatement pr;
 							String sql = "INSERT INTO user (`firstName`, `lastName`, `phoneNumber`, `email`, `payment`, `userName`, `password`) VALUES (?,?,?,?,?,?,?)";
@@ -112,12 +112,24 @@ public class Server {
 					} else if (((String) ((Object[]) (data))[0]).equals("UpdatePlace")) {
 
 						System.out.println("this is update");
-						Place place = ((Place) ((Object[]) (data))[1]);
+						Place place;
+						if (((Object[]) (data))[1] instanceof UPlace) {
+							place = ((UPlace) ((Object[]) (data))[1]);
+						} else
+							place = ((Place) ((Object[]) (data))[1]);
+
 						long serialid = place.getSerialID();
 						String MapId = place.getMapId();
 						int PlaceId = -1;
 						if (place.getType().equals("UPDATE")) {
 							PlaceId = Integer.parseInt(((String) ((Object[]) (data))[2]));
+						}
+						if (place instanceof UPlace) {
+							if (((UPlace) place).getPlaceId() == -1) {
+								PlaceId = (int) ((UPlace) place).getPlaceId();
+							} else {
+								PlaceId = ((UPlace) place).getPlaceId();
+							}
 						}
 						String CityName = place.getPlaceName();
 						String PlaceName = place.getPlaceName();
@@ -134,14 +146,18 @@ public class Server {
 							Class.forName(JDBC_DRIVER);
 
 							conn = DriverManager.getConnection(DB_URL, USER, PASS);
-							// stmt = conn.createStatement();
+							stmt = conn.createStatement();
 
 							PreparedStatement pr;
 							String sql = "INSERT INTO Updates (`MapId`,PlaceId ,`Name`, `Place`, `description`, `classification`, accessibility, LocX, LocY, `Type`) VALUES (?,?,?,?,?,?,?,?,?,?)";
 							// ResultSet rs = stmt.executeQuery(sql);
 
 							if (conn != null) {
-								checkplace(place, conn);
+								if (PlaceId == -1)
+									checkplace(place, conn, "NOP");
+								else
+									checkplace(place, conn, "YESP");
+
 								pr = conn.prepareStatement(sql);
 								pr.setString(1, MapId);
 								pr.setInt(2, PlaceId);
@@ -155,12 +171,12 @@ public class Server {
 								pr.setString(10, Type);
 
 								if (pr.executeUpdate() > 0) {
-									JOptionPane.showMessageDialog(null, "thanks for Update");
+									// JOptionPane.showMessageDialog(null, "thanks for Update");
 									System.out.println("thanks for Update");
 								}
 							}
 							skt.close();
-							stmt.close();
+
 							conn.close();
 
 						} catch (SQLException se) {
@@ -299,28 +315,23 @@ public class Server {
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
-					} 
-					   else if(((String[])(data))[0].equals("getPlaceCatalog"))
-		                {   
-		                   ObservableList<Place> placeList = getPlaceFromDB();
-		                  
-		                   Object[] data = new Object[placeList.size()+1];
-		                   data[0] = placeList.size();
-		                   int counter = 1;
-		                   for(Place tu: placeList) {
-		                       data[counter] = tu;
-		                       counter++;
-		                   }
-		                   try {
-		                       ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
-		                       objectOutput.writeObject(data);       
-		                   } 
-		                   catch (IOException e) 
-		                   {
-		                       e.printStackTrace();
-		                   } 
-		                }
-					else if (((String[]) (data))[0].equals("getMaps")) {
+					} else if (((String[]) (data))[0].equals("getPlaceCatalog")) {
+						ObservableList<Place> placeList = getPlaceFromDB();
+
+						Object[] data = new Object[placeList.size() + 1];
+						data[0] = placeList.size();
+						int counter = 1;
+						for (Place tu : placeList) {
+							data[counter] = tu;
+							counter++;
+						}
+						try {
+							ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
+							objectOutput.writeObject(data);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					} else if (((String[]) (data))[0].equals("getMaps")) {
 						ObservableList<Map> mapList = getMapFromDB(((String[]) (data))[1]);
 
 						Object[] data = new Object[mapList.size() + 1];
@@ -380,7 +391,7 @@ public class Server {
 								}
 							}
 
-							stmt.close();
+							// stmt.close();
 							conn.close();
 
 						} catch (SQLException se) {
@@ -520,8 +531,8 @@ public class Server {
 								// rs.getString("pathNum");
 
 								// data.add(new User(username, description, mapsnum , placesnum, pathnum ));
-								UPlace place = new UPlace(MapId,Name, Place, description, classification, accessibility,
-										id, LocX, LocY,Type,PlaceId);
+								UPlace place = new UPlace(MapId, Name, Place, description, classification,
+										accessibility, id, LocX, LocY, Type, PlaceId);
 								list[index] = (place);
 								index++;
 
@@ -566,40 +577,39 @@ public class Server {
 		}
 	}
 
-	static ObservableList<City> getCityFromDB(){
+	static ObservableList<City> getCityFromDB() {
 		ObservableList<City> data = FXCollections.observableArrayList();
 
-		   
-	    Connection conn = null;
+		Connection conn = null;
 		Statement stmt = null;
 		Statement stmt2 = null;
-		
+
 		try {
 			Class.forName(JDBC_DRIVER);
-			 
+
 			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			stmt = conn.createStatement();
 			stmt2 = conn.createStatement();
-			
-			String sql = "SELECT * FROM CityCatalog"   ;
+
+			String sql = "SELECT * FROM CityCatalog";
 			ResultSet rs = stmt.executeQuery(sql);
-		
+
 			while (rs.next()) {
-			  String city = rs.getString("name");
-			  String description = rs.getString("description");
-			  String mapsnum = rs.getString("mapsNum");
-			  String placesnum = rs.getString("placesNum");
-			  String pathnum = rs.getString("pathNum");
-			  String places = null;			  
-			  String sql2 = "SELECT * FROM places WHERE Name ='" + city + "'"  ;
-			  ResultSet rs2 = stmt2.executeQuery(sql2);
-			   
-			  while (rs2.next()) {		
-			    String place = rs2.getString("Place");
-			    places += (" + " + place);
-			  }
-			 
-			  data.add(new City(city, description, mapsnum , placesnum, pathnum, places));
+				String city = rs.getString("name");
+				String description = rs.getString("description");
+				String mapsnum = rs.getString("mapsNum");
+				String placesnum = rs.getString("placesNum");
+				String pathnum = rs.getString("pathNum");
+				String places = null;
+				String sql2 = "SELECT * FROM places WHERE Name ='" + city + "'";
+				ResultSet rs2 = stmt2.executeQuery(sql2);
+
+				while (rs2.next()) {
+					String place = rs2.getString("Place");
+					places += (" + " + place);
+				}
+
+				data.add(new City(city, description, mapsnum, placesnum, pathnum, places));
 			}
 
 			stmt.close();
@@ -616,7 +626,7 @@ public class Server {
 		} finally {
 			try {
 				if (stmt != null)
-					stmt.close();	
+					stmt.close();
 				if (conn != null)
 					conn.close();
 			} catch (SQLException se) {
@@ -627,64 +637,57 @@ public class Server {
 		return data;
 	}
 
-	   static ObservableList<Place> getPlaceFromDB(){
-		   ObservableList<Place> data = FXCollections.observableArrayList();
+	static ObservableList<Place> getPlaceFromDB() {
+		ObservableList<Place> data = FXCollections.observableArrayList();
 
-		     
-		      Connection conn = null;
-		   Statement stmt = null;
+		Connection conn = null;
+		Statement stmt = null;
 
+		try {
+			Class.forName(JDBC_DRIVER);
 
-		   try {
-		   Class.forName(JDBC_DRIVER);
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			stmt = conn.createStatement();
 
-		   conn = DriverManager.getConnection(DB_URL, USER, PASS);
-		   stmt = conn.createStatement();
+			String sql = "SELECT * FROM places";
+			ResultSet rs = stmt.executeQuery(sql);
 
+			while (rs.next()) {
+				String city = rs.getString("Name");
+				String description = rs.getString("description");
+				String place = rs.getString("Place");
+				String Classification = rs.getString("Classification");
+				int Accessibility = rs.getInt("Accessibility");
+				int numOfMaps = rs.getInt("mapsNum");
 
-		   String sql = "SELECT * FROM places"   ;
-		   ResultSet rs = stmt.executeQuery(sql);
+				data.add(new Place(city, place, description, Classification, Accessibility, numOfMaps));
+			}
 
-		   while (rs.next()) {
-		    String city = rs.getString("Name");
-		    String description = rs.getString("description");
-		    String place = rs.getString("Place");
-		    String Classification = rs.getString("Classification");
-		    int Accessibility = rs.getInt("Accessibility");
-		    int numOfMaps = rs.getInt("mapsNum");
+			stmt.close();
+			conn.close();
 
-		    data.add(new Place(city, place, description, Classification , Accessibility, numOfMaps ));
-		   }
-		      
+			return data;
+		} catch (SQLException se) {
+			se.printStackTrace();
+			System.out.println("SQLException: " + se.getMessage());
+			System.out.println("SQLState: " + se.getSQLState());
+			System.out.println("VendorError: " + se.getErrorCode());
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			}
+		}
 
-		   stmt.close();
-		   conn.close();
+		return data;
+	}
 
-		   return data;
-		   }
-		   catch (SQLException se) {
-		   se.printStackTrace();
-		   System.out.println("SQLException: " + se.getMessage());
-		      System.out.println("SQLState: " + se.getSQLState());
-		      System.out.println("VendorError: " + se.getErrorCode());
-		   } catch (Exception e) {
-		   e.printStackTrace();
-		   } finally {
-		   try {
-		   if (stmt != null)
-		   stmt.close();
-		   if (conn != null)
-		   conn.close();
-		   } catch (SQLException se) {
-		   se.printStackTrace();
-		   }
-		   }
-		     
-		     
-		     return data;
-		   }
-		     
-	
 	static ObservableList<Map> getMapFromDB(String city) {
 		ObservableList<Map> data = FXCollections.observableArrayList();
 
@@ -835,22 +838,40 @@ public class Server {
 		return a;
 	}
 
-	public static void checkplace(Place place, Connection conn) {
+	public static void checkplace(Place place, Connection conn, String Type) {
 		Statement pr;
+		Statement pr2;
 
 		ResultSet rs = null;
 		int a = 0;
-		String sqlfind = "Select * FROM Updates WHERE PlaceId ='" + place.getMapId() + "'";
 
-		String sql = "DELETE * FROM Updates WHERE PlaceId ='" + place.getMapId() + "'";
+		String sqlfind = "";
+		String sql = "";
+		if (Type.equals("NOP")) {
+			if (place instanceof UPlace) {
+				sqlfind = "Select * FROM Updates WHERE id ='" + ((UPlace) place).getSerialID() + "'";
+				sql = "DELETE FROM Updates WHERE id ='" + ((UPlace) place).getSerialID() + "'";
+			} else
+				return;
+
+		} else if (Type.equals("YESP")) {
+			if (place instanceof UPlace) {
+				sqlfind = "Select * FROM Updates WHERE id ='" + ((Place) place).getSerialID() + "'";
+				sql = "DELETE FROM Updates WHERE id ='" + ((Place) place).getSerialID() + "'";
+			} else {
+				sqlfind = "Select * FROM Updates WHERE PlaceId ='" + ((Place) place).getSerialID() + "'";
+				sql = "DELETE FROM Updates WHERE PlaceId ='" + ((Place) place).getSerialID() + "'";
+			}
+		}
 		// Connection conn=connecttion();
 		if (conn != null) {
 			try {
 				pr = conn.createStatement();
 				rs = pr.executeQuery(sqlfind);
 				if (rs.next()) {
-					pr = conn.createStatement();
-					rs = pr.executeQuery(sql);
+					pr2 = conn.createStatement();
+					int rs2 = pr2.executeUpdate(sql);
+					rs2++;
 				}
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
