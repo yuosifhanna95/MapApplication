@@ -387,31 +387,33 @@ public class Server {
         	            } 
                 	}
 					else if (((String[]) (data))[0].equals("addCityToMember")) {
-						Connection conn = null;
-						Statement stmt = null;
-						try {
-							Class.forName(JDBC_DRIVER);
-							conn = DriverManager.getConnection(DB_URL, USER, PASS);
-							System.out.println(((String[]) (data))[1]);
-							System.out.println(((String[]) (data))[2]);
-							PreparedStatement pr;
-							String sql = "INSERT INTO memberMap (`member`, `city`) VALUES (?,?)";
-
-							if (conn != null) {
-								try {
-
-									pr = conn.prepareStatement(sql);
-									pr.setString(1, ((String[]) (data))[1]);
-									pr.setString(2, ((String[]) (data))[2]);
-									pr.executeUpdate();
-								} catch (SQLException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-							}
-
-							// stmt.close();
-							conn.close();
+						
+							Connection conn = null;
+	            			Statement stmt = null;
+	            			try {
+	            				Class.forName(JDBC_DRIVER);
+	            				conn = DriverManager.getConnection(DB_URL, USER, PASS);             				
+	              				PreparedStatement pr;
+	              				String sql = "INSERT INTO fixedPurchase (`user`, `city`, `startDate`, `endDate`) VALUES (?,?,?,?)"; 
+	              				
+	              			
+	              				if(conn!=null) {
+	              		    		try {
+	              		    			
+	              						pr=conn.prepareStatement(sql);
+	              						pr.setString(1, ((String[])(data))[1]);
+	              						pr.setString(2, ((String[])(data))[2]);
+	              						pr.setDate(3, java.sql.Date.valueOf("2013-09-04"));
+	              						pr.setDate(4, java.sql.Date.valueOf("2013-09-04"));
+	              						pr.executeUpdate();
+	              					} catch (SQLException e) {
+	              						// TODO Auto-generated catch block
+	              						e.printStackTrace();
+	              					}
+	              		    	}
+	            			    
+	            			
+	            				conn.close();
 
 						} catch (SQLException se) {
 							se.printStackTrace();
@@ -815,54 +817,44 @@ public class Server {
 		return data;
 	}
 
-	@SuppressWarnings("null")
-	static ObservableList<Map> getMyMapsFromDB(String user) {
+	static ObservableList<Map> getMyMapsFromDB(String city){
 		ObservableList<Map> data = FXCollections.observableArrayList();
-		String[] Cities = new String[100];
-		int count = 0;
-
+		
+	    
 		Connection conn = null;
 		Statement stmt = null;
 		Statement stmt2 = null;
 		try {
 			Class.forName(JDBC_DRIVER);
-
+			 
 			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			stmt = conn.createStatement();
 			stmt2 = conn.createStatement();
+			
 
-			String sql = "SELECT * FROM memberMap WHERE member ='" + user + "'";
-			ResultSet rs = stmt.executeQuery(sql);
-
-			while (rs.next()) {
-				String city = rs.getString("city");
-				// Cities[count] = city;
-				// count++;
-
-				String sql2 = "SELECT * FROM maps WHERE city ='" + city + "'";
-				ResultSet rs2 = stmt2.executeQuery(sql2);
-
-				while (rs2.next()) {
-					int id = rs2.getInt("id");
-					String description = rs2.getString("description");
-					String linkC = rs2.getString("linkCustomer");
-					String linkE = rs2.getString("linkEmployee");
-
-					data.add(new Map(id, city, description, linkC, linkE));
+			String sql = "SELECT * FROM maps WHERE city ='" + city + "'"  ;
+			   ResultSet rs = stmt2.executeQuery(sql);
+			   
+				while (rs.next()) {
+				  int id = rs.getInt("id");
+				  String description = rs.getString("description");
+				  String linkC = rs.getString("linkCustomer");
+				  String linkE = rs.getString("linkEmployee");
+				 
+				  data.add(new Map(id, city,description, linkC , linkE ));
 				}
 
-			}
-
-			stmt2.close();
+			
 			stmt.close();
 			conn.close();
-
+			
 			return data;
-		} catch (SQLException se) {
+		}
+		catch (SQLException se) {
 			se.printStackTrace();
 			System.out.println("SQLException: " + se.getMessage());
-			System.out.println("SQLState: " + se.getSQLState());
-			System.out.println("VendorError: " + se.getErrorCode());
+		    System.out.println("SQLState: " + se.getSQLState());
+		    System.out.println("VendorError: " + se.getErrorCode());
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -875,9 +867,11 @@ public class Server {
 				se.printStackTrace();
 			}
 		}
-
-		return data;
+	   
+	   
+	   return data;
 	}
+	   
 
 	public static int checkuser(String user2, Connection conn) {
 		Statement pr;
