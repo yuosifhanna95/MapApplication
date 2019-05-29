@@ -1,55 +1,37 @@
 package application;
-import javafx.scene.control.TextField;
+
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Control;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.URL;
 import java.net.UnknownHostException;
-
-import javax.security.auth.callback.Callback;
-
-import javafx.scene.Group; 
-
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 
-import javafx.scene.image.Image;
 
 public class MyMapsController {
 
     @FXML
-    private TableView<Map> mapTable;
+    private TableView<FixedPurchase> mapTable;
 
     @FXML
-    private TableColumn<Map, String> cityCol;
+    private TableColumn<FixedPurchase, String> cityCol;
 
-    @FXML
-    private TableColumn<Map, String> DescriptionCol;
 
     @FXML
     private Button Back;
@@ -57,9 +39,41 @@ public class MyMapsController {
     @FXML
     private ImageView map;
     
-    private ObservableList<Map> data = null;
+    @FXML
+    private Button Renew;
 
+    @FXML
+    private Button Maps;
 
+    @FXML
+    private Button Paths;
+
+    private ObservableList<FixedPurchase> data = null;
+
+    @FXML
+    void RenewBtn(ActionEvent event) {
+
+    }
+
+    @FXML
+    void ShowMapsBtn(ActionEvent event) throws IOException {
+		Stage primaryStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
+        URL url = getClass().getResource("ShowMapsScene.fxml");
+    	Globals.backLink = "MyMapsScene.fxml";		 	    	
+		AnchorPane pane;
+		pane = FXMLLoader.load(url);
+		
+		Scene scene = new Scene(pane);
+		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		primaryStage.setScene(scene);
+		primaryStage.show();
+    }
+
+    @FXML
+    void ShowPathsBtn(ActionEvent event) {
+
+    }
+    
     @FXML
     void backFunc(ActionEvent event) throws IOException {
     	Stage primaryStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
@@ -72,42 +86,33 @@ public class MyMapsController {
 		primaryStage.show();
     }
     
-    @FXML
+    @SuppressWarnings("unchecked")
+	@FXML
     public void initialize() throws UnknownHostException, IOException {
     	if(Globals.MODE<3)
     		Globals.backLink="DefaultPage.fxml";
     	else
     		Globals.backLink="EmployeePage.fxml";
+    	
+    	Maps.setDisable(true);
+    	Paths.setDisable(true);
+    	Renew.setDisable(true);
     		
     	buildData();
     	
     	mapTable.getColumns().clear();
     	mapTable.setEditable(true);
+    
     	
     	mapTable.setRowFactory( tv -> {
-    	    TableRow<Map> row = new TableRow<>();
+    	    TableRow<FixedPurchase> row = new TableRow<>();
     	    row.setOnMouseClicked(event -> {
-   	        if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
-	        	Map mapRow = mapTable.getSelectionModel().getSelectedItem();
- 	            Globals.map = mapRow;
- 	            
-				try {
-					Stage primaryStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
-		 	        URL url = getClass().getResource("viewMapScene.fxml");
-		 	    	Globals.backLink = "MyMapsScene.fxml";		 	    	
-		 			AnchorPane pane;
-					pane = FXMLLoader.load(url);
-					Scene scene = new Scene(pane);
-	 				scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-	 				primaryStage.setScene(scene);
-	 				primaryStage.show();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
- 				
- 	
+   	        if (event.getClickCount() == 1 && (! row.isEmpty()) ) {
+	        	FixedPurchase FixedPurchaseRow = mapTable.getSelectionModel().getSelectedItem();
+ 	            Globals.FixedPurchase = FixedPurchaseRow;
+ 	            Maps.setDisable(false);
+ 	           	Paths.setDisable(false);
+ 	      	    Renew.setDisable(false);
    	        	}
     	    });
     	    return row ;
@@ -115,27 +120,12 @@ public class MyMapsController {
     	
     	cityCol.setStyle( "-fx-alignment: CENTER;");
     	cityCol.setMinWidth(100);
-    	cityCol.setCellValueFactory( new PropertyValueFactory<Map, String>("city"));
-
-        DescriptionCol.setCellFactory(tc -> {
-            TableCell<Map, String> cell = new TableCell<>();
-            Text text = new Text();
-            cell.setGraphic(text);
-            cell.setPrefHeight(Control.USE_COMPUTED_SIZE);
-            text.wrappingWidthProperty().bind(DescriptionCol.widthProperty());
-            text.textProperty().bind(cell.itemProperty());
-            return cell ;
-        });
-        DescriptionCol.setStyle( "-fx-alignment: CENTER;");
-        DescriptionCol.setMinWidth(150);
-        DescriptionCol.setCellValueFactory(
-                new PropertyValueFactory<Map, String>("Description"));
+    	cityCol.setCellValueFactory( new PropertyValueFactory<FixedPurchase, String>("city"));
 
         
-        
-        FilteredList<Map> flCity = new FilteredList<Map>(data, p -> true);//Pass the data to a filtered list
+        FilteredList<FixedPurchase> flCity = new FilteredList<FixedPurchase>(data, p -> true);//Pass the data to a filtered list
         mapTable.setItems(flCity);//Set the table's items using the filtered list
-        mapTable.getColumns().addAll(cityCol, DescriptionCol);
+        mapTable.getColumns().addAll(cityCol);
         	
     }
     
@@ -145,7 +135,7 @@ public class MyMapsController {
         data = FXCollections.observableArrayList();
         
         String[] get = new String[2];
-        get[0] = "getMyMaps";
+        get[0] = "getFixedPurchase";
         get[1] = Globals.user.getUserName();
         try {
             ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
@@ -155,7 +145,7 @@ public class MyMapsController {
                 try {
                     Object[] object = (Object[]) objectInput.readObject();
                     for(int i=1 ; i <= (int) object[0] ; i++) {
-                 	  data.add((Map) object[i]);
+                 	  data.add((FixedPurchase) object[i]);
                     }
                
                 } catch (ClassNotFoundException e) {
@@ -173,6 +163,8 @@ public class MyMapsController {
         } 
 
      }
+    
+
 
 }
 
