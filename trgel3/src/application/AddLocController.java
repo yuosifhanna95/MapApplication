@@ -28,6 +28,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.scene.transform.Transform;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -184,6 +185,7 @@ public class AddLocController {
 
 	}
 
+	@SuppressWarnings("deprecation")
 	void DrawPlaces() throws IOException, ClassNotFoundException {
 
 		@SuppressWarnings("resource")
@@ -237,14 +239,19 @@ public class AddLocController {
 							list2[c].getSerialID(), list2[c].getLocX(), list2[c].getLocY(), list2[c].getType(),
 							list2[c].getPlaceId());
 					label.setText(p.getPlaceName());
-
-					label.relocate(list2[c].getLocX() - (label.getWidth() / 2),
-							list2[c].getLocY() - (label.getHeight() + (im.getHeight() / 2) * aspect));
+					Text t = new Text();
+					t.setText(label.getText());
+					t.setFont(label.getFont());
+					double width = t.getBoundsInLocal().getWidth();
+					double height = t.getBoundsInLocal().getHeight();
+					
+					label.relocate(list2[c].getLocX() - (width / 2),
+							list2[c].getLocY() - (height + (im.getHeight() / 2) * aspect));
 
 					newLoc.setFitHeight(im.getHeight() * aspect);
 					newLoc.setFitWidth(im.getWidth() * aspect);
 					newLoc.setId("imv" + Counter);
-
+					
 					ImagePlaces[counter] = new ImagePlace(counter, newLoc, label, p, list2[c].getLocX(),
 							list2[c].getLocY());
 					counter++;
@@ -271,9 +278,15 @@ public class AddLocController {
 						list[i].getDescription(), list[i].getClassification(), list[i].getAccessibility(),
 						list[i].getSerialID(), list[i].getLocX(), list[i].getLocY(), list[i].getType());
 				label.setText(p.getPlaceName());
-
-				label.relocate(list[i].getLocX() - (label.getWidth() / 2),
-						list[i].getLocY() - (label.getHeight() + (im.getHeight() / 2) * aspect));
+				
+				Text t = new Text();
+				t.setText(label.getText());
+				t.setFont(label.getFont());
+				double width = t.getBoundsInLocal().getWidth();
+				double height = t.getBoundsInLocal().getHeight();
+				
+				label.relocate(list[i].getLocX() - (width / 2),
+						list[i].getLocY() - (height + (im.getHeight() / 2) * aspect));
 
 				newLoc.setFitHeight(im.getHeight() * aspect);
 				newLoc.setFitWidth(im.getWidth() * aspect);
@@ -303,8 +316,15 @@ public class AddLocController {
 						list2[c].getSerialID(), list2[c].getLocX(), list2[c].getLocY(), list2[c].getType(),
 						list2[c].getPlaceId());
 				label.setText(p.getPlaceName());
-				label.relocate(list2[c].getLocX() - (label.getWidth() / 2),
-						list2[c].getLocY() - (label.getHeight() + (im.getHeight() / 2) * aspect));
+				
+				Text t = new Text();
+				t.setText(label.getText());
+				t.setFont(label.getFont());
+				double width = t.getBoundsInLocal().getWidth();
+				double height = t.getBoundsInLocal().getHeight();
+				
+				label.relocate(list2[c].getLocX() - (width / 2),
+						list2[c].getLocY() - (height + (im.getHeight() / 2) * aspect));
 
 				newLoc.setFitHeight(im.getHeight() * aspect);
 				newLoc.setFitWidth(im.getWidth() * aspect);
@@ -575,7 +595,7 @@ public class AddLocController {
 			}
 		}
 		DrawPlaces();
-		updateLocations();
+		//updateLocations();
 
 	}
 
@@ -607,6 +627,7 @@ public class AddLocController {
 
 	@FXML
 	void saveImage(ActionEvent event) {
+		//updateLocations();
 		FileChooser fileChooser = new FileChooser();
 
 		// Set extension filter
