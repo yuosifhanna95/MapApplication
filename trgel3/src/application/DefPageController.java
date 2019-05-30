@@ -184,38 +184,47 @@ public class DefPageController {
 	}
 
 	@FXML
-	void OnePurchase(ActionEvent event) {
-
+	void OnePurchase(ActionEvent event) throws IOException{
 		
-
+		 addDataBasetoMember();
+			
+			Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+			URL url = getClass().getResource("mapCatalogScene.fxml");
+			Globals.backLink = "DefaultPage.fxml";
+			AnchorPane pane;
+			try {
+				pane = FXMLLoader.load(url);
+				Scene scene = new Scene(pane);
+				scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+				primaryStage.setScene(scene);
+				primaryStage.show();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	}
 	
 	@FXML
     void FixedPurchase(ActionEvent event) throws UnknownHostException, IOException {
 		
-	    addDataBasetoMember();
-		
 		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-		URL url = getClass().getResource("mapCatalogScene.fxml");
+		URL url = getClass().getResource("payementforpurchase.fxml");
+		AnchorPane pane = FXMLLoader.load(url);
 		Globals.backLink = "DefaultPage.fxml";
-		AnchorPane pane;
-		try {
-			pane = FXMLLoader.load(url);
-			Scene scene = new Scene(pane);
-			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-			primaryStage.setScene(scene);
-			primaryStage.show();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		Scene scene = new Scene(pane);
+		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		primaryStage.setScene(scene);
+		primaryStage.show();
     }
 
 	@SuppressWarnings("unchecked")
 	@FXML // This method is called by the FXMLLoader when initialization is complete
 	void initialize() throws IOException, Exception {
 		Globals.backLink = "MainPage.fxml";
-		
+		FixedTimePurchase.setVisible(false);
+		FixedTimePurchase.setDisable(true);
+		OneTimePurchase.setVisible(false);
+		OneTimePurchase.setDisable(true);
 		searchCity.getStyleClass().removeAll("addBobOk, focus"); 
 		searchCity.getStyleClass().add("addBobOk");
 
@@ -227,6 +236,7 @@ public class DefPageController {
 
 		searchTable1.getColumns().clear();
     	searchTable1.setEditable(true);
+    	
     	
       	PlaceCol1.setStyle( "-fx-alignment: CENTER;");
       	PlaceCol1.setMinWidth(100);
@@ -272,7 +282,10 @@ public class DefPageController {
 				if (event.getClickCount() == 1 && (!row.isEmpty())) {
 					City cityRow = searchTable.getSelectionModel().getSelectedItem();
 					Globals.city = (City) cityRow;
-
+					FixedTimePurchase.setVisible(true);
+					FixedTimePurchase.setDisable(false);
+					OneTimePurchase.setVisible(true);
+					OneTimePurchase.setDisable(false);
 				}
 			});
 			return row;

@@ -12,17 +12,31 @@ public class City implements Serializable{
     private String  numOfMaps;
     private String  numOfPlaces;
     private String  Places;
-    private final String  numOfPaths;
-
-    City(String city, String Description, String numOfMaps, String numOfPlaces, String numOfPaths, String Places) {
+    private  String  numOfPaths;
+    private double fixedcost;
+    private double onetimecost;
+    City(String city, String Description, String numOfMaps, String numOfPlaces, String numOfPaths, String Places,double fcost,double ocost) {
         this.city = city;
         this.Description = Description;
         this.numOfMaps = numOfMaps;
         this.numOfPlaces =numOfPlaces;
         this.numOfPaths = numOfPaths;
         this.Places = Places;
+        this.fixedcost=fcost;
+        this.onetimecost=ocost;
     }
-
+    public double getfixedcost() {
+        return fixedcost;
+    }
+    public void setfixedcost(double str) {
+        this.fixedcost = str;
+    }
+    public double getonetimedcost() {
+        return onetimecost;
+    }
+    public void setonetimecost(double str) {
+        this.onetimecost = str;
+    }
     public String getCity() {
         return city;
     }

@@ -32,7 +32,7 @@ import javafx.scene.transform.Transform;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-public class AddLocController {
+/*public class AddLocController {
 	private int Mode;
 	private Label[] labels = new Label[10];
 	private ImageView[] locations = new ImageView[10];
@@ -191,7 +191,7 @@ public class AddLocController {
 		ObjectInputStream objectInput2 = new ObjectInputStream(socket2.getInputStream());
 		data2 = objectInput2.readObject();
 		System.out.println(((Object[]) data2)[0]);
-		UPlace[] list2 = (UPlace[]) ((Object[]) data2)[1];
+		//UPlace[] list2 = (UPlace[]) ((Object[]) data2)[1];
 
 		int counter = 0;
 		int flag = 0;
@@ -515,4 +515,4 @@ public class AddLocController {
 		return node.snapshot(spa, writableImage);
 	}
 
-}
+}*/

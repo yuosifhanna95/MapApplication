@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="trgel3/src"/>
+	<classpathentry kind="con" path="org.eclipse.fx.ide.jdt.core.JAVAFX_CONTAINER"/>
+	<classpathentry kind="lib" path="C:/Users/kasim/Desktop/Git/lab5-jdbc-ammar-qassem_lab5/target/se-0.0.1-jdbcHelloWorld.jar"/>
+	<classpathentry kind="lib" path="C:/Users/kasim/Desktop/Git/lab5-jdbc-ammar-qassem_lab5/target/se-0.0.1-jdbcHelloWorld-jar-with-dependencies.jar"/>
+	<classpathentry kind="lib" path="C:/Users/kasim/Desktop/Git/lab5-jdbc-ammar-qassem_lab5/lib/javafx.base.jar"/>
+	<classpathentry kind="lib" path="C:/Users/kasim/Desktop/Git/lab5-jdbc-ammar-qassem_lab5/lib/javafx.controls.jar"/>
+	<classpathentry kind="lib" path="C:/Users/kasim/Desktop/Git/lab5-jdbc-ammar-qassem_lab5/lib/javafx.fxml.jar"/>
+	<classpathentry kind="lib" path="C:/Users/kasim/Desktop/Git/lab5-jdbc-ammar-qassem_lab5/lib/javafx.graphics.jar"/>
+	<classpathentry kind="lib" path="C:/Users/kasim/Desktop/Git/lab5-jdbc-ammar-qassem_lab5/lib/javafx.media.jar"/>
+	<classpathentry kind="lib" path="C:/Users/kasim/Desktop/Git/lab5-jdbc-ammar-qassem_lab5/lib/javafx.swing.jar"/>
+	<classpathentry kind="lib" path="C:/Users/kasim/Desktop/Git/lab5-jdbc-ammar-qassem_lab5/lib/javafx.web.jar"/>
+	<classpathentry kind="lib" path="C:/Users/kasim/Desktop/Git/lab5-jdbc-ammar-qassem_lab5/lib/javafx-swt.jar"/>
+	<classpathentry kind="lib" path="C:/Users/kasim/.m2/repository/mysql/mysql-connector-java/8.0.15/mysql-connector-java-8.0.15.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

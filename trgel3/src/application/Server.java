@@ -11,6 +11,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 import javax.swing.JOptionPane;
 
@@ -35,7 +38,121 @@ public class Server {
 				Socket skt = myServerSocket.accept();
 				ObjectInputStream objectInput = new ObjectInputStream(skt.getInputStream());
 				data = objectInput.readObject();
+				 
+				
 				if (data instanceof Object[] && !(data instanceof String[])) {
+					if(((String)((Object[])(data))[0]).equals("dofixedpurchase")) {
+						int x=0;
+						Connection conn = null;
+            			Statement stmt = null;
+            			fixedPurchase fp=((fixedPurchase)((Object[])(data))[1]);
+            			int period=fp.getperiod();
+            			String user2=fp.getuser();
+            			
+            			if(period<=3) {
+            				ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
+  		    				String message="the period should be bigger than 3";
+  		    				x=1;
+	     	                objectOutput.writeObject(message);
+            			}
+            			else if(period>180) {
+            				ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
+  		    				String message="the period is very big,you can purchase until 180 day";
+	     	                x=1;
+  		    				objectOutput.writeObject(message);
+            			}
+            			else if(((String)((Object[])(data))[2]).equals("")&&((String)((Object[])(data))[3]).equals("Yes")) {
+            				ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
+  		    				x=1;
+            				String message="we need the payinfo to continue";
+	     	                objectOutput.writeObject(message);
+            			}
+            			else if(x==0) {
+            				
+    							Class.forName(JDBC_DRIVER);
+
+    							conn = DriverManager.getConnection(DB_URL, USER, PASS);
+    							PreparedStatement pr;
+    							String sql="INSERT INTO fixedPurchase(`user`, `city`, `period`, `startdate`, `endDate`, `purchaseprice`) VALUES (?,?,?,?,?,?)";
+    							if (conn != null) {
+    								pr = conn.prepareStatement(sql);
+    								SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+    								Calendar c = Calendar.getInstance();
+    								c.setTime(new Date());
+    								c.add(Calendar.DATE, fp.getperiod());
+    								String output = sdf.format(c.getTime());
+    								fp.setedate(output);
+									pr.setString(1,fp.getuser() );
+									pr.setString(2, fp.getcity());
+									pr.setString(3,Integer.toString(fp.getperiod()));
+									pr.setString(4, fp.getsdate());
+									pr.setString(5, fp.getedate());
+									pr.setString(6,Double.toString(fp.getprice()));
+									if (pr.executeUpdate() > 0) {
+										ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
+              		    				String message="thanks for purchace,you will enjoy";
+            	     	                objectOutput.writeObject(message);
+									}
+									
+    							}
+            			}
+					}
+					if(((String)((Object[])(data))[0]).equals("getfixedcostandpayinfo")) {
+						
+                		Connection conn = null;
+            			Statement stmt = null;
+            			Statement stmt1 = null;
+            			Object[] ob = new Object[2];
+            			double i=-1;
+            			String pay="";
+            			String cityname=((String)((Object[])(data))[1]);
+            			String username=((String)((Object[])(data))[2]);
+            			 System.out.println(cityname);
+            			try {
+            				Class.forName(JDBC_DRIVER);
+            				 
+            				conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            				stmt = conn.createStatement();
+            				stmt1=conn.createStatement();
+            				String sql = "SELECT * FROM CityCatalog"   ;
+            				String sql1 = "SELECT * FROM user"   ;
+            				ResultSet rs = stmt.executeQuery(sql);
+            				ResultSet rs1 = stmt1.executeQuery(sql1);
+            				
+            				while (rs.next()) {
+            					 String x=rs.getString("name");
+            					if(x.equals(cityname)) {
+            						 i=rs.getDouble("fixedCost");
+            						 
+            					}
+            				}
+            					while (rs1.next()) {
+               					 String y=rs1.getString("userName");
+               					if(y.equals(username)) {
+               						 pay=rs1.getString("payment");
+               						 
+               					}
+            					
+            				}
+            				 
+            				ob[0]=i;
+            				ob[1]=pay;
+            				ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
+            				 objectOutput.writeObject(ob);
+            				 stmt.close();
+            					conn.close();
+            					
+            					
+            				
+            			}
+            				catch (SQLException se) {
+            					se.printStackTrace();
+            					System.out.println("SQLException: " + se.getMessage());
+            				    System.out.println("SQLState: " + se.getSQLState());
+            				    System.out.println("VendorError: " + se.getErrorCode());
+            				}
+                	}
+					
 					if (((String) ((Object[]) (data))[0]).equals("Register")) {
 						
 						User client = ((User) ((Object[]) (data))[1]);
@@ -64,7 +181,9 @@ public class Server {
 									if ((fname1.equals("")) || (lname1.equals("")) || (phone.equals(""))
 											|| (email.equals("")) || (pay.equals("")) || (user.equals(""))
 											|| (password.equals(""))) {
-										JOptionPane.showMessageDialog(null, "Please fill all the fields");
+										ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
+              		    				String message="fill all the fields";
+            	     	                objectOutput.writeObject(message);
 
 									} else if (checkuser(user, conn) == 1) {
 										// System.out.println("please");
@@ -79,7 +198,9 @@ public class Server {
 										pr.setString(6, user);
 										pr.setString(7, password);
 										if (pr.executeUpdate() > 0) {
-											JOptionPane.showMessageDialog(null, "thanks for registeration");
+											ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
+	              		    				String message="thanks for registeration";
+	            	     	                objectOutput.writeObject(message);
 										}
 									}
 								} catch (SQLException e) {
@@ -232,7 +353,7 @@ public class Server {
 							Object[] result = new Object[2];
 							while (rs.next()) {
 
-								System.out.println("Hello User");
+								
 
 								Connected = true;
 
@@ -477,7 +598,7 @@ public class Server {
 							}
 						}
 
-					} else if (((String[]) (data))[0].equals("getUPlaces")) {
+					}/* else if (((String[]) (data))[0].equals("getUPlaces")) {
 
 						UPlace[] list;
 						int k = ((String[]) (data)).length;
@@ -556,7 +677,7 @@ public class Server {
 							}
 						}
 
-					}
+					}*/
 
 				}
 
@@ -590,7 +711,9 @@ public class Server {
 			  String mapsnum = rs.getString("mapsNum");
 			  String placesnum = rs.getString("placesNum");
 			  String pathnum = rs.getString("pathNum");
-			  String places = null;			  
+			  String places = null;		
+			  double fixedcost=rs.getDouble("fixedCost");
+			  double onetimecost=rs.getDouble("oneTimeCost");
 			  String sql2 = "SELECT * FROM places WHERE Name ='" + city + "'"  ;
 			  ResultSet rs2 = stmt2.executeQuery(sql2);
 			   
@@ -599,7 +722,7 @@ public class Server {
 			    places += (" + " + place);
 			  }
 			 
-			  data.add(new City(city, description, mapsnum , placesnum, pathnum, places));
+			  data.add(new City(city, description, mapsnum , placesnum, pathnum, places,fixedcost,onetimecost));
 			}
 
 			stmt.close();
