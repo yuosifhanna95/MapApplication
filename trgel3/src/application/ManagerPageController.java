@@ -24,6 +24,9 @@ public class ManagerPageController {
 
 	@FXML
 	private Button btn_editMaps;
+	
+	@FXML
+	private Button memberfile;
 
 	@FXML
 	void confirmMapsFunc(ActionEvent event) throws IOException {
@@ -38,6 +41,20 @@ public class ManagerPageController {
 
 	}
 
+	@FXML
+	void MembersFileFunc(ActionEvent event) throws IOException {
+		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+		URL url = getClass().getResource("MemberFile.fxml");
+		AnchorPane pane = FXMLLoader.load(url);
+
+		Scene scene = new Scene(pane);
+		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		primaryStage.setScene(scene);
+		primaryStage.show();
+
+	}
+	
+	
 	@FXML // This method is called by the FXMLLoader when initialization is complete
 	void initialize() throws IOException, Exception {
 

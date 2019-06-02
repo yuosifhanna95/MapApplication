@@ -9,7 +9,7 @@
       <Button fx:id="Back" layoutX="614.0" layoutY="174.0" mnemonicParsing="false" onAction="#backFunc" text="Back" />
       <Button fx:id="btn_editMaps" layoutX="684.0" layoutY="208.0" mnemonicParsing="false" onAction="#editmaps" text="Edit Maps" />
       <Button fx:id="btn_confirmMaps" layoutX="765.0" layoutY="208.0" mnemonicParsing="false" onAction="#confirmMapsFunc" text="Confirm Maps" />
-      <Button fx:id="memberfile" layoutX="609.0" layoutY="245.0" mnemonicParsing="false" text="Members File" />
+      <Button fx:id="memberfile" layoutX="609.0" layoutY="245.0" mnemonicParsing="false" text="Members File" onAction="#MembersFileFunc"/>
       
    </children>
 </AnchorPane>

@@ -225,8 +225,8 @@ public class MemberFileController {
 	void initialize() throws IOException, Exception {
 		Globals.backLink = "MainPage.fxml";
 
-		searchCity.getStyleClass().removeAll("addBobOk, focus");
-		searchCity.getStyleClass().add("addBobOk");
+		//searchCity.getStyleClass().removeAll("addBobOk, focus");
+		//searchCity.getStyleClass().add("addBobOk");
 
 		buildData("user");
 		
@@ -403,15 +403,11 @@ public class MemberFileController {
 				ObjectInputStream objectInput = new ObjectInputStream(socket.getInputStream());
 				try {
 					Object[] object = (Object[]) objectInput.readObject();
-					if (type.equals("User")) {
+					if (type.equals("user")) {
 						for (int i = 1; i <= (int) object[0]; i++) {
 							dataUser.add((User) object[i]);
 						}
-					} else {
-						for (int i = 1; i <= (int) object[0]; i++) {
-							dataPlace.add((Place) object[i]);
-						}
-					}
+					} 
 
 				} catch (ClassNotFoundException e) {
 					System.out.println("The title list has not come from the server");

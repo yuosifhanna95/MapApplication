@@ -558,8 +558,7 @@ public class Server {
 						}
 
 						/////////////////////
-					}
-					else if (((String[]) (data))[0].equals("getUsers")) {
+					}					else if (((String[]) (data))[0].equals("getUsers")) {
 						ObservableList<User> userList = getUserFromDB();
 
 						Object[] data = new Object[userList.size() + 1];
@@ -575,7 +574,7 @@ public class Server {
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
-					}
+					} 
 					else if (((String[]) (data))[0].equals("getCatalog")) {
 						ObservableList<City> cityList = getCityFromDB();
 
@@ -1012,65 +1011,7 @@ public class Server {
 
 		return p;
 	}
-	
-	static ObservableList<User> getUserFromDB() {
-		ObservableList<User> data = FXCollections.observableArrayList();
 
-		Connection conn = null;
-		Statement stmt = null;
-		Statement stmt2 = null;
-
-		try {
-			Class.forName(JDBC_DRIVER);
-
-			conn = DriverManager.getConnection(DB_URL, USER, PASS);
-			stmt = conn.createStatement();
-			stmt2 = conn.createStatement();
-
-			String sql = "SELECT * FROM Users";
-			ResultSet rs = stmt.executeQuery(sql);
-
-			while (rs.next()) {
-				String fname = rs.getString("firstName");
-				String lname = rs.getString("lastName");
-				String pnumber = rs.getString("phoneNumber");
-				String email = rs.getString("email");
-				String username = rs.getString("userName");
-				String password = rs.getString("password");
-				String payment = rs.getString("payment");
-				String type = rs.getString("type");
-				
-
-	
-				data.add(new User(fname, lname, email, username, password, pnumber, payment,type));
-			}
-
-			stmt.close();
-			conn.close();
-
-			return data;
-		} catch (SQLException se) {
-			se.printStackTrace();
-			System.out.println("SQLException: " + se.getMessage());
-			System.out.println("SQLState: " + se.getSQLState());
-			System.out.println("VendorError: " + se.getErrorCode());
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (stmt != null)
-					stmt.close();
-				if (conn != null)
-					conn.close();
-			} catch (SQLException se) {
-				se.printStackTrace();
-			}
-		}
-
-		return data;
-	}
-
-	
 	static ObservableList<City> getCityFromDB() {
 		ObservableList<City> data = FXCollections.observableArrayList();
 
@@ -1716,5 +1657,63 @@ public class Server {
 		}
 		return -1;
 	}
+	static ObservableList<User> getUserFromDB() {
+		ObservableList<User> data = FXCollections.observableArrayList();
+
+		Connection conn = null;
+		Statement stmt = null;
+		Statement stmt2 = null;
+
+		try {
+			Class.forName(JDBC_DRIVER);
+
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			stmt = conn.createStatement();
+			stmt2 = conn.createStatement();
+
+			String sql = "SELECT * FROM user";
+			ResultSet rs = stmt.executeQuery(sql);
+
+			while (rs.next()) {
+				String fname = rs.getString("firstName");
+				String lname = rs.getString("lastName");
+				String pnumber = rs.getString("phoneNumber");
+				String email = rs.getString("email");
+				String username = rs.getString("userName");
+				String password = rs.getString("password");
+				String payment = rs.getString("payment");
+				String type = rs.getString("type");
+				
+
+	
+				data.add(new User(fname, lname, email, username, password, pnumber, payment,type));
+			}
+
+			stmt.close();
+			conn.close();
+
+			return data;
+		} catch (SQLException se) {
+			se.printStackTrace();
+			System.out.println("SQLException: " + se.getMessage());
+			System.out.println("SQLState: " + se.getSQLState());
+			System.out.println("VendorError: " + se.getErrorCode());
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			}
+		}
+
+		return data;
+	}
+
+	
 
 }
