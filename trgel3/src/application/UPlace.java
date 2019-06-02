@@ -24,8 +24,9 @@ public class UPlace extends Place implements Serializable {
 	}
 
 	public UPlace(String MapId, String CityName, String PlaceName, String Description, String Classification,
-			int Accessibility, long serialID, int LocX, int LocY, String Type, int PlaceId) {
-		super(MapId, CityName, PlaceName, Description, Classification, Accessibility, serialID, LocX, LocY, Type);
+			int Accessibility, long serialID, int LocX, int LocY, String Type, int numOfmaps, int PlaceId) {
+		super(MapId, CityName, PlaceName, Description, Classification, Accessibility, serialID, LocX, LocY, Type,
+				numOfmaps);
 		this.PlaceId = PlaceId;
 	}
 

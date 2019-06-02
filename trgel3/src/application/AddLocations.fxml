@@ -22,5 +22,6 @@
       <Button fx:id="btn_ViewMode" layoutX="244.0" layoutY="14.0" mnemonicParsing="false" onAction="#changeMode" text="View Mode" />
       <Button fx:id="btn_AddLoc" layoutX="387.0" layoutY="14.0" mnemonicParsing="false" onAction="#AddLocation" text="Set new location" />
       <Button fx:id="btn_UpdateMap" layoutX="728.0" layoutY="14.0" mnemonicParsing="false" onAction="#UpdateMap" text="Update map" />
+      <Button fx:id="ConfirmUpdate" layoutX="823.0" layoutY="14.0" mnemonicParsing="false" onAction="#ConfirmUpdate" text="Confirm Update" />
    </children>
 </AnchorPane>
