@@ -1,5 +1,6 @@
 package application;
 
+
 import java.io.IOException;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -16,10 +17,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-/**
-*
-* @author zoranpavlovic.blogspot.com
-*/
+
 public class ViewController  {
    @FXML
     private ImageView mapImage;
@@ -41,6 +39,8 @@ public class ViewController  {
    void backFunc(ActionEvent event) throws IOException {
      	Stage primaryStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
      	URL url = getClass().getResource(Globals.backLink);
+     	Globals.backLink = "MyMapsScene.fxml";
+
 		AnchorPane pane =FXMLLoader.load(url);
 
 		Scene scene = new Scene(pane);

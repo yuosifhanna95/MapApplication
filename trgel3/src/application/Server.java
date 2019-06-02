@@ -11,6 +11,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import javax.swing.JOptionPane;
@@ -29,7 +30,7 @@ public class Server {
 	static private final String PASS = "eSS7xZeTpg";// bW3%jS1%
 	static private Object data;
 
-	public static void main(String[] args) throws ClassNotFoundException, SQLException {
+	public static void main(String[] args) throws ClassNotFoundException, SQLException, ParseException {
 
 		try {
 			@SuppressWarnings("resource")
@@ -80,12 +81,13 @@ public class Server {
     								c.setTime(new Date());
     								c.add(Calendar.DATE, fp.getperiod());
     								String output = sdf.format(c.getTime());
-    								fp.setedate(output);
+    								Date s=sdf.parse(output);
+    								fp.setedate(s);
 									pr.setString(1,fp.getuser() );
 									pr.setString(2, fp.getcity());
 									pr.setString(3,Integer.toString(fp.getperiod()));
-									pr.setString(4, fp.getsdate());
-									pr.setString(5, fp.getedate());
+									pr.setDate(4, (java.sql.Date) fp.getsdate());
+									pr.setDate(5, (java.sql.Date) fp.getedate());
 									pr.setString(6,Double.toString(fp.getprice()));
 									if (pr.executeUpdate() > 0) {
 										ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());

@@ -174,7 +174,20 @@ public class RegisterController {
     	 try {
              ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
              objectOutput.writeObject(get); 
-         } 
+             ObjectInputStream  objectInput = new ObjectInputStream(socket.getInputStream());
+             try {
+ 				Object data=objectInput.readObject();
+ 				
+ 				if((data).equals("fill all the fields")){
+ 					JOptionPane.showMessageDialog(null, "Please fill all the fields");
+ 				}
+ 				if((data).equals("thanks for registeration")){
+ 					JOptionPane.showMessageDialog(null, "thanks for registeration");}
+         } catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
+    	 }
          catch (IOException e) 
          {
              e.printStackTrace();

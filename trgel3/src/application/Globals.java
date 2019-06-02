@@ -6,5 +6,6 @@ public class Globals {
 	static City city;
 	static FixedPurchase FixedPurchase;
 	static Map map;
+	static Route route;
 	static String backLink;
 }
