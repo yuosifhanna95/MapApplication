@@ -51,9 +51,9 @@ public class Server {
 						int x=0;
 						Connection conn = null;
             			Statement stmt = null;
-            			fixedPurchase fp=((fixedPurchase)((Object[])(data))[1]);
-            			int period=fp.getperiod();
-            			String user2=fp.getuser();
+            			FixedPurchase fp=((FixedPurchase)((Object[])(data))[1]);
+            			int period=fp.getPeriod();
+            			String user2=fp.getUser();
             			
             			if(period<=3) {
             				ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
@@ -85,16 +85,16 @@ public class Server {
     								SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
     								Calendar c = Calendar.getInstance();
     								c.setTime(new Date());
-    								c.add(Calendar.DATE, fp.getperiod());
+    								c.add(Calendar.DATE, fp.getPeriod());
     								String output = sdf.format(c.getTime());
     								Date s=sdf.parse(output);
-    								fp.setedate(s);
-									pr.setString(1,fp.getuser() );
-									pr.setString(2, fp.getcity());
-									pr.setString(3,Integer.toString(fp.getperiod()));
-									pr.setDate(4, (java.sql.Date) fp.getsdate());
-									pr.setDate(5, (java.sql.Date) fp.getedate());
-									pr.setString(6,Double.toString(fp.getprice()));
+    								fp.setEndDate(s);
+									pr.setString(1,fp.getUser() );
+									pr.setString(2, fp.getCity());
+									pr.setString(3,Integer.toString(fp.getPeriod()));
+									pr.setDate(4, (java.sql.Date) fp.getStartDate());
+									pr.setDate(5, (java.sql.Date) fp.getEndDate());
+									pr.setString(6,Double.toString(fp.getPrice()));
 									if (pr.executeUpdate() > 0) {
 										ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
               		    				String message="thanks for purchace,you will enjoy";
@@ -916,12 +916,13 @@ public class Server {
 				String city = rs.getString("city");
 				java.sql.Date startDate = rs.getDate("startDate");
 				java.sql.Date endDate = rs.getDate("endDate");
-
+				int period = rs.getInt("period");
+				double price = rs.getDouble("purchaseprice");
 				if (currentDate.compareTo(endDate) > 0) {
 					System.out.println(currentDate);
 					rs.deleteRow();
 				} else
-					data.add(new FixedPurchase(user, city, startDate, endDate));
+					data.add(new FixedPurchase(user, period, city, startDate, endDate, price));
 			}
 
 			stmt.close();
