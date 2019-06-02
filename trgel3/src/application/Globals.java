@@ -7,4 +7,6 @@ public class Globals {
 	static FixedPurchase FixedPurchase;
 	static Map map;
 	static String backLink;
+	static Boolean ThereIsCityUpdate = false;
+	static Boolean ThereIsMapUpdate = false;
 }

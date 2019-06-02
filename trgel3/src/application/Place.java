@@ -2,10 +2,8 @@ package application;
 
 import java.io.Serializable;
 
-
 @SuppressWarnings("serial")
 public class Place implements Serializable {
-
 
 	private static final long serialVersionUID = 1L;
 	private long serialID;
@@ -24,7 +22,6 @@ public class Place implements Serializable {
 
 	}
 
-
 	public Place(String MapId, String CityName, String PlaceName, String Description, String Classification,
 			int Accessibility, int LocX, int LocY, String Type) {
 		this.MapId = MapId;
@@ -33,8 +30,8 @@ public class Place implements Serializable {
 		this.Description = Description;
 		this.Classification = Classification;
 		this.Accessibility = Accessibility;
-		this.LocX=LocX;
-		this.LocY=LocY;
+		this.LocX = LocX;
+		this.LocY = LocY;
 		this.Type = Type;
 	}
 
@@ -46,23 +43,25 @@ public class Place implements Serializable {
 		this.Description = Description;
 		this.Classification = Classification;
 		this.Accessibility = Accessibility;
-		this.serialID=serialID;
-		this.LocX=LocX;
-		this.LocY=LocY;
-		
+		this.serialID = serialID;
+		this.LocX = LocX;
+		this.LocY = LocY;
+
 	}
-	public Place(String CityName, String PlaceName, String Description, String Classification, int Accessibility, int numOfmaps) {
+
+	public Place(String CityName, String PlaceName, String Description, String Classification, int Accessibility,
+			int numOfmaps) {
 		this.CityName = CityName;
 		this.PlaceName = PlaceName;
 		this.Description = Description;
 		this.Classification = Classification;
 		this.Accessibility = Accessibility;
-		this.numOfmaps = numOfmaps;		
-		
+		this.numOfmaps = numOfmaps;
+
 	}
 
 	public Place(String MapId, String CityName, String PlaceName, String Description, String Classification,
-			int Accessibility, long serialID, int LocX, int LocY, String Type) {
+			int Accessibility, long serialID, int LocX, int LocY, String Type, int numOfmaps) {
 		this.MapId = MapId;
 		this.CityName = CityName;
 		this.PlaceName = PlaceName;
@@ -71,8 +70,9 @@ public class Place implements Serializable {
 		this.Accessibility = Accessibility;
 		this.serialID = serialID;
 		this.Type = Type;
-		this.LocX=LocX;
-		this.LocY=LocY;
+		this.LocX = LocX;
+		this.LocY = LocY;
+		this.numOfmaps = numOfmaps;
 	}
 
 	public void setCityName(String cityName) {
