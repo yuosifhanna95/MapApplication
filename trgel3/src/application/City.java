@@ -5,24 +5,29 @@ import java.io.Serializable;
 public class City implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private String city;
-	private String Description;
-	private String numOfMaps;
-	private String numOfPlaces;
-	private String Places;
-	private final String numOfPaths;
+
+    private String city;
+    private String Description;
+    private String  numOfMaps;
+    private String  numOfPlaces;
+    private String  Places;
+    private final String  numOfPaths;
+    private int oneTimeCost;
+    private int fixedCost;
 	private Boolean NewUpdate;
 
-	City(String city, String Description, String numOfMaps, String numOfPlaces, String numOfPaths, String Places,
-			Boolean NewUpdate) {
-		this.city = city;
-		this.Description = Description;
-		this.numOfMaps = numOfMaps;
-		this.numOfPlaces = numOfPlaces;
-		this.numOfPaths = numOfPaths;
-		this.Places = Places;
-		this.NewUpdate = NewUpdate;
-	}
+    City(String city, String Description, String numOfMaps, String numOfPlaces, String numOfPaths, String Places, int oneTimeCost, int fixedCost, Boolean NewUpdate) {
+        this.city = city;
+        this.Description = Description;
+        this.numOfMaps = numOfMaps;
+        this.numOfPlaces =numOfPlaces;
+        this.numOfPaths = numOfPaths;
+        this.Places = Places;
+        this.oneTimeCost = oneTimeCost;
+        this.fixedCost = fixedCost;
+        this.NewUpdate = NewUpdate;
+    }
+
 
 	public String getCity() {
 		return city;
@@ -71,6 +76,25 @@ public class City implements Serializable {
 	public void setPlaces(String places) {
 		Places = places;
 	}
+
+
+	public int getOneTimeCost() {
+		return oneTimeCost;
+	}
+
+	public void setOneTimeCost(int oneTimeCost) {
+		this.oneTimeCost = oneTimeCost;
+	}
+
+	public int getFixedCost() {
+		return fixedCost;
+	}
+
+	public void setFixedCost(int fixedCost) {
+		this.fixedCost = fixedCost;
+	}
+    
+
 
 	public Boolean getNewUpdate() {
 		return NewUpdate;

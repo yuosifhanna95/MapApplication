@@ -1,5 +1,6 @@
 package application;
 
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -21,10 +22,10 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-/**
- *
- * @author zoranpavlovic.blogspot.com
- */
+
+
+
+
 public class ViewController {
 
 	private ImagePlace[] ImagePlaces = new ImagePlace[10];
@@ -54,6 +55,7 @@ public class ViewController {
 		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 		URL url = getClass().getResource(Globals.backLink);
 		AnchorPane pane = FXMLLoader.load(url);
+
 
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
