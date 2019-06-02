@@ -35,6 +35,7 @@ public class ManagerPageController {
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
 		primaryStage.show();
+
 	}
 
 	@FXML // This method is called by the FXMLLoader when initialization is complete
