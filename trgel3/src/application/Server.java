@@ -663,7 +663,7 @@ public class Server {
 							}
 						}
 
-					}/* else if (((String[]) (data))[0].equals("getUPlaces")) {
+					} else if (((String[]) (data))[0].equals("getUPlaces")) {
 
 						UPlace[] list;
 						int k = ((String[]) (data)).length;
@@ -742,15 +742,15 @@ public class Server {
 							}
 						}
 
-					} */
+					}
 
 				}
 
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-		} 
-	} 
+		}
+	}
 	
 
 	   static ObservableList<FixedPurchase> getFixedPurchaseFromDB(String user){
