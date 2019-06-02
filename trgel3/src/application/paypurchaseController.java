@@ -103,7 +103,7 @@ public class paypurchaseController {
         Date enddate=sdate;
         double price1=Double.parseDouble(price.getText());
         String city1=Globals.city.getCity();
-        fixedPurchase fp=new fixedPurchase(user,timeperiod,city1,sdate,enddate,price1);
+        FixedPurchase fp=new FixedPurchase(user,timeperiod,city1,sdate,enddate,price1);
         if(!(user.equals(Globals.user.getUserName()))){
         	JOptionPane.showMessageDialog(null, "the username isn't correct");
         }
