@@ -1,12 +1,11 @@
 package application;
 
-
 import java.io.Serializable;
 
+public class City implements Serializable {
 
-public class City implements Serializable{
- 
 	private static final long serialVersionUID = 1L;
+
     private String city;
     private String Description;
     private String  numOfMaps;
@@ -15,8 +14,9 @@ public class City implements Serializable{
     private final String  numOfPaths;
     private int oneTimeCost;
     private int fixedCost;
+	private Boolean NewUpdate;
 
-    City(String city, String Description, String numOfMaps, String numOfPlaces, String numOfPaths, String Places, int oneTimeCost, int fixedCost) {
+    City(String city, String Description, String numOfMaps, String numOfPlaces, String numOfPaths, String Places, int oneTimeCost, int fixedCost, Boolean NewUpdate) {
         this.city = city;
         this.Description = Description;
         this.numOfMaps = numOfMaps;
@@ -25,47 +25,49 @@ public class City implements Serializable{
         this.Places = Places;
         this.oneTimeCost = oneTimeCost;
         this.fixedCost = fixedCost;
+        this.NewUpdate = NewUpdate;
     }
 
-    public String getCity() {
-        return city;
-    }
 
-    public void setCity(String str) {
-        this.city = str;
-    }
+	public String getCity() {
+		return city;
+	}
 
-    public String getDescription() {        
-        return Description;
-    }
+	public void setCity(String str) {
+		this.city = str;
+	}
 
-    public void setDescription(String str) {
-    	this.Description = str;
-    }
+	public String getDescription() {
+		return Description;
+	}
 
-    public String getNumOfMaps() {
-        return numOfMaps;
-    }
+	public void setDescription(String str) {
+		this.Description = str;
+	}
 
-    public void setNumOfMaps(String str) {
-    	this.numOfMaps = str;
-    }
-   
-    public String getNumOfPlaces() {
-        return numOfPlaces;
-    }
-    
-    public void setNumOfPlaces(String str) {
-    	this.numOfPlaces = str;
-    }
-  
-    public String getNumOfPaths() {
-        return numOfPaths;
-    }
+	public String getNumOfMaps() {
+		return numOfMaps;
+	}
 
-    public void setNumOfPaths(String str) {
-    	this.numOfMaps = str;
-    }
+	public void setNumOfMaps(String str) {
+		this.numOfMaps = str;
+	}
+
+	public String getNumOfPlaces() {
+		return numOfPlaces;
+	}
+
+	public void setNumOfPlaces(String str) {
+		this.numOfPlaces = str;
+	}
+
+	public String getNumOfPaths() {
+		return numOfPaths;
+	}
+
+	public void setNumOfPaths(String str) {
+		this.numOfMaps = str;
+	}
 
 	public String getPlaces() {
 		return Places;
@@ -74,6 +76,7 @@ public class City implements Serializable{
 	public void setPlaces(String places) {
 		Places = places;
 	}
+
 
 	public int getOneTimeCost() {
 		return oneTimeCost;
@@ -91,6 +94,13 @@ public class City implements Serializable{
 		this.fixedCost = fixedCost;
 	}
     
-  
 
+
+	public Boolean getNewUpdate() {
+		return NewUpdate;
+	}
+
+	public void setNewUpdate(Boolean newUpdate) {
+		NewUpdate = newUpdate;
+	}
 }

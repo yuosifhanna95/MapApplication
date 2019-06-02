@@ -1,5 +1,6 @@
 package application;
 
+import java.awt.Point;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -11,15 +12,20 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+
+import java.util.Calendar;
 
 import javax.swing.JOptionPane;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
 import java.util.Calendar;
 import java.util.Date;
+
 
 public class Server {
 
@@ -252,13 +258,14 @@ public class Server {
 								PlaceId = ((UPlace) place).getPlaceId();
 							}
 						}
-						String CityName = place.getPlaceName();
+						String CityName = place.getCityName();
 						String PlaceName = place.getPlaceName();
 						String description = place.getDescription();
 						String classification = place.getClassification();
 						int accessibility = place.getAccessibility();
 						int LocX = place.getLocX();
 						int LocY = place.getLocY();
+						int mapsNum = place.getNumOfmaps();
 						String Type = place.getType();
 
 						Connection conn = null;
@@ -270,14 +277,14 @@ public class Server {
 							stmt = conn.createStatement();
 
 							PreparedStatement pr;
-							String sql = "INSERT INTO Updates (`MapId`,PlaceId ,`Name`, `Place`, `description`, `classification`, accessibility, LocX, LocY, `Type`) VALUES (?,?,?,?,?,?,?,?,?,?)";
+							String sql = "INSERT INTO Updates (`MapId`,PlaceId ,`Name`, `Place`, `description`, `classification`, accessibility, LocX, LocY, mapsNum, `Type`) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 							// ResultSet rs = stmt.executeQuery(sql);
 
 							if (conn != null) {
 								if (PlaceId == -1)
-									checkplace(place, conn, "NOP");
+									checkuplace(place, conn, "NOP");
 								else
-									checkplace(place, conn, "YESP");
+									checkuplace(place, conn, "YESP");
 
 								pr = conn.prepareStatement(sql);
 								pr.setString(1, MapId);
@@ -289,11 +296,15 @@ public class Server {
 								pr.setInt(7, accessibility);
 								pr.setInt(8, LocX);
 								pr.setInt(9, LocY);
-								pr.setString(10, Type);
+								pr.setInt(10, mapsNum);
+								pr.setString(11, Type);
 
 								if (pr.executeUpdate() > 0) {
 									// JOptionPane.showMessageDialog(null, "thanks for Update");
 									System.out.println("thanks for Update");
+									SetUpdateForMap(Integer.parseInt(MapId), conn);
+									SetUpdateForCity(CityName, conn);
+
 								}
 							}
 							skt.close();
@@ -319,12 +330,139 @@ public class Server {
 						}
 
 					}
-				}
-
-				else if (data instanceof String[]) {
+				} else if (data instanceof String[]) {
 
 					if (((String[]) (data))[0].equals("Exit"))
 						break;
+					else if (((String) ((String[]) (data))[0]).equals("ConfirmUpdate")) {
+
+						System.out.println("this is confirm");
+						Boolean flag = false;
+						UPlace place;
+
+						String MapId = ((String[]) (data))[1];
+						UPlace[] list = getPlaces(MapId);
+
+						for (int i = 0; i < list.length; i++) {
+							place = list[i];
+							int PlaceId = -1;
+							if (place.getType().equals("UPDATE")) {
+								PlaceId = place.getPlaceId();
+							}
+							if (place instanceof UPlace) {
+								if (((UPlace) place).getPlaceId() == -1) {
+									PlaceId = (int) ((UPlace) place).getPlaceId();
+								} else {
+									PlaceId = ((UPlace) place).getPlaceId();
+								}
+							}
+							String CityName = place.getCityName();
+							String PlaceName = place.getPlaceName();
+							String description = place.getDescription();
+							String classification = place.getClassification();
+							int accessibility = place.getAccessibility();
+							int LocX = place.getLocX();
+							int LocY = place.getLocY();
+							String Type = place.getType();
+							int mapsnum = place.getNumOfmaps();
+							Connection conn = null;
+							Statement stmt = null, stmt2 = null;
+							try {
+								Class.forName(JDBC_DRIVER);
+
+								conn = DriverManager.getConnection(DB_URL, USER, PASS);
+								stmt = conn.createStatement();
+								stmt2 = conn.createStatement();
+								PreparedStatement pr, pr2;
+
+								String sql, sql2;// = "INSERT INTO places (`MapId` ,`Name`, `Place`, `description`,
+								// `classification`, accessibility, LocX, LocY, `Type`) VALUES
+								// (?,?,?,?,?,?,?,?,?)";
+								// ResultSet rs = stmt.executeQuery(sql);
+
+								if (place.getType().equals("NEW")) {
+									sql = "INSERT INTO places (`MapId` ,`Name`, `Place`, `description`, `classification`, accessibility, LocX, LocY, mapsNum) VALUES (?,?,?,?,?,?,?,?,?)";
+									sql2 = "INSERT INTO placeMap (`Name`,`MapId` ,LocX, LocY) VALUES (?,?,?,?)";
+								} else {
+									sql = "UPDATE places SET `Place` = '" + PlaceName + "', `description` = '"
+											+ description + "', `classification` = '" + classification
+											+ "', accessibility = " + accessibility + " WHERE id=" + PlaceId;
+
+									int PlaceMapId = getPlaceMapId(PlaceName, conn, MapId);
+									sql2 = "UPDATE placeMap SET `Name` = '" + PlaceName + "', LocX = " + LocX
+											+ ", LocY = " + LocY + " WHERE id=" + PlaceMapId;
+								}
+								if (conn != null) {
+									// if (PlaceId == -1)
+									// checkplace(place, conn, "NOP");
+									// else
+									// checkplace(place, conn, "YESP");
+
+									if (place.getType().equals("NEW")) {
+										pr = conn.prepareStatement(sql);
+										pr.setString(1, MapId);
+										pr.setString(2, CityName);
+										pr.setString(3, PlaceName);
+										pr.setString(4, description);
+										pr.setString(5, classification);
+										pr.setInt(6, accessibility);
+										pr.setInt(7, LocX);
+										pr.setInt(8, LocY);
+										pr.setInt(9, mapsnum);
+
+										pr2 = conn.prepareStatement(sql2);
+										pr2.setString(1, PlaceName);
+										pr2.setString(2, MapId);
+										pr2.setInt(3, LocX);
+										pr2.setInt(4, LocY);
+										if (pr.executeUpdate() > 0) {
+											// JOptionPane.showMessageDialog(null, "thanks for Update");
+											System.out.println("thanks for confirmation");
+											if (pr2.executeUpdate() > 0) {
+												// JOptionPane.showMessageDialog(null, "thanks for Update");
+												System.out.println("thanks for confirmation");
+												flag = true;
+											}
+										}
+
+									} else if (place.getType().equals("UPDATE")) {
+										if (stmt.executeUpdate(sql) > 0) {
+											// JOptionPane.showMessageDialog(null, "thanks for Update");
+											System.out.println("thanks for confirmation");
+											if (stmt2.executeUpdate(sql2) > 0) {
+												// JOptionPane.showMessageDialog(null, "thanks for Update");
+												System.out.println("thanks for confirmation");
+												flag = true;
+											}
+										}
+
+									}
+								}
+								skt.close();
+								conn.close();
+
+							} catch (SQLException se) {
+								se.printStackTrace();
+								System.out.println("SQLException: " + se.getMessage());
+								System.out.println("SQLState: " + se.getSQLState());
+								System.out.println("VendorError: " + se.getErrorCode());
+							} catch (Exception e) {
+								e.printStackTrace();
+							} finally {
+								try {
+									if (stmt != null)
+										stmt.close();
+									if (conn != null)
+										conn.close();
+								} catch (SQLException se) {
+									se.printStackTrace();
+								}
+							}
+						}
+						DeleteUpdates(MapId);
+						DeleteNewUpdates(MapId);
+					}
+
 					else if (((String[]) (data))[0].equals("getMessages")) {
 
 						Connection conn = null;
@@ -486,6 +624,7 @@ public class Server {
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
+
 					}
 					else if (((String[]) (data))[0].equals("getMyRoutes")) {
 						ObservableList<Route> RouteList = getMyRoutesFromDB(((String[]) (data))[1]);
@@ -566,29 +705,28 @@ public class Server {
 	              						// TODO Auto-generated catch block
 	              						e.printStackTrace();
 	              					}
-	              		    	}
+	              		    	} 
 	            			    
 	            			
 	            				conn.close();
 
+					}catch (SQLException se) {
+						se.printStackTrace();
+						System.out.println("SQLException: " + se.getMessage());
+						System.out.println("SQLState: " + se.getSQLState());
+						System.out.println("VendorError: " + se.getErrorCode());
+					} catch (Exception e) {
+						e.printStackTrace();
+					} finally {
+						try {
+							if (stmt != null)
+								stmt.close();
+							if (conn != null)
+								conn.close();
 						} catch (SQLException se) {
 							se.printStackTrace();
-							System.out.println("SQLException: " + se.getMessage());
-							System.out.println("SQLState: " + se.getSQLState());
-							System.out.println("VendorError: " + se.getErrorCode());
-						} catch (Exception e) {
-							e.printStackTrace();
-						} finally {
-							try {
-								if (stmt != null)
-									stmt.close();
-								if (conn != null)
-									conn.close();
-							} catch (SQLException se) {
-								se.printStackTrace();
-							}
 						}
-					} else if (((String[]) (data))[0].equals("getPlaces")) {
+					}} else if (((String[]) (data))[0].equals("getPlaces")) {
 
 						Place[] list;
 						int k = ((String[]) (data)).length;
@@ -624,8 +762,10 @@ public class Server {
 								String description = rs.getString("description");
 								String classification = rs.getString("classification");
 								int accessibility = rs.getInt("accessibility");
-								int LocX = rs.getInt("LocX");
-								int LocY = rs.getInt("LocY");
+
+								Point p = GetLocationFromDB(Integer.parseInt(MapId), Place);
+								int LocX = (int) p.getX();
+								int LocY = (int) p.getY();
 								// rs.getString("pathNum");
 
 								// data.add(new User(username, description, mapsnum , placesnum, pathnum ));
@@ -706,10 +846,10 @@ public class Server {
 								int LocY = rs.getInt("LocY");
 								String Type = rs.getString("Type");
 								// rs.getString("pathNum");
-
+								int mapsNum = rs.getInt("mapsNum");
 								// data.add(new User(username, description, mapsnum , placesnum, pathnum ));
 								UPlace place = new UPlace(MapId, Name, Place, description, classification,
-										accessibility, id, LocX, LocY, Type, PlaceId);
+										accessibility, id, LocX, LocY, Type, mapsNum, PlaceId);
 								list[index] = (place);
 								index++;
 
@@ -749,69 +889,110 @@ public class Server {
 				}
 
 			}
-		} catch (IOException e) {
+		} catch (
+
+		IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
 
-	   static ObservableList<FixedPurchase> getFixedPurchaseFromDB(String user){
-			ObservableList<FixedPurchase> data = FXCollections.observableArrayList();
-			
-		    Connection conn = null;
-			Statement stmt = null;
-			
+	static ObservableList<FixedPurchase> getFixedPurchaseFromDB(String user) {
+		ObservableList<FixedPurchase> data = FXCollections.observableArrayList();
+
+		Connection conn = null;
+		Statement stmt = null;
+
+		try {
+			Class.forName(JDBC_DRIVER);
+
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
+
+			String sql = "SELECT * FROM fixedPurchase WHERE user ='" + user + "'";
+			ResultSet rs = stmt.executeQuery(sql);
+			java.util.Date currentDate = Calendar.getInstance().getTime();
+
+			while (rs.next()) {
+				String city = rs.getString("city");
+				java.sql.Date startDate = rs.getDate("startDate");
+				java.sql.Date endDate = rs.getDate("endDate");
+
+				if (currentDate.compareTo(endDate) > 0) {
+					System.out.println(currentDate);
+					rs.deleteRow();
+				} else
+					data.add(new FixedPurchase(user, city, startDate, endDate));
+			}
+
+			stmt.close();
+			conn.close();
+
+			return data;
+		} catch (SQLException se) {
+			se.printStackTrace();
+			System.out.println("SQLException: " + se.getMessage());
+			System.out.println("SQLState: " + se.getSQLState());
+			System.out.println("VendorError: " + se.getErrorCode());
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
 			try {
-				Class.forName(JDBC_DRIVER);
-				 
-				conn = DriverManager.getConnection(DB_URL, USER, PASS);
-				stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY,
-				        ResultSet.CONCUR_UPDATABLE);
-			
-				String sql = "SELECT * FROM fixedPurchase WHERE user ='" + user + "'"  ;
-				ResultSet rs = stmt.executeQuery(sql);
-				java.util.Date currentDate = Calendar.getInstance().getTime();
-				
-				while (rs.next()) {
-				  String city = rs.getString("city"); 
-				  java.sql.Date startDate = rs.getDate("startDate");
-				  java.sql.Date endDate = rs.getDate("endDate");
-				  
-				  if (currentDate.compareTo(endDate) > 0) {
-					  System.out.println(currentDate);
-					  rs.deleteRow();
-				  }
-				  else
-					  data.add(new FixedPurchase(user, city, startDate, endDate));
-				}
-			    
-				
-				stmt.close();
-				conn.close();
-				
-				return data;
-			}
-			catch (SQLException se) {
+				if (stmt != null)
+					stmt.close();
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
 				se.printStackTrace();
-				System.out.println("SQLException: " + se.getMessage());
-			    System.out.println("SQLState: " + se.getSQLState());
-			    System.out.println("VendorError: " + se.getErrorCode());
-			} catch (Exception e) {
-				e.printStackTrace();
-			} finally {
-				try {
-					if (stmt != null)
-						stmt.close();
-					if (conn != null)
-						conn.close();
-				} catch (SQLException se) {
-					se.printStackTrace();
-				}
 			}
-		   
-		   
-		   return data;
-		 }
+		}
+
+		return data;
+	}
+
+	static Point GetLocationFromDB(int MapId, String Name) {
+		ObservableList<FixedPurchase> data = FXCollections.observableArrayList();
+		Point p = new Point();
+		Connection conn = null;
+		Statement stmt = null;
+
+		try {
+			Class.forName(JDBC_DRIVER);
+
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
+
+			String sql = "SELECT * FROM placeMap WHERE Name ='" + Name + "' AND MapID=" + MapId;
+			ResultSet rs = stmt.executeQuery(sql);
+
+			while (rs.next()) {
+				int X = rs.getInt("LocX");
+				int Y = rs.getInt("LocY");
+				p.setLocation(X, Y);
+			}
+
+			stmt.close();
+			conn.close();
+
+		} catch (SQLException se) {
+			se.printStackTrace();
+			System.out.println("SQLException: " + se.getMessage());
+			System.out.println("SQLState: " + se.getSQLState());
+			System.out.println("VendorError: " + se.getErrorCode());
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			}
+		}
+
+		return p;
+	}
 
 	static ObservableList<City> getCityFromDB() {
 		ObservableList<City> data = FXCollections.observableArrayList();
@@ -839,6 +1020,7 @@ public class Server {
 				int oneTimeCost = rs.getInt("oneTimeCost");
 				int FixedCost = rs.getInt("FixedCost");
 				String places = null;
+				Boolean NewUpdate = rs.getBoolean("NewUpdate");
 				String sql2 = "SELECT * FROM places WHERE Name ='" + city + "'";
 				ResultSet rs2 = stmt2.executeQuery(sql2);
 
@@ -847,7 +1029,9 @@ public class Server {
 					places += (" + " + place);
 				}
 
-				data.add(new City(city, description, mapsnum, placesnum, pathnum, places, oneTimeCost, FixedCost));
+
+				data.add(new City(city, description, mapsnum, placesnum, pathnum, places, oneTimeCost, FixedCost,NewUpdate));
+
 			}
 
 			stmt.close();
@@ -946,8 +1130,9 @@ public class Server {
 				String description = rs.getString("description");
 				String linkC = rs.getString("linkCustomer");
 				String linkE = rs.getString("linkEmployee");
+				Boolean NewUpdate = rs.getBoolean("NewUpdate");
 
-				data.add(new Map(id, city, description, linkC, linkE));
+				data.add(new Map(id, city, description, linkC, linkE, NewUpdate));
 			}
 
 			stmt.close();
@@ -977,42 +1162,39 @@ public class Server {
 
 	static ObservableList<Map> getMyMapsFromDB(String city) {
 		ObservableList<Map> data = FXCollections.observableArrayList();
-		
-	    
+
 		Connection conn = null;
 		Statement stmt = null;
 		Statement stmt2 = null;
 		try {
 			Class.forName(JDBC_DRIVER);
-			 
+
 			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			stmt = conn.createStatement();
 			stmt2 = conn.createStatement();
-			
 
-			String sql = "SELECT * FROM maps WHERE city ='" + city + "'"  ;
-			   ResultSet rs = stmt2.executeQuery(sql);
-			   
-				while (rs.next()) {
-				  int id = rs.getInt("id");
-				  String description = rs.getString("description");
-				  String linkC = rs.getString("linkCustomer");
-				  String linkE = rs.getString("linkEmployee");
-				 
-				  data.add(new Map(id, city,description, linkC , linkE ));
-				}
+			String sql = "SELECT * FROM maps WHERE city ='" + city + "'";
+			ResultSet rs = stmt2.executeQuery(sql);
 
-			
+			while (rs.next()) {
+				int id = rs.getInt("id");
+				String description = rs.getString("description");
+				String linkC = rs.getString("linkCustomer");
+				String linkE = rs.getString("linkEmployee");
+
+				Boolean NewUpdate = rs.getBoolean("NewUpdate");
+				data.add(new Map(id, city, description, linkC, linkE, NewUpdate));
+			}
+
 			stmt.close();
 			conn.close();
-			
+
 			return data;
-		}
-		catch (SQLException se) {
+		} catch (SQLException se) {
 			se.printStackTrace();
 			System.out.println("SQLException: " + se.getMessage());
-		    System.out.println("SQLState: " + se.getSQLState());
-		    System.out.println("VendorError: " + se.getErrorCode());
+			System.out.println("SQLState: " + se.getSQLState());
+			System.out.println("VendorError: " + se.getErrorCode());
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -1025,10 +1207,10 @@ public class Server {
 				se.printStackTrace();
 			}
 		}
-	   
-	   
-	   return data;
+
+		return data;
 	}
+
 	   
 	static ObservableList<Route> getMyRoutesFromDB(String city) {
 		ObservableList<Route> data = FXCollections.observableArrayList();
@@ -1136,6 +1318,71 @@ public class Server {
 	   
 	   return data;
 	}
+	static UPlace[] getPlaces(String MapId) {
+		Connection conn = null;
+		Statement stmt = null;
+		UPlace[] list;
+		try {
+			Class.forName(JDBC_DRIVER);
+
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			stmt = conn.createStatement();
+
+			String sql = "SELECT * FROM Updates WHERE MapId=" + MapId;
+			ResultSet rs = stmt.executeQuery(sql);
+
+			int index = 0;
+			while (rs.next()) {
+				index++;
+			}
+			list = new UPlace[index];
+			index = 0;
+			rs.first();
+			rs.previous();
+			while (rs.next()) {
+				long id = rs.getInt("id");
+				String city = rs.getString("Name");
+				String description = rs.getString("description");
+				String place = rs.getString("Place");
+				String Classification = rs.getString("Classification");
+				int Accessibility = rs.getInt("Accessibility");
+				int palceid = rs.getInt("PlaceId");
+				// int numOfMaps = rs.getInt("mapsNum");
+				// Point p = GetLocationFromDB(Integer.parseInt(MapId), place);
+				int LocX = rs.getInt("LocX");
+				int LocY = rs.getInt("LocY");
+				String Type = rs.getString("Type");
+				int mapsNum = rs.getInt("mapsNum");
+				list[index] = new UPlace(MapId, city, place, description, Classification, Accessibility, id, LocX, LocY,
+						Type, mapsNum, palceid);
+				index++;
+			}
+
+			stmt.close();
+			conn.close();
+
+			return list;
+
+		} catch (SQLException se) {
+			se.printStackTrace();
+			System.out.println("SQLException: " + se.getMessage());
+			System.out.println("SQLState: " + se.getSQLState());
+			System.out.println("VendorError: " + se.getErrorCode());
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			}
+		}
+		return null;
+
+	}
 
 	public static int checkuser(String user2, Connection conn) {
 		Statement pr;
@@ -1174,7 +1421,7 @@ public class Server {
 		return a;
 	}
 
-	public static void checkplace(Place place, Connection conn, String Type) {
+	public static void checkuplace(Place place, Connection conn, String Type) {
 		Statement pr;
 		Statement pr2;
 
@@ -1215,6 +1462,182 @@ public class Server {
 			}
 
 		}
+	}
+
+	public static void DeleteUpdates(String MapId) throws SQLException {
+		Statement pr;
+		Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+		ResultSet rs = null;
+
+		String sql = "";
+		sql = "DELETE FROM Updates WHERE MapId ='" + MapId + "'";
+
+		// Connection conn=connecttion();
+		if (conn != null) {
+			try {
+				pr = conn.createStatement();
+				int k = pr.executeUpdate(sql);
+				if (k > 0) {
+
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+	}
+
+	public static void DeleteNewUpdates(String MapId) throws SQLException {
+		Statement pr, pr1, pr2;
+		Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+		ResultSet rs = null;
+
+		String sql = "", sql2 = "", sqlfind = "";
+		sql = "UPDATE maps SET NewUpdate=" + false + " WHERE id=" + MapId;
+		sql2 = "UPDATE CityCatalog SET NewUpdate=" + false + " WHERE Name='";
+		sqlfind = "Select * FROM maps WHERE id ='" + MapId + "'";
+		// Connection conn=connecttion();
+		int counter = 0;
+		if (conn != null) {
+			try {
+				pr = conn.createStatement();
+				int k = pr.executeUpdate(sql);
+				if (k > 0) {
+					pr1 = conn.createStatement();
+					rs = pr1.executeQuery(sqlfind);
+					String city = "";
+					while (rs.next()) {
+						counter += rs.getInt("NewUpdate");
+						city = rs.getString("city");
+					}
+					if (counter == 0) {
+						sql2 += city + "'";
+						pr2 = conn.createStatement();
+						pr2.executeUpdate(sql2);
+					}
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+	}
+
+	public static String checkplace(Place place, Connection conn, String Type) {
+		Statement pr;
+
+		ResultSet rs = null;
+
+		String sqlfind = "";
+		if (Type.equals("NOP")) {
+			if (place instanceof UPlace) {
+				sqlfind = "Select * FROM places WHERE id ='" + ((UPlace) place).getSerialID() + "'";
+			} else
+				return "Error";
+
+		} else if (Type.equals("YESP")) {
+			if (place instanceof UPlace) {
+				sqlfind = "Select * FROM places WHERE id ='" + ((Place) place).getSerialID() + "'";
+
+				sqlfind = "Select * FROM places WHERE PlaceId ='" + ((Place) place).getSerialID() + "'";
+			}
+		}
+		// Connection conn=connecttion();
+		if (conn != null) {
+			try {
+				pr = conn.createStatement();
+				rs = pr.executeQuery(sqlfind);
+				if (rs.next()) {
+					return "UPDATE";
+				}
+				return "NEW";
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+		return "Error";
+	}
+
+	public static void SetUpdateForMap(int mapid, Connection conn) {
+		Statement pr;
+
+		ResultSet rs = null;
+
+		String sqlfind = "";
+
+		sqlfind = "UPDATE maps SET NewUpdate=" + true + " WHERE id=" + mapid;
+
+		// Connection conn=connecttion();
+		if (conn != null) {
+			try {
+				pr = conn.createStatement();
+				int k = pr.executeUpdate(sqlfind);
+				if (k > 0) {
+					System.out.println("Thanks For Map NewUpdate");
+				}
+
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+	}
+
+	public static void SetUpdateForCity(String cityName, Connection conn) {
+		Statement pr;
+
+		ResultSet rs = null;
+
+		String sqlfind = "";
+
+		sqlfind = "UPDATE CityCatalog SET NewUpdate=" + true + " WHERE name='" + cityName + "'";
+
+		// Connection conn=connecttion();
+		if (conn != null) {
+			try {
+				pr = conn.createStatement();
+				int k = pr.executeUpdate(sqlfind);
+				if (k > 0) {
+					System.out.println("Thanks For City NewUpdate");
+				}
+
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+	}
+
+	public static int getPlaceMapId(String name, Connection conn, String Mapid) {
+		Statement pr;
+
+		ResultSet rs = null;
+
+		String sqlfind = "";
+
+		sqlfind = "Select * FROM placeMap WHERE Name ='" + name + "' AND mapID=" + Mapid;
+
+		if (conn != null) {
+			try {
+				pr = conn.createStatement();
+				rs = pr.executeQuery(sqlfind);
+				if (rs.next()) {
+					return rs.getInt("id");
+				}
+				return -1;
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+		return -1;
 	}
 
 }

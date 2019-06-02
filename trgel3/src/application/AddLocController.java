@@ -28,6 +28,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.scene.transform.Transform;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -77,6 +78,9 @@ public class AddLocController {
 	private Button OK;
 
 	@FXML
+	private Button ConfirmUpdate;
+
+	@FXML
 	private ImageView raninImage;
 
 	@FXML
@@ -112,10 +116,11 @@ public class AddLocController {
 					int accessibility = ImagePlaces[i].getPlace().getAccessibility();
 					int LocX = ImagePlaces[i].getX();
 					int LocY = ImagePlaces[i].getY();
+					int mapsNum = ImagePlaces[i].getPlace().getNumOfmaps();
 					String type = ImagePlaces[i].getPlace().getType();
 					array2[0] = "UpdatePlace";
 					array2[1] = new UPlace(MapId, CityName, PlaceName, description, classification, accessibility,
-							serialid, LocX, LocY, type, PlaceId);
+							serialid, LocX, LocY, type, mapsNum, PlaceId);
 					// objectOutput = new ObjectOutputStream(socket.getOutputStream());
 					array2[2] = "" + serialid;
 					@SuppressWarnings("resource")
@@ -138,10 +143,11 @@ public class AddLocController {
 							int accessibility = ImagePlaces[i].getPlace().getAccessibility();
 							int LocX = ImagePlaces[i].getX();
 							int LocY = ImagePlaces[i].getY();
+							int mapsNum = ImagePlaces[i].getPlace().getNumOfmaps();
 							String type = "UPDATE";
 							array2[0] = "UpdatePlace";
 							array2[1] = new Place(MapId, CityName, PlaceName, description, classification,
-									accessibility, serialid, LocX, LocY, type);
+									accessibility, serialid, LocX, LocY, type, mapsNum);
 							// objectOutput = new ObjectOutputStream(socket.getOutputStream());
 							array2[2] = "" + serialid;
 							@SuppressWarnings("resource")
@@ -164,11 +170,19 @@ public class AddLocController {
 						int accessibility = ImagePlaces[i].getPlace().getAccessibility();
 						int LocX = ImagePlaces[i].getX();
 						int LocY = ImagePlaces[i].getY();
-						String type = "NEW";
+						String type;
+						if (ImagePlaces[i].getPlace() instanceof UPlace)
+							if (((UPlace) ImagePlaces[i].getPlace()).getPlaceId() == -1)
+								type = "NEW";
+							else
+								type = "UPDATE";
+						else
+							type = "UPDATE";
 						array2[0] = "UpdatePlace";
 						Place pp = new Place(MapId, CityName, PlaceName, description, classification, accessibility,
 								LocX, LocY, type);
 						array2[1] = pp;
+						array2[2] = "" + serialid;
 						@SuppressWarnings("resource")
 						Socket socket2 = new Socket("localhost", 5555);
 						objectOutput = new ObjectOutputStream(socket2.getOutputStream());
@@ -177,14 +191,27 @@ public class AddLocController {
 				}
 			}
 		}
+		ConfirmUpdate.setVisible(true);
+		DrawPlaces();
 
 	}
 
-	void InitializeImagePlaces() {
-
-	}
-
+	@SuppressWarnings("deprecation")
 	void DrawPlaces() throws IOException, ClassNotFoundException {
+
+		// ImagePlaces = null;ty
+		Counter = 0;
+		for (int i = 0; i < ImagePlaces.length; i++) {
+
+			if (ImagePlaces[i] != null) {
+
+				mainPane.getChildren().removeAll(ImagePlaces[i].getImageview());
+				mainPane.getChildren().removeAll(ImagePlaces[i].getLabel());
+
+			}
+
+		}
+		ImagePlaces = new ImagePlace[10];
 
 		@SuppressWarnings("resource")
 		Socket socket = new Socket("localhost", 5555);
@@ -235,11 +262,16 @@ public class AddLocController {
 					UPlace p = new UPlace("" + Globals.map.getId(), list2[c].getCityName(), list2[c].getPlaceName(),
 							list2[c].getDescription(), list2[c].getClassification(), list2[c].getAccessibility(),
 							list2[c].getSerialID(), list2[c].getLocX(), list2[c].getLocY(), list2[c].getType(),
-							list2[c].getPlaceId());
+							list2[c].getNumOfmaps(), list2[c].getPlaceId());
 					label.setText(p.getPlaceName());
+					Text t = new Text();
+					t.setText(label.getText());
+					t.setFont(label.getFont());
+					double width = t.getBoundsInLocal().getWidth();
+					double height = t.getBoundsInLocal().getHeight();
 
-					label.relocate(list2[c].getLocX() - (label.getWidth() / 2),
-							list2[c].getLocY() - (label.getHeight() + (im.getHeight() / 2) * aspect));
+					label.relocate(list2[c].getLocX() - (width / 2),
+							list2[c].getLocY() - (height + (im.getHeight() / 2) * aspect));
 
 					newLoc.setFitHeight(im.getHeight() * aspect);
 					newLoc.setFitWidth(im.getWidth() * aspect);
@@ -269,11 +301,18 @@ public class AddLocController {
 				label.setFont(new Font("Quicksand", 20));
 				Place p = new Place("" + Globals.map.getId(), list[i].getCityName(), list[i].getPlaceName(),
 						list[i].getDescription(), list[i].getClassification(), list[i].getAccessibility(),
-						list[i].getSerialID(), list[i].getLocX(), list[i].getLocY(), list[i].getType());
+						list[i].getSerialID(), list[i].getLocX(), list[i].getLocY(), list[i].getType(),
+						list[i].getNumOfmaps());
 				label.setText(p.getPlaceName());
 
-				label.relocate(list[i].getLocX() - (label.getWidth() / 2),
-						list[i].getLocY() - (label.getHeight() + (im.getHeight() / 2) * aspect));
+				Text t = new Text();
+				t.setText(label.getText());
+				t.setFont(label.getFont());
+				double width = t.getBoundsInLocal().getWidth();
+				double height = t.getBoundsInLocal().getHeight();
+
+				label.relocate(list[i].getLocX() - (width / 2),
+						list[i].getLocY() - (height + (im.getHeight() / 2) * aspect));
 
 				newLoc.setFitHeight(im.getHeight() * aspect);
 				newLoc.setFitWidth(im.getWidth() * aspect);
@@ -301,10 +340,17 @@ public class AddLocController {
 				UPlace p = new UPlace("" + Globals.map.getId(), list2[c].getCityName(), list2[c].getPlaceName(),
 						list2[c].getDescription(), list2[c].getClassification(), list2[c].getAccessibility(),
 						list2[c].getSerialID(), list2[c].getLocX(), list2[c].getLocY(), list2[c].getType(),
-						list2[c].getPlaceId());
+						list2[c].getNumOfmaps(), list2[c].getPlaceId());
 				label.setText(p.getPlaceName());
-				label.relocate(list2[c].getLocX() - (label.getWidth() / 2),
-						list2[c].getLocY() - (label.getHeight() + (im.getHeight() / 2) * aspect));
+
+				Text t = new Text();
+				t.setText(label.getText());
+				t.setFont(label.getFont());
+				double width = t.getBoundsInLocal().getWidth();
+				double height = t.getBoundsInLocal().getHeight();
+
+				label.relocate(list2[c].getLocX() - (width / 2),
+						list2[c].getLocY() - (height + (im.getHeight() / 2) * aspect));
 
 				newLoc.setFitHeight(im.getHeight() * aspect);
 				newLoc.setFitWidth(im.getWidth() * aspect);
@@ -431,8 +477,8 @@ public class AddLocController {
 			newLoc.setId("imv" + Counter);
 			labels[Counter] = label;
 			locations[Counter] = newLoc;
-			Places[Counter] = new Place("" + Globals.map.getId(), Globals.map.getCity(), label.getText(), "", "", 1,
-					(int) newLoc.getX(), (int) newLoc.getY(), "NEW");
+			Places[Counter] = new UPlace("" + Globals.map.getId(), Globals.map.getCity(), label.getText(), "", "", 1,
+					(int) newLoc.getX(), (int) newLoc.getY(), "NEW", -1);
 
 			ImagePlaces[Counter] = new ImagePlace(Counter, locations[Counter], labels[Counter], Places[Counter],
 					(int) MapImage.getLayoutX(), (int) MapImage.getLayoutY());
@@ -517,6 +563,32 @@ public class AddLocController {
 	}
 
 	@FXML
+	void ConfirmUpdate(ActionEvent event) throws IOException, ClassNotFoundException {
+
+		@SuppressWarnings("resource")
+		Socket socket = new Socket("localhost", 5555);
+		String[] array = new String[2];
+		ObjectOutputStream objectOutput;
+
+		array[0] = "ConfirmUpdate";
+		array[1] = "" + Globals.map.getId();
+		objectOutput = new ObjectOutputStream(socket.getOutputStream());
+		objectOutput.writeObject(array);
+		ConfirmUpdate.setVisible(false);
+		/*
+		 * for (int i = 0; i < ImagePlaces.length; i++) { if (ImagePlaces[i] != null) {
+		 * if (ImagePlaces[i].getPlace() instanceof UPlace) { String MapId =
+		 * ImagePlaces[i].getPlace().getMapId(); array[0] = "ConfirmUpdate"; array[1] =
+		 * "" + MapId; objectOutput = new ObjectOutputStream(socket.getOutputStream());
+		 * objectOutput.writeObject(array); }
+		 * 
+		 * }
+		 * 
+		 * }
+		 */
+	}
+
+	@FXML
 	void changeMode(ActionEvent event) {
 		if (((Node) event.getSource()).getId().equals("btn_EditMode")) {
 			Mode = 1;
@@ -527,6 +599,12 @@ public class AddLocController {
 
 	@FXML
 	void initialize() throws IOException, Exception {
+
+		if (Globals.MODE < 4) {
+			ConfirmUpdate.setVisible(false);
+		}
+		if (!Globals.ThereIsMapUpdate)
+			ConfirmUpdate.setVisible(false);
 
 		Image LinkedImage = new Image(Globals.map.getLinkCustomer());
 		raninImage = new ImageView(LinkedImage);
@@ -575,7 +653,7 @@ public class AddLocController {
 			}
 		}
 		DrawPlaces();
-		updateLocations();
+		// updateLocations();
 
 	}
 
@@ -596,7 +674,7 @@ public class AddLocController {
 	void backFunc(ActionEvent event) throws IOException {
 
 		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-		URL url = getClass().getResource("SingleEditMap.fxml");
+		URL url = getClass().getResource(Globals.backLink);
 		AnchorPane pane = FXMLLoader.load(url);
 
 		Scene scene = new Scene(pane);
@@ -607,6 +685,7 @@ public class AddLocController {
 
 	@FXML
 	void saveImage(ActionEvent event) {
+		// updateLocations();
 		FileChooser fileChooser = new FileChooser();
 
 		// Set extension filter
