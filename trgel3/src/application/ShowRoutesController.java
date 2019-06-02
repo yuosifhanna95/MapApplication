@@ -1,11 +1,15 @@
 package application;
 
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.ImageView;
-
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.text.Text;
-import javafx.stage.Stage;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+import java.net.URL;
+import java.net.UnknownHostException;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -16,34 +20,22 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
-import java.net.URL;
-import java.net.UnknownHostException;
-
-
-
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
-import javafx.event.ActionEvent;
-
-
-public class ShowMapsController {
-
-    @FXML
-    private TableView<Map> mapTable;
+public class ShowRoutesController {
+	@FXML
+    private TableView<Route> mapTable;
     
     @FXML
-    private TableColumn<Map, String> IdCol;
+    private TableColumn<Route, String> IdCol;
 
     @FXML
-    private TableColumn<Map, String> DescriptionCol;
+    private TableColumn<Route, String> DescriptionCol;
     
-    private ObservableList<Map> data = null;
+    private ObservableList<Route> data = null;
 
     @FXML
     private Button Back;
@@ -70,16 +62,16 @@ public class ShowMapsController {
     
     	
     	mapTable.setRowFactory( tv -> {
-    	    TableRow<Map> row = new TableRow<>();
+    	    TableRow<Route> row = new TableRow<>();
     	    row.setOnMouseClicked(event -> {
    	        if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
-	        	Map mapRow = mapTable.getSelectionModel().getSelectedItem();
- 	            Globals.map = mapRow;
+   	        	Route routeRow = mapTable.getSelectionModel().getSelectedItem();
+ 	            Globals.route = routeRow;
  	            
 				try {
 					Stage primaryStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
-		 	        URL url = getClass().getResource("viewMapScene.fxml");
-		 	    	Globals.backLink = "ShowMapsScene.fxml";		 	    	
+		 	        URL url = getClass().getResource("ViewRouteScene.fxml");
+		 	    	Globals.backLink = "ShowRoutesScene.fxml";		 	    	
 		 			AnchorPane pane;
 					pane = FXMLLoader.load(url);
 					Scene scene = new Scene(pane);
@@ -100,10 +92,10 @@ public class ShowMapsController {
     	
     	IdCol.setStyle( "-fx-alignment: CENTER;");
     	IdCol.setMinWidth(100);
-    	IdCol.setCellValueFactory( new PropertyValueFactory<Map, String>("id"));
+    	IdCol.setCellValueFactory( new PropertyValueFactory<Route, String>("id"));
     	
     	DescriptionCol.setCellFactory(tc -> {
-            TableCell<Map, String> cell = new TableCell<>();
+            TableCell<Route, String> cell = new TableCell<>();
             Text text = new Text();
             cell.setGraphic(text);
             cell.setPrefHeight(Control.USE_COMPUTED_SIZE);
@@ -115,9 +107,9 @@ public class ShowMapsController {
         DescriptionCol.setStyle( "-fx-alignment: CENTER;");
         DescriptionCol.setMinWidth(150);
         DescriptionCol.setCellValueFactory(
-                new PropertyValueFactory<Map, String>("Description"));
+                new PropertyValueFactory<Route, String>("description"));
         
-        FilteredList<Map> flCity = new FilteredList<Map>(data, p -> true);//Pass the data to a filtered list
+        FilteredList<Route> flCity = new FilteredList<Route>(data, p -> true);//Pass the data to a filtered list
         mapTable.setItems(flCity);//Set the table's items using the filtered list
         mapTable.getColumns().addAll(IdCol, DescriptionCol);
         	
@@ -129,7 +121,7 @@ public class ShowMapsController {
 	  data = FXCollections.observableArrayList();
 	  
 	  String[] get = new String[2];
-	  get[0] = "getMyMaps";
+	  get[0] = "getMyRoutes";
 	  get[1] = Globals.FixedPurchase.getCity();
 	  try {
 	      ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
@@ -139,7 +131,7 @@ public class ShowMapsController {
 	          try {
 	              Object[] object = (Object[]) objectInput.readObject();
 	              for(int i=1 ; i <= (int) object[0] ; i++) {
-	           	  data.add((Map) object[i]);
+	           	  data.add((Route) object[i]);
 	              }
 	         
 	          } catch (ClassNotFoundException e) {

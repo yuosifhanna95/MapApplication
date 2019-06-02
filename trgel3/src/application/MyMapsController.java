@@ -70,8 +70,17 @@ public class MyMapsController {
     }
 
     @FXML
-    void ShowPathsBtn(ActionEvent event) {
-
+    void ShowPathsBtn(ActionEvent event) throws IOException {
+    	Stage primaryStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
+        URL url = getClass().getResource("ShowRoutesScene.fxml");
+    	Globals.backLink = "MyMapsScene.fxml";		 	    	
+		AnchorPane pane;
+		pane = FXMLLoader.load(url);
+		
+		Scene scene = new Scene(pane);
+		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		primaryStage.setScene(scene);
+		primaryStage.show();
     }
     
     @FXML
