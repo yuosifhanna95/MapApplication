@@ -18,6 +18,7 @@ public class FixedPurchase implements Serializable{
 		this.city = city;
 		this.startDate = startDate;
 		this.endDate = endDate;
+		this.price = price;
 	}
 
 	public String getUser() {

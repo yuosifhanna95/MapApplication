@@ -13,6 +13,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import java.text.DateFormat;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
@@ -159,7 +161,53 @@ public class Server {
             				    System.out.println("VendorError: " + se.getErrorCode());
             				}
                 	}
-					
+					if(((String)((Object[])(data))[0]).equals("addNewDate")) {
+                		Connection conn = null;
+            			Statement stmt = null;
+            			
+            			Date NewDate = ((Date)((Object[])(data))[1]);
+            			DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+            			Calendar c = Calendar.getInstance();
+            			
+            			String NewDateAsString = df.format(NewDate);
+            			c.setTime(df.parse(NewDateAsString));
+            			c.add(Calendar.DATE, 1);
+            			NewDateAsString = df.format(c.getTime()); 
+            			String cityname=((String)((Object[])(data))[3]);
+            			String username=((String)((Object[])(data))[2]);
+            			
+            			try {
+            				Class.forName(JDBC_DRIVER);
+            				 
+            				conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            				stmt = conn.createStatement();
+            				
+							String sql = "update fixedPurchase set endDate = ? where user = ? and city = ?";
+							PreparedStatement pr;
+            			
+            				if(conn!=null) {
+            					pr = conn.prepareStatement(sql);
+								pr.setDate(1, java.sql.Date.valueOf(NewDateAsString));
+								pr.setString(2, username);
+								pr.setString(3, cityname);
+								pr.executeUpdate();
+            				}
+            					
+            				 
+            				
+            				stmt.close();
+            				conn.close();
+            					
+            					
+            				
+            			}
+            				catch (SQLException se) {
+            					se.printStackTrace();
+            					System.out.println("SQLException: " + se.getMessage());
+            				    System.out.println("SQLState: " + se.getSQLState());
+            				    System.out.println("VendorError: " + se.getErrorCode());
+            				}
+                	}
 					if (((String) ((Object[]) (data))[0]).equals("Register")) {
 						
 						User client = ((User) ((Object[]) (data))[1]);
