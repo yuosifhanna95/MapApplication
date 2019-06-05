@@ -128,7 +128,7 @@ public class AddLocController {
 	}
 
 	@FXML
-	void UpdateMap(ActionEvent event) throws IOException, ClassNotFoundException {
+	void UpdateMap(ActionEvent event) throws Exception {
 
 		@SuppressWarnings("resource")
 		Socket socket = new Socket("localhost", 5555);
@@ -147,37 +147,65 @@ public class AddLocController {
 		// System.out.println(((Object[]) data)[0]);
 		UPlace[] list = (UPlace[]) ((Object[]) data)[1];
 		for (int i = 0; i < ImagePlaces.length; i++) {
-			if (ImagePlaces[i] != null) {
-				int flagnew = 1;
-				if (ImagePlaces[i].getPlace() instanceof UPlace) {
-					long serialid = ImagePlaces[i].getPlace().getSerialID();
-					String MapId = ImagePlaces[i].getPlace().getMapId();
-					int PlaceId = ((UPlace) (ImagePlaces[i].getPlace())).getPlaceId();
-					String CityName = ImagePlaces[i].getPlace().getCityName();
-					String PlaceName = ImagePlaces[i].getPlace().getPlaceName();
-					String description = ImagePlaces[i].getPlace().getDescription();
-					String classification = ImagePlaces[i].getPlace().getClassification();
-					int accessibility = ImagePlaces[i].getPlace().getAccessibility();
-					int LocX = ImagePlaces[i].getX();
-					int LocY = ImagePlaces[i].getY();
-					int mapsNum = ImagePlaces[i].getPlace().getNumOfmaps();
-					String type = ImagePlaces[i].getPlace().getType();
-					array2[0] = "UpdatePlace";
-					array2[1] = new UPlace(MapId, CityName, PlaceName, description, classification, accessibility,
-							serialid, LocX, LocY, type, mapsNum, PlaceId);
-					// objectOutput = new ObjectOutputStream(socket.getOutputStream());
-					array2[2] = "" + serialid;
-					@SuppressWarnings("resource")
-					Socket socket2 = new Socket("localhost", 5555);
-					objectOutput = new ObjectOutputStream(socket2.getOutputStream());
-					objectOutput.writeObject(array2);
-					flagnew = 0;
+			if (ImagePlaces[i] != null)
+				if (ImagePlaces[i].getChanged()) {
+					int flagnew = 1;
+					if (ImagePlaces[i].getPlace() instanceof UPlace) {
+						long serialid = ImagePlaces[i].getPlace().getSerialID();
+						String MapId = ImagePlaces[i].getPlace().getMapId();
+						int PlaceId = ((UPlace) (ImagePlaces[i].getPlace())).getPlaceId();
+						String CityName = ImagePlaces[i].getPlace().getCityName();
+						String PlaceName = ImagePlaces[i].getPlace().getPlaceName();
+						String description = ImagePlaces[i].getPlace().getDescription();
+						String classification = ImagePlaces[i].getPlace().getClassification();
+						int accessibility = ImagePlaces[i].getPlace().getAccessibility();
+						int LocX = ImagePlaces[i].getX();
+						int LocY = ImagePlaces[i].getY();
+						int mapsNum = ImagePlaces[i].getPlace().getNumOfmaps();
+						String type = ImagePlaces[i].getPlace().getType();
+						array2[0] = "UpdatePlace";
+						array2[1] = new UPlace(MapId, CityName, PlaceName, description, classification, accessibility,
+								serialid, LocX, LocY, type, mapsNum, PlaceId);
+						// objectOutput = new ObjectOutputStream(socket.getOutputStream());
+						array2[2] = "" + serialid;
+						@SuppressWarnings("resource")
+						Socket socket2 = new Socket("localhost", 5555);
+						objectOutput = new ObjectOutputStream(socket2.getOutputStream());
+						objectOutput.writeObject(array2);
+						flagnew = 0;
 
-				} else {
+					} else {
 
-					for (Place pl : list) {
+						for (Place pl : list) {
 
-						if (ImagePlaces[i].getPlace().getSerialID() == pl.getSerialID()) {
+							if (ImagePlaces[i].getPlace().getSerialID() == pl.getSerialID()) {
+								long serialid = ImagePlaces[i].getPlace().getSerialID();
+								String MapId = ImagePlaces[i].getPlace().getMapId();
+								String CityName = ImagePlaces[i].getPlace().getCityName();
+								String PlaceName = ImagePlaces[i].getPlace().getPlaceName();
+								String description = ImagePlaces[i].getPlace().getDescription();
+								String classification = ImagePlaces[i].getPlace().getClassification();
+								int accessibility = ImagePlaces[i].getPlace().getAccessibility();
+								int LocX = ImagePlaces[i].getX();
+								int LocY = ImagePlaces[i].getY();
+								int mapsNum = ImagePlaces[i].getPlace().getNumOfmaps();
+								String type = "UPDATE";
+								array2[0] = "UpdatePlace";
+								array2[1] = new Place(MapId, CityName, PlaceName, description, classification,
+										accessibility, serialid, LocX, LocY, type, mapsNum);
+								// objectOutput = new ObjectOutputStream(socket.getOutputStream());
+								array2[2] = "" + serialid;
+								@SuppressWarnings("resource")
+								Socket socket2 = new Socket("localhost", 5555);
+								objectOutput = new ObjectOutputStream(socket2.getOutputStream());
+								objectOutput.writeObject(array2);
+								flagnew = 0;
+								break;
+
+							}
+
+						}
+						if (flagnew == 1) {
 							long serialid = ImagePlaces[i].getPlace().getSerialID();
 							String MapId = ImagePlaces[i].getPlace().getMapId();
 							String CityName = ImagePlaces[i].getPlace().getCityName();
@@ -187,56 +215,30 @@ public class AddLocController {
 							int accessibility = ImagePlaces[i].getPlace().getAccessibility();
 							int LocX = ImagePlaces[i].getX();
 							int LocY = ImagePlaces[i].getY();
-							int mapsNum = ImagePlaces[i].getPlace().getNumOfmaps();
-							String type = "UPDATE";
+							String type;
+							if (ImagePlaces[i].getPlace() instanceof UPlace)
+								if (((UPlace) ImagePlaces[i].getPlace()).getPlaceId() == -1)
+									type = "NEW";
+								else
+									type = "UPDATE";
+							else
+								type = "UPDATE";
 							array2[0] = "UpdatePlace";
-							array2[1] = new Place(MapId, CityName, PlaceName, description, classification,
-									accessibility, serialid, LocX, LocY, type, mapsNum);
-							// objectOutput = new ObjectOutputStream(socket.getOutputStream());
+							Place pp = new Place(MapId, CityName, PlaceName, description, classification, accessibility,
+									LocX, LocY, type);
+							array2[1] = pp;
 							array2[2] = "" + serialid;
 							@SuppressWarnings("resource")
 							Socket socket2 = new Socket("localhost", 5555);
 							objectOutput = new ObjectOutputStream(socket2.getOutputStream());
 							objectOutput.writeObject(array2);
-							flagnew = 0;
-							break;
-
 						}
-
-					}
-					if (flagnew == 1) {
-						long serialid = ImagePlaces[i].getPlace().getSerialID();
-						String MapId = ImagePlaces[i].getPlace().getMapId();
-						String CityName = ImagePlaces[i].getPlace().getCityName();
-						String PlaceName = ImagePlaces[i].getPlace().getPlaceName();
-						String description = ImagePlaces[i].getPlace().getDescription();
-						String classification = ImagePlaces[i].getPlace().getClassification();
-						int accessibility = ImagePlaces[i].getPlace().getAccessibility();
-						int LocX = ImagePlaces[i].getX();
-						int LocY = ImagePlaces[i].getY();
-						String type;
-						if (ImagePlaces[i].getPlace() instanceof UPlace)
-							if (((UPlace) ImagePlaces[i].getPlace()).getPlaceId() == -1)
-								type = "NEW";
-							else
-								type = "UPDATE";
-						else
-							type = "UPDATE";
-						array2[0] = "UpdatePlace";
-						Place pp = new Place(MapId, CityName, PlaceName, description, classification, accessibility,
-								LocX, LocY, type);
-						array2[1] = pp;
-						array2[2] = "" + serialid;
-						@SuppressWarnings("resource")
-						Socket socket2 = new Socket("localhost", 5555);
-						objectOutput = new ObjectOutputStream(socket2.getOutputStream());
-						objectOutput.writeObject(array2);
 					}
 				}
-			}
 		}
 		ConfirmUpdate.setVisible(true);
 		BuildAllPlaces();
+		BuildOldMap();
 
 	}
 
@@ -344,7 +346,7 @@ public class AddLocController {
 				// }
 			}
 			if (flag == 0) {
-				Image im = new Image("File:newloc.png");
+				Image im = new Image("File:oldloc.png");
 				ImageView newLoc = new ImageView(im);
 				double X = OPlacelist[i].getLocX(), Y = OPlacelist[i].getLocY();
 				// newLoc1.relocate(X, Y);
@@ -385,7 +387,7 @@ public class AddLocController {
 
 		for (int c = 0; c < UPlacelist.length; c++) {
 			if (UPlacelist[c].getType().equals("NEW") || UPlacelist[c].getType().equals("UNEW")) {
-				Image im = new Image("File:loc.png");
+				Image im = new Image("File:newloc.png");
 				ImageView newLoc = new ImageView(im);
 				// newLoc.relocate((double) list2[c].getLocX(), (double) list2[c].getLocY());
 				Label label = new Label();
@@ -527,6 +529,7 @@ public class AddLocController {
 
 				ImagePlacesOld[counter] = new ImagePlace(counter, newLoc, label, p, OPlacelist[i].getLocX(),
 						OPlacelist[i].getLocY(), false);
+
 				counter++;
 				Counter++;
 			}
@@ -753,7 +756,7 @@ public class AddLocController {
 	}
 
 	@FXML
-	void ConfirmUpdate(ActionEvent event) throws IOException, ClassNotFoundException {
+	void ConfirmUpdate(ActionEvent event) throws Exception {
 
 		@SuppressWarnings("resource")
 		Socket socket = new Socket("localhost", 5555);
@@ -765,6 +768,8 @@ public class AddLocController {
 		objectOutput = new ObjectOutputStream(socket.getOutputStream());
 		objectOutput.writeObject(array);
 		ConfirmUpdate.setVisible(false);
+		BuildAllPlaces();
+		BuildOldMap();
 		/*
 		 * for (int i = 0; i < ImagePlaces.length; i++) { if (ImagePlaces[i] != null) {
 		 * if (ImagePlaces[i].getPlace() instanceof UPlace) { String MapId =
@@ -802,7 +807,7 @@ public class AddLocController {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-				} else {
+				} else if (old != null) {
 					try {
 						DrawUpdatedPlaces();
 					} catch (ClassNotFoundException | IOException e) {

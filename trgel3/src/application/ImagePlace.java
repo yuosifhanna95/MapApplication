@@ -27,6 +27,7 @@ public class ImagePlace {
 		this.place = place;
 		this.X = X;
 		this.Y = Y;
+		this.Changed = Changed;
 	}
 
 	public void setId(int id) {
