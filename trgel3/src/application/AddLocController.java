@@ -536,18 +536,6 @@ public class AddLocController {
 			flag = 0;
 
 		}
-		/**
-		 * for (int i = 0; i < ImagePlacesOld.length; i++) {
-		 * 
-		 * if (ImagePlacesOld[i] != null) {
-		 * 
-		 * mainPane.getChildren().addAll(ImagePlacesOld[i].getImageview());
-		 * mainPane.getChildren().addAll(ImagePlacesOld[i].getLabel());
-		 * 
-		 * }
-		 * 
-		 * }
-		 **/
 
 	}
 
