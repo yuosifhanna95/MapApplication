@@ -15,15 +15,10 @@ import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-
 import java.util.Calendar;
-
 import javax.swing.JOptionPane;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
-import java.util.Calendar;
 import java.util.Date;
 
 
@@ -55,25 +50,14 @@ public class Server {
             			int period=fp.getPeriod();
             			String user2=fp.getUser();
             			
-            			if(period<=3) {
-            				ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
-  		    				String message="the period should be bigger than 3";
-  		    				x=1;
-	     	                objectOutput.writeObject(message);
-            			}
-            			else if(period>180) {
-            				ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
-  		    				String message="the period is very big,you can purchase until 180 day";
-	     	                x=1;
-  		    				objectOutput.writeObject(message);
-            			}
-            			else if(((String)((Object[])(data))[2]).equals("")&&((String)((Object[])(data))[3]).equals("Yes")) {
-            				ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
-  		    				x=1;
-            				String message="we need the payinfo to continue";
-	     	                objectOutput.writeObject(message);
-            			}
-            			else if(x==0) {
+            		
+//            			else if(((String)((Object[])(data))[2]).equals("")&&((String)((Object[])(data))[3]).equals("Yes")) {
+//            				ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
+//  		    				x=1;
+//            				String message="we need the payinfo to continue";
+//	     	                objectOutput.writeObject(message);
+//            			}
+            			if(x==0) {
             				
     							Class.forName(JDBC_DRIVER);
 
@@ -82,18 +66,25 @@ public class Server {
     							String sql="INSERT INTO fixedPurchase(`user`, `city`, `period`, `startdate`, `endDate`, `purchaseprice`) VALUES (?,?,?,?,?,?)";
     							if (conn != null) {
     								pr = conn.prepareStatement(sql);
-    								SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-    								Calendar c = Calendar.getInstance();
-    								c.setTime(new Date());
-    								c.add(Calendar.DATE, fp.getPeriod());
-    								String output = sdf.format(c.getTime());
-    								Date s=sdf.parse(output);
-    								fp.setEndDate(s);
+
+    								Date StartDate = fp.getStartDate();
+    		            			DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+    		            			Calendar c = Calendar.getInstance();
+    		            			String startDateAsString = df.format(StartDate);
+    		            			c.setTime(df.parse(startDateAsString));
+    		            			c.add(Calendar.DATE, 1);
+    		            			startDateAsString = df.format(c.getTime()); 
+    		            			Date endDate = fp.getEndDate();
+    		            			String endDateAsString = df.format(endDate);
+    		            			c.setTime(df.parse(endDateAsString));
+    		            			c.add(Calendar.DATE, 1);
+    		            			endDateAsString = df.format(c.getTime()); 
+                              
 									pr.setString(1,fp.getUser() );
 									pr.setString(2, fp.getCity());
-									pr.setString(3,Integer.toString(fp.getPeriod()));
-									pr.setDate(4, (java.sql.Date) fp.getStartDate());
-									pr.setDate(5, (java.sql.Date) fp.getEndDate());
+									pr.setInt(3,fp.getPeriod());
+									pr.setDate(4, java.sql.Date.valueOf(startDateAsString));
+									pr.setDate(5,java.sql.Date.valueOf(endDateAsString));
 									pr.setString(6,Double.toString(fp.getPrice()));
 									if (pr.executeUpdate() > 0) {
 										ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
@@ -725,37 +716,33 @@ public class Server {
         	                e.printStackTrace();
         	            } 
                 	}
-					else if (((String[]) (data))[0].equals("addCityToMember")) {
+					else if (((String[]) (data))[0].equals("checkCityExist")) {
 						
 							Connection conn = null;
 	            			Statement stmt = null;
+	            			String user = ((String[])(data))[1];
+	            			String city = ((String[])(data))[2];
+	            			
 	            			try {
 	            				Class.forName(JDBC_DRIVER);
 	            				conn = DriverManager.getConnection(DB_URL, USER, PASS);             				
-	              				PreparedStatement pr;
-	              				String sql = "INSERT INTO fixedPurchase (`user`, `city`, `startDate`, `endDate`, `period`, `purchaseprice`) VALUES (?,?,?,?,?,?)"; 
-	              				
-	              			
-	              				if(conn!=null) {
-	              		    		try {
-	              		    			
-	              						pr=conn.prepareStatement(sql);
-	              						pr.setString(1, ((String[])(data))[1]);
-	              						pr.setString(2, ((String[])(data))[2]);
-	              						pr.setDate(3, java.sql.Date.valueOf("2013-09-04"));
-	              						pr.setDate(4, java.sql.Date.valueOf("2013-09-04"));
-	              						pr.setInt(5, 30);
-	              						pr.setInt(6, 30);
-	              						pr.executeUpdate();
-	              					} catch (SQLException e) {
-	              						// TODO Auto-generated catch block
-	              						e.printStackTrace();
-	              					}
-	              		    	} 
-	            			    
-	            			
-	            				conn.close();
-
+								stmt = conn.createStatement();
+								
+	              				String sql = "SELECT * FROM fixedPurchase where user ='"+ user +"' and city ='"+ city+"'"; 
+	              				ResultSet rs = stmt.executeQuery(sql);
+	              				if(!rs.next()) {
+	              					stmt.close();
+	              					conn.close();
+	              					
+	              					ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
+	    							objectOutput.writeObject("No");
+	              				}
+	              				else {
+		              				stmt.close();
+		            				conn.close();
+		            				ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
+	    							objectOutput.writeObject("Yes");
+	              				}
 					}catch (SQLException se) {
 						se.printStackTrace();
 						System.out.println("SQLException: " + se.getMessage());

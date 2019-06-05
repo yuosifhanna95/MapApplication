@@ -9,6 +9,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
@@ -16,20 +17,26 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-
+import javafx.scene.control.Tooltip;
+import java.time.Instant;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Calendar;
 import java.util.Date;
 import java.time.temporal.ChronoUnit;
 import javafx.collections.FXCollections;
@@ -72,8 +79,8 @@ public class MyMapsController {
 
     @FXML
     void RenewBtn(ActionEvent event) {
-    	final Stage onePurchaseWindow = new Stage();
-		onePurchaseWindow.initModality(Modality.APPLICATION_MODAL);
+    	final Stage RenewPurchaseWindow = new Stage();
+    	RenewPurchaseWindow.initModality(Modality.APPLICATION_MODAL);
 		 
 		Text text = new Text("The purchase is until " + Globals.FixedPurchase.getEndDate());
 		Button buttonSet = new Button("Calculate");
@@ -81,7 +88,7 @@ public class MyMapsController {
 		Button buttonSave = new Button("Save"); 
 		Text cost = new Text();
 		
-		buttonCancel.setOnAction(e -> onePurchaseWindow.close());
+		buttonCancel.setOnAction(e -> RenewPurchaseWindow.close());
 		buttonSet.setOnAction(e -> {
 			calculate();
 			cost.setText(renewVal);
@@ -89,14 +96,54 @@ public class MyMapsController {
 		buttonSave.setOnAction(e -> {
 			try {
 				saveNewPurchaseToDB();
+				RenewPurchaseWindow.close();
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		 });
 		
+		
+		
 		DatePicker = new DatePicker();
-
+		DatePicker checkInDatePicker = new DatePicker();
+		Date dateToConvert = new Date();
+		dateToConvert = Globals.FixedPurchase.getEndDate();
+		LocalDate ld = new java.sql.Date( dateToConvert.getTime() ) .toLocalDate();
+        checkInDatePicker.setValue(ld);
+        final Callback<DatePicker, DateCell> dayCellFactory = 
+            new Callback<DatePicker, DateCell>() {
+                @Override
+                public DateCell call(final DatePicker datePicker) {
+                    return new DateCell() {
+                        @Override
+                        public void updateItem(LocalDate item, boolean empty) {
+                            super.updateItem(item, empty);
+                            if (item.isBefore(
+                                    checkInDatePicker.getValue().plusDays(1))
+                                ) {
+                                    setDisable(true);
+                                    setStyle("-fx-background-color: #ffc0cb;");
+                            }
+                            if (item.isAfter(
+                                    checkInDatePicker.getValue().plusMonths(6))
+                                ) {
+                                    setDisable(true);
+                                    setStyle("-fx-background-color: #ffc0cb;");
+                            }
+                            long p = ChronoUnit.DAYS.between(
+                                    checkInDatePicker.getValue(), item
+                            );
+                            setTooltip(new Tooltip(
+                                "You're about to stay for " + p + " days")
+                            );
+                    }
+                };
+            }
+        };
+        DatePicker.setDayCellFactory(dayCellFactory);
+        DatePicker.setValue(checkInDatePicker.getValue().plusDays(1));
+        
         GridPane gridPane = new GridPane();
 	    gridPane.setHgap(10);
 	    gridPane.setVgap(10);
@@ -130,50 +177,10 @@ public class MyMapsController {
         layoutV.setAlignment(Pos.CENTER);
         
         Scene dialogScene = new Scene(layoutV, 300, 200);
-        onePurchaseWindow.setScene(dialogScene);
-        onePurchaseWindow.show();
+        RenewPurchaseWindow.setScene(dialogScene);
+        RenewPurchaseWindow.show();
     }
 
-    private void saveNewPurchaseToDB() throws UnknownHostException, IOException {
-    	LocalDate date = DatePicker.getValue();
-    	if(date != null) {
-    	Date newDate = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    	
-    	Socket socket = new Socket("localhost",5555);
-   
-    	Object[] set = new Object[4];
-        set[0] = "addNewDate";
-        set[1] = newDate;	
-        set[2] = Globals.FixedPurchase.getUser();
-        set[3] = Globals.FixedPurchase.getCity();
-		try {
-		    ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
-		    objectOutput.writeObject(set); 
-		  } 
-		  catch (IOException e) 
-		  {
-		      e.printStackTrace();
-		  } 
-		
-    	}
-	}
-
-	private void calculate() {
-    	LocalDate date = DatePicker.getValue();
-    	if(date != null) {
-    	Date newDate = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
-		double cost = Globals.FixedPurchase.getPrice();
-        Date oldDate = Globals.FixedPurchase.getEndDate();
-        
-        double diffInDays = (double)( (newDate.getTime() - oldDate.getTime())/(1000 * 60 * 60 * 24) );
-		double m = diffInDays/30;
-		double months = Math.ceil(m);
-        
-        renewVal = Double.toString(months * cost);
-    	}
-	}
-
-	
 
 	@FXML
     void ShowMapsBtn(ActionEvent event) throws IOException {
@@ -293,6 +300,46 @@ public class MyMapsController {
 
      }
     
+    private void saveNewPurchaseToDB() throws UnknownHostException, IOException {
+    	LocalDate date = DatePicker.getValue();
+    	if(date != null) {
+    	Date newDate = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+    	
+    	Socket socket = new Socket("localhost",5555);
+   
+    	Object[] set = new Object[4];
+        set[0] = "addNewDate";
+        set[1] = newDate;	
+        set[2] = Globals.FixedPurchase.getUser();
+        set[3] = Globals.FixedPurchase.getCity();
+		try {
+		    ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
+		    objectOutput.writeObject(set); 
+		  } 
+		  catch (IOException e) 
+		  {
+		      e.printStackTrace();
+		  } 
+		
+    	}
+	}
+
+	private void calculate() {
+    	LocalDate date = DatePicker.getValue();
+    	if(date != null) {
+    	Date newDate = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+		double cost = Globals.FixedPurchase.getPrice();
+        Date oldDate = Globals.FixedPurchase.getEndDate();
+        
+        double diffInDays = (double)( (newDate.getTime() - oldDate.getTime())/(1000 * 60 * 60 * 24) );
+        diffInDays++;
+   
+		double m = diffInDays/30;
+		double months = Math.ceil(m);
+        
+        renewVal = Double.toString(months * cost);
+    	}
+	}
 
 
 }
