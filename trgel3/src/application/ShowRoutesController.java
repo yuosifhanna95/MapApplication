@@ -43,7 +43,7 @@ public class ShowRoutesController {
     @FXML
     void backFunc(ActionEvent event) throws IOException {
     	Stage primaryStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
-    	URL url = getClass().getResource(Globals.backLink);
+    	URL url = getClass().getResource("MyMapsScene.fxml");
 		AnchorPane pane =FXMLLoader.load(url);
 
 		Scene scene = new Scene(pane);

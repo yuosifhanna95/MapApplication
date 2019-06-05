@@ -10,8 +10,17 @@ import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.Calendar;
+import java.util.Date;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
+import javax.swing.JOptionPane;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -19,26 +28,33 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
+import javafx.scene.control.DateCell;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
 
 public class DefPageController {
@@ -123,6 +139,13 @@ public class DefPageController {
 	static File dir;
 	
 	static TextField area;
+	
+	private DatePicker DatePicker;
+	
+	private String costVal;
+	
+	private int period;
+	
     
 	
 	@FXML
@@ -251,19 +274,125 @@ public class DefPageController {
 	
 	@FXML
     void FixedPurchase(ActionEvent event) throws UnknownHostException, IOException {
-		addDataBasetoMember();
-		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();			
-		URL url = getClass().getResource("payementforpurchase.fxml");
-		AnchorPane pane = FXMLLoader.load(url);
-				
-		Globals.backLink = "DefaultPage.fxml";
-				
-		Scene scene = new Scene(pane);
-		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());			
-		primaryStage.setScene(scene);			
-		primaryStage.show();
+//		addDataBasetoMember();
+//		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();			
+//		URL url = getClass().getResource("payementforpurchase.fxml");
+//		AnchorPane pane = FXMLLoader.load(url);
+//				
+//		Globals.backLink = "DefaultPage.fxml";
+//				
+//		Scene scene = new Scene(pane);
+//		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());			
+//		primaryStage.setScene(scene);			
+//		primaryStage.show();
+		
+		if(checkIfCityExist().equals("Yes")) {
+			JOptionPane.showMessageDialog(null, "You already purchased this city!");
+		}
+		else {
+			final Stage FixedPurchaseWindow = new Stage();
+			FixedPurchaseWindow.initModality(Modality.APPLICATION_MODAL);
+			 
+			Text text = new Text("The purchase costs " + Globals.city.getFixedCost());
+			Button buttonSet = new Button("Calculate");
+			Button buttonCancel = new Button("Cancel");
+			Button buttonPurchase= new Button("Purchase"); 
+			Text cost = new Text();
+			
+			buttonPurchase.setDisable(true);
+			
+			buttonCancel.setOnAction(e -> FixedPurchaseWindow.close());
+			buttonSet.setOnAction(e -> {
+				calculate();
+				cost.setText("The period is " + period + " days and it costs " + costVal);
+				buttonPurchase.setDisable(false);
+			 });
+			buttonPurchase.setOnAction(e -> {
+				try {
+					savePurchase();
+					FixedPurchaseWindow.close();
+					JOptionPane.showMessageDialog(null, "thanks for purchace,you will enjoy");
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			 });
+			
+			DatePicker = new DatePicker();
+			
+			DatePicker checkInDatePicker = new DatePicker();
+	       
+	        checkInDatePicker.setValue(LocalDate.now());
+	        final Callback<DatePicker, DateCell> dayCellFactory = 
+	            new Callback<DatePicker, DateCell>() {
+	                @Override
+	                public DateCell call(final DatePicker datePicker) {
+	                    return new DateCell() {
+	                        @Override
+	                        public void updateItem(LocalDate item, boolean empty) {
+	                            super.updateItem(item, empty);
+	                            if (item.isBefore(
+	                                    checkInDatePicker.getValue().plusDays(1))
+	                                ) {
+	                                    setDisable(true);
+	                                    setStyle("-fx-background-color: #ffc0cb;");
+	                            }
+	                            if (item.isAfter(
+	                                    checkInDatePicker.getValue().plusMonths(6))
+	                                ) {
+	                                    setDisable(true);
+	                                    setStyle("-fx-background-color: #ffc0cb;");
+	                            }
+	                            long p = ChronoUnit.DAYS.between(
+	                                    checkInDatePicker.getValue(), item
+	                            );
+	                            setTooltip(new Tooltip(
+	                                "You're about to stay for " + p + " days")
+	                            );
+	                    }
+	                };
+	            }
+	        };
+	        DatePicker.setDayCellFactory(dayCellFactory);
+	       
+	     
+	
+	        GridPane gridPane = new GridPane();
+		    gridPane.setHgap(10);
+		    gridPane.setVgap(10);
+		      
+		    Label checkInlabel = new Label("Select last date for the purchase:");
+		    gridPane.add(checkInlabel, 0, 0);
+	
+	        GridPane.setHalignment(checkInlabel, HPos.LEFT);
+	        gridPane.add(DatePicker, 0, 1);
+	        
+	        HBox layout = new HBox(20);
+	        layout.getChildren().add(buttonCancel);
+	        layout.getChildren().add(buttonPurchase);
+	        layout.setAlignment(Pos.CENTER);
+	
+	        HBox hbox2 = new HBox(20);
+	        hbox2.getChildren().add(gridPane);
+	        hbox2.setAlignment(Pos.CENTER);
+	        
+	        
+	        VBox layoutV = new VBox(20);
+	        layoutV.getChildren().add(text);
+	        layoutV.getChildren().add(hbox2);
+	        layoutV.getChildren().add(buttonSet);
+	        layoutV.getChildren().add(cost);
+	        //layoutV.getChildren().add(hbox);
+	        layoutV.getChildren().add(layout);
+	        layoutV.setAlignment(Pos.CENTER);
+	        
+	        Scene dialogScene = new Scene(layoutV, 400, 300);
+	        FixedPurchaseWindow.setScene(dialogScene);
+	        FixedPurchaseWindow.show();
+		}
     
 	}
+	
 	@SuppressWarnings("unchecked")
 	@FXML // This method is called by the FXMLLoader when initialization is complete
 	void initialize() throws IOException, Exception {
@@ -385,21 +514,34 @@ public class DefPageController {
 	
 	}
 
-	public void addDataBasetoMember() throws UnknownHostException, IOException {
+	public String checkIfCityExist() throws UnknownHostException, IOException {
 		@SuppressWarnings("resource")
 		Socket socket = new Socket("localhost", 5555);
 		dataCity = FXCollections.observableArrayList();
 
 		String[] set = new String[3];
-		set[0] = "addCityToMember";
+		set[0] = "checkCityExist";
 		set[1] = Globals.user.getUserName();
 		set[2] = Globals.city.getCity();
 		try {
 			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			objectOutput.writeObject(set);
+			ObjectInputStream  objectInput = new ObjectInputStream(socket.getInputStream());
+			try {
+	 				Object data=objectInput.readObject();
+	 				
+	 				if((data).equals("Yes")){ System.out.println("here");
+	 					return "Yes";
+	 				}
+			} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+			} 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		return "No";
 	}
 
 	public void buildData(String type) throws UnknownHostException, IOException {
@@ -592,5 +734,76 @@ public class DefPageController {
         });
  	}
 	}
+	
+	private void calculate() {
+    	LocalDate date = DatePicker.getValue();
+    	if(date != null) {
+    	Date endDate = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+		double cost = Globals.city.getFixedCost();    
+		Date today = Calendar.getInstance().getTime();
+		
+        double diffInDays = (double)( (endDate.getTime() - today.getTime())/(1000 * 60 * 60 * 24) );
+        diffInDays++;
+		period = (int) diffInDays;
+
+        double m = diffInDays/30;
+		double months = Math.ceil(m);
+        
+        costVal = Double.toString(months * cost);
+    	}
+	}
+	
+	 void savePurchase() throws UnknownHostException, IOException {
+		    LocalDate date = DatePicker.getValue();
+	    	if(date != null) {
+	    	
+	    	Date enddate = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+	        String user = Globals.user.getUserName();;
+	        Date sdate = Calendar.getInstance().getTime();
+	        double price = (int)Globals.city.getFixedCost();
+	        String city=Globals.city.getCity();
+	        FixedPurchase fp=new FixedPurchase(user,period,city,sdate,enddate,price);
+
+	        
+	        @SuppressWarnings("resource")
+	    	Socket	 socket = new Socket("localhost",5555);
+	        Object[] set = new Object[4];
+	        set[0] = "dofixedpurchase";
+	        set[1]= fp;
+	       // set[2]=payinfo.getText();
+	        //set[3]=infopay.getValue();
+	        try {
+	            ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
+	            objectOutput.writeObject(set); 
+	            ObjectInputStream  objectInput = new ObjectInputStream(socket.getInputStream());
+	            try {
+	 				Object data=objectInput.readObject();
+	 				
+//	 				if((data).equals("we need the payinfo to continue")){
+//	 					JOptionPane.showMessageDialog(null, "we need the payinfo to continue");
+//	 				}
+	 				if((data).equals("thanks for purchace,you will enjoy")){
+//	 					JOptionPane.showMessageDialog(null, "thanks for purchace,you will enjoy");
+//	 					Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+//	 					URL url = getClass().getResource("MyMapsScene.fxml");
+//	 					AnchorPane pane = FXMLLoader.load(url);
+//	 					Globals.backLink = "DefaultPage.fxml";
+//	 					Scene scene = new Scene(pane);
+//	 					scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+//	 					primaryStage.setScene(scene);
+//	 					primaryStage.show();
+	 				}
+	            } catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} 
+	        }
+	        catch (IOException e) 
+	        {
+	            e.printStackTrace();
+	        } 
+	        }
+	    	
+	    }
 
 }
