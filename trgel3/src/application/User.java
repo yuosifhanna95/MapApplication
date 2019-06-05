@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class User extends Client implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+	protected int id;
 	protected String firstName;
 	protected String lastName;
 	protected String phoneNumber;
@@ -15,8 +16,9 @@ public class User extends Client implements Serializable {
 	protected String Type;
 	protected String History;
 
-	public User(String firstName, String lastName, String email, String userName, String password, String phoneNumber,
+	public User(int id,String firstName, String lastName, String email, String userName, String password, String phoneNumber,
 			String payment, String Type, String History) {
+		this.id = id;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
@@ -26,6 +28,14 @@ public class User extends Client implements Serializable {
 		this.payment = payment;
 		this.Type = Type;
 		this.History = History;
+	}
+	
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int str) {
+		this.id = str;
 	}
 
 	public String getFirstName() {

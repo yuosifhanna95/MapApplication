@@ -40,6 +40,7 @@
       <Button fx:id="myMaps" layoutX="218.0" layoutY="283.0" mnemonicParsing="false" onAction="#showMymaps" text="My maps" />
       <Button fx:id="OneTimePurchase" layoutX="463.0" layoutY="602.0" mnemonicParsing="false" onAction="#OnePurchase" prefHeight="26.0" prefWidth="151.0" text="One time purchase" />
       <Button fx:id="FixedTimePurchase" layoutX="672.0" layoutY="602.0" mnemonicParsing="false" onAction="#FixedPurchase" text="Fixed time purchase" />
+      <Button fx:id="editProfile" layoutX="1085.0" layoutY="71.0" mnemonicParsing="false" onAction="#editProfileButt" text="Edit Profile" />
  
    </children>
 </AnchorPane>

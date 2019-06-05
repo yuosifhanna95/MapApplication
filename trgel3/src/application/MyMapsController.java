@@ -6,6 +6,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -20,10 +22,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import java.time.Instant;
 import java.io.IOException;
@@ -38,6 +42,9 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
+
+import javax.swing.JOptionPane;
+
 import java.time.temporal.ChronoUnit;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -83,7 +90,7 @@ public class MyMapsController {
     	RenewPurchaseWindow.initModality(Modality.APPLICATION_MODAL);
 		 
 		Text text = new Text("The purchase is until " + Globals.FixedPurchase.getEndDate());
-		Button buttonSet = new Button("Calculate");
+		Button buttonSet = new Button("Show Price");
 		Button buttonCancel = new Button("Cancel");
 		Button buttonSave = new Button("Save"); 
 		Text cost = new Text();
@@ -91,18 +98,8 @@ public class MyMapsController {
 		buttonCancel.setOnAction(e -> RenewPurchaseWindow.close());
 		buttonSet.setOnAction(e -> {
 			calculate();
-			cost.setText(renewVal);
+			cost.setText("The price is " + renewVal);
 		 });
-		buttonSave.setOnAction(e -> {
-			try {
-				saveNewPurchaseToDB();
-				RenewPurchaseWindow.close();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		 });
-		
 		
 		
 		DatePicker = new DatePicker();
@@ -154,13 +151,62 @@ public class MyMapsController {
         GridPane.setHalignment(checkInlabel, HPos.LEFT);
         gridPane.add(DatePicker, 0, 1);
         
+        gridPane.add(buttonSet, 2, 1);
+        
+        GridPane gridPanePayment = new GridPane();
+        gridPanePayment.setHgap(10);
+        gridPanePayment.setVgap(10);
+        
+        Text textPayment =  new Text("Payment method");
+        textPayment.setFont(Font.font("Verdana", FontWeight.BOLD, 15));
+        gridPanePayment.add(textPayment, 0, 0);
+        
+        Button buttonChange= new Button("Change"); 
+        gridPanePayment.add(buttonChange, 1, 0);
+        
+        ToggleGroup group = new ToggleGroup();
+        RadioButton rb1 = new RadioButton();
+        rb1.setText("   VISA ("+ Globals.user.getPayment() +")");
+        gridPanePayment.add(rb1, 0, 1);
+        rb1.setToggleGroup(group);
+        rb1.setSelected(true);
+        
+        RadioButton rb2 = new RadioButton();	        
+		TextField newPayment = new TextField();
+		HBox h = new HBox(20);
+        h.getChildren().add(rb2);
+        h.getChildren().add(newPayment);
+        h.setAlignment(Pos.CENTER);
+        gridPanePayment.add(h, 0, 2);
+		newPayment.setVisible(false);
+		rb2.setToggleGroup(group);
+		rb2.setVisible(false);
+		
+		buttonChange.setOnAction(e -> {
+			newPayment.setVisible(true);
+			rb2.setVisible(true);
+		});
+		
+		buttonSave.setOnAction(e -> {
+			if(rb2.isSelected() && newPayment.getText().contentEquals("")) {
+				JOptionPane.showMessageDialog(null, "Please insert payment method!");
+			}
+			else {
+				try {
+					saveNewPurchaseToDB();
+					RenewPurchaseWindow.close();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+		 }});
+        
         HBox layout = new HBox(20);
         layout.getChildren().add(buttonCancel);
         layout.getChildren().add(buttonSave);
         layout.setAlignment(Pos.CENTER);
 
         HBox hbox = new HBox(20);
-        hbox.getChildren().add(buttonSet);
         hbox.getChildren().add(cost);
         hbox.setAlignment(Pos.CENTER);
         
@@ -168,15 +214,19 @@ public class MyMapsController {
         hbox2.getChildren().add(gridPane);
         hbox2.setAlignment(Pos.CENTER);
         
+        HBox hbox3 = new HBox(20);
+        hbox3.getChildren().add(gridPanePayment);
+        hbox3.setAlignment(Pos.CENTER);
         
         VBox layoutV = new VBox(20);
         layoutV.getChildren().add(text);
         layoutV.getChildren().add(hbox2);
         layoutV.getChildren().add(hbox);
+        layoutV.getChildren().add(hbox3);
         layoutV.getChildren().add(layout);
         layoutV.setAlignment(Pos.CENTER);
         
-        Scene dialogScene = new Scene(layoutV, 300, 200);
+        Scene dialogScene = new Scene(layoutV, 500, 300);
         RenewPurchaseWindow.setScene(dialogScene);
         RenewPurchaseWindow.show();
     }

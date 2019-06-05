@@ -25,17 +25,10 @@ import java.text.SimpleDateFormat;
 
 
 import java.util.Calendar;
-
 import java.util.Date;
-
 import javax.swing.JOptionPane;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
-
-import java.util.Calendar;
-
-import java.util.Date;
 
 
 public class Server {
@@ -60,61 +53,77 @@ public class Server {
 				
 				if (data instanceof Object[] && !(data instanceof String[])) {
 					if(((String)((Object[])(data))[0]).equals("dofixedpurchase")) {
-						int x=0;
 						Connection conn = null;
             			
             			FixedPurchase fp=((FixedPurchase)((Object[])(data))[1]);
             			
-            			
-            		
-//            			else if(((String)((Object[])(data))[2]).equals("")&&((String)((Object[])(data))[3]).equals("Yes")) {
-//            				ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
-//  		    				x=1;
-//            				String message="we need the payinfo to continue";
-//	     	                objectOutput.writeObject(message);
-//            			}
-            			if(x==0) {
-            				
-    							Class.forName(JDBC_DRIVER);
-
-    							conn = DriverManager.getConnection(DB_URL, USER, PASS);
-    							PreparedStatement pr;
-    							String sql="INSERT INTO fixedPurchase(`user`, `city`, `period`, `startdate`, `endDate`, `purchaseprice`) VALUES (?,?,?,?,?,?)";
-    			
-    							if (conn != null) {
-    								pr = conn.prepareStatement(sql);
-
-    								Date StartDate = fp.getStartDate();
-    		            			DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-    		            			Calendar c = Calendar.getInstance();
-    		            			String startDateAsString = df.format(StartDate);
-    		            			c.setTime(df.parse(startDateAsString));
-    		            			c.add(Calendar.DATE, 1);
-    		            			startDateAsString = df.format(c.getTime()); 
-    		            			Date endDate = fp.getEndDate();
-    		            			String endDateAsString = df.format(endDate);
-    		            			c.setTime(df.parse(endDateAsString));
-    		            			c.add(Calendar.DATE, 1);
-    		            			endDateAsString = df.format(c.getTime()); 
-                              
-									pr.setString(1,fp.getUser() );
-									pr.setString(2, fp.getCity());
-									pr.setInt(3,fp.getPeriod());
-									pr.setDate(4, java.sql.Date.valueOf(startDateAsString));
-									pr.setDate(5,java.sql.Date.valueOf(endDateAsString));
-									pr.setString(6,Double.toString(fp.getPrice()));
-									if (pr.executeUpdate() > 0) {
-										ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
-              		    				String message="thanks for purchace,you will enjoy";
-            	     	                objectOutput.writeObject(message);
-									}
-								
-									AddPurchaseToHistory(fp.getCity(), 1, fp.getUser(), "FT", conn);
-									
-									
-    							}
-            			}
+						Class.forName(JDBC_DRIVER);
+	
+						conn = DriverManager.getConnection(DB_URL, USER, PASS);
+						PreparedStatement pr;
+						String sql="INSERT INTO fixedPurchase(`user`, `city`, `period`, `startdate`, `endDate`, `purchaseprice`) VALUES (?,?,?,?,?,?)";
 		
+						if (conn != null) {
+							pr = conn.prepareStatement(sql);
+	
+							Date StartDate = fp.getStartDate();
+	            			DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+	            			Calendar c = Calendar.getInstance();
+	            			String startDateAsString = df.format(StartDate);
+	            			c.setTime(df.parse(startDateAsString));
+	            			c.add(Calendar.DATE, 1);
+	            			startDateAsString = df.format(c.getTime()); 
+	            			Date endDate = fp.getEndDate();
+	            			String endDateAsString = df.format(endDate);
+	            			c.setTime(df.parse(endDateAsString));
+	            			c.add(Calendar.DATE, 1);
+	            			endDateAsString = df.format(c.getTime()); 
+	                  
+							pr.setString(1,fp.getUser() );
+							pr.setString(2, fp.getCity());
+							pr.setInt(3,fp.getPeriod());
+							pr.setDate(4, java.sql.Date.valueOf(startDateAsString));
+							pr.setDate(5,java.sql.Date.valueOf(endDateAsString));
+							pr.setString(6,Double.toString(fp.getPrice()));
+							if (pr.executeUpdate() > 0) {
+								ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
+	  		    				String message="thanks for purchace,you will enjoy";
+		     	                objectOutput.writeObject(message);
+							}
+						
+							AddPurchaseToHistory(fp.getCity(), 1, fp.getUser(), "FT", conn);
+					
+						}
+            			
+		
+					} else if(((String)((Object[])(data))[0]).equals("updateUserInfo")) {
+						Connection conn = null;
+            			
+            			User user = ((User)((Object[])(data))[1]);
+            			
+						Class.forName(JDBC_DRIVER);
+	
+						conn = DriverManager.getConnection(DB_URL, USER, PASS);
+						
+						PreparedStatement pr;
+						String sql = "UPDATE user SET firstName = ?, lastName = ?, phoneNumber = ?, email = ?, payment = ?, userName = ?, password = ? WHERE id = ?";
+						if (conn != null) {
+							pr = conn.prepareStatement(sql);
+	                  
+							pr.setString(1, user.getFirstName() );
+							pr.setString(2, user.getLastName());
+							pr.setString(3,user.getPhoneNumber());
+							pr.setString(4,user.getEmail());
+							pr.setString(5,user.getPayment());
+							pr.setString(6,user.getUserName());
+							pr.setString(7,user.getPassword());
+							pr.setInt(8,user.getId());
+							
+							pr.executeUpdate();
+					
+					
+						}
+            			
 					} else if (((String) ((Object[]) (data))[0]).equals("getfixedcostandpayinfo")) {
 
 						Connection conn = null;
@@ -602,7 +611,7 @@ public class Server {
 								System.out.println("Hello User");
 
 								Connected = true;
-
+								int id = rs.getInt("id");
 								String username = rs.getString("userName");
 								String password = rs.getString("password");
 								String email = rs.getString("email");
@@ -615,7 +624,7 @@ public class Server {
 								// String pathnum = rs.getString("pathNum");
 
 								// data.add(new User(username, description, mapsnum , placesnum, pathnum ));
-								User user = new User(firstname, lastname, email, username, password, phonenumber,
+								User user = new User(id, firstname, lastname, email, username, password, phonenumber,
 										payment, type, history);
 
 								result[1] = user;
@@ -1759,6 +1768,7 @@ public class Server {
 			ResultSet rs = stmt.executeQuery(sql);
 
 			while (rs.next()) {
+				int id = rs.getInt("id");
 				String fname = rs.getString("firstName");
 				String lname = rs.getString("lastName");
 				String pnumber = rs.getString("phoneNumber");
@@ -1769,7 +1779,7 @@ public class Server {
 				String type = rs.getString("type");
 				String history = rs.getString("History");
 
-				data.add(new User(fname, lname, email, username, password, pnumber, payment, type, history));
+				data.add(new User(id,fname, lname, email, username, password, pnumber, payment, type, history));
 			}
 
 			stmt.close();
