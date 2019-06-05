@@ -47,11 +47,13 @@ import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
 
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
@@ -61,8 +63,10 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -137,6 +141,10 @@ public class DefPageController {
 	FilteredList<City> flCity = null;
 
 	FilteredList<Place> flPlace = null;
+	
+
+    @FXML
+    private Button editProfile;
 
 	@FXML
 	private Button searchCity;
@@ -159,9 +167,6 @@ public class DefPageController {
 	private String costVal;
 	
 	private int period;
-	
-    
-	
 
 	@FXML
 	private ImageView MainImage;
@@ -244,6 +249,17 @@ public class DefPageController {
 		});
 
 	}
+	
+	@FXML
+    void editProfileButt(ActionEvent event) throws IOException {
+		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+		URL url = getClass().getResource("MyProfileScene.fxml");
+		AnchorPane pane = FXMLLoader.load(url);
+		Scene scene = new Scene(pane);
+		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		primaryStage.setScene(scene);
+		primaryStage.show();
+    }
 
 	@FXML
 	void showMymaps(ActionEvent event) throws IOException {
@@ -278,55 +294,100 @@ public class DefPageController {
 			area.setDisable(true);
 	
 			Button buttonSelect = new Button("Select File");
-			Button buttonSave = new Button("Save");
+			Button buttonSave = new Button("Purchase");
 			Button buttonCancel = new Button("Cancel");
 			buttonCancel.setOnAction(e -> onePurchaseWindow.close());
 			buttonSelect.setOnAction(e -> {
 				selectFolder();
 			});
-			buttonSave.setOnAction(e -> {
-				try {
-					// saveToFile();
-					saveAllMaps();
-					@SuppressWarnings("resource")
-					Socket socket = new Socket("localhost", 5555);
-					Object[] array = new Object[4];
-					array[0] = "OneTimePurchase";
-					// get[1] = "" + ImagePlaces[i].getPlace().getCityName();
-					array[1] = Globals.user;
-					array[2] = Globals.city.getCity();
-					array[3] = Globals.city.getVersion();
-					String history = Globals.user.getHistory();
-					history += "#" + array[2] + ",OT," + array[3];
-					Globals.user.setHistory(history);
-					ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
-					objectOutput.writeObject(array);
-	
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (ClassNotFoundException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				onePurchaseWindow.close();
+			
+			
+			GridPane gridPanePayment = new GridPane();
+	        gridPanePayment.setHgap(10);
+	        gridPanePayment.setVgap(10);
+	        
+	        Text textPayment =  new Text("Payment method");
+	        textPayment.setFont(Font.font("Verdana", FontWeight.BOLD, 15));
+	        gridPanePayment.add(textPayment, 0, 0);
+	        
+	        Button buttonChange= new Button("Change"); 
+	        gridPanePayment.add(buttonChange, 1, 0);
+	        
+	        ToggleGroup group = new ToggleGroup();
+	        RadioButton rb1 = new RadioButton();
+	        rb1.setText("   VISA ("+ Globals.user.getPayment() +")");
+	        gridPanePayment.add(rb1, 0, 1);
+	        rb1.setToggleGroup(group);
+	        rb1.setSelected(true);
+	        
+	        RadioButton rb2 = new RadioButton();	        
+			TextField newPayment = new TextField();
+			HBox h = new HBox(20);
+	        h.getChildren().add(rb2);
+	        h.getChildren().add(newPayment);
+	        h.setAlignment(Pos.CENTER);
+	        gridPanePayment.add(h, 0, 2);
+			newPayment.setVisible(false);
+			rb2.setToggleGroup(group);
+			rb2.setVisible(false);
+			
+			buttonChange.setOnAction(e -> {
+				newPayment.setVisible(true);
+				rb2.setVisible(true);
 			});
+			
+			buttonSave.setOnAction(e -> {
+				if(rb2.isSelected() && newPayment.getText().contentEquals("")) {
+					JOptionPane.showMessageDialog(null, "Please insert payment method!");
+				}
+				else if( dir == null) {
+					JOptionPane.showMessageDialog(null, "Please select a file!");
+				}
+				else {
+				  try {
+						saveAllMaps();
+						@SuppressWarnings("resource")
+						Socket socket = new Socket("localhost", 5555);
+						Object[] array = new Object[4];
+						array[0] = "OneTimePurchase";
+						array[1] = Globals.user;
+						array[2] = Globals.city.getCity();
+						array[3] = Globals.city.getVersion();
+						String history = Globals.user.getHistory();
+						history += "#" + array[2] + ",OT," + array[3];
+						Globals.user.setHistory(history);
+						ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
+						objectOutput.writeObject(array);
+				  } catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				  } catch (ClassNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				  }
+				  onePurchaseWindow.close();
+			
+			}});
 	
 			HBox layout = new HBox(20);
-	
 			layout.getChildren().add(buttonCancel);
 			layout.getChildren().add(buttonSave);
 			layout.setAlignment(Pos.CENTER);
 	
 			HBox hbox = new HBox(area, buttonSelect);
 			hbox.setAlignment(Pos.CENTER);
+			
+			HBox hbox1 = new HBox(20);
+	        hbox1.getChildren().add(gridPanePayment);
+		    hbox1.setAlignment(Pos.CENTER);
 	
 			VBox layoutV = new VBox(20);
 			layoutV.getChildren().add(text);
 			layoutV.getChildren().add(hbox);
+			layoutV.getChildren().add(hbox1);
 			layoutV.getChildren().add(layout);
 			layoutV.setAlignment(Pos.CENTER);
-			Scene dialogScene = new Scene(layoutV, 300, 200);
+			Scene dialogScene = new Scene(layoutV, 500, 300);
 			onePurchaseWindow.setScene(dialogScene);
 			onePurchaseWindow.show();
 			}
@@ -344,29 +405,28 @@ public class DefPageController {
 			FixedPurchaseWindow.initModality(Modality.APPLICATION_MODAL);
 			 
 			Text text = new Text("The purchase costs " + Globals.city.getFixedCost());
-			Button buttonSet = new Button("Calculate");
+			Button buttonSet = new Button("Show Price");
 			Button buttonCancel = new Button("Cancel");
 			Button buttonPurchase= new Button("Purchase"); 
 			Text cost = new Text();
 			
+			
 			buttonPurchase.setDisable(true);
+			buttonPurchase.setVisible(false);
 			
 			buttonCancel.setOnAction(e -> FixedPurchaseWindow.close());
 			buttonSet.setOnAction(e -> {
 				calculate();
-				cost.setText("The period is " + period + " days and it costs " + costVal);
-				buttonPurchase.setDisable(false);
-			 });
-			buttonPurchase.setOnAction(e -> {
-				try {
-					savePurchase();
-					FixedPurchaseWindow.close();
-					JOptionPane.showMessageDialog(null, "thanks for purchace,you will enjoy");
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+				if(period == 0) {
+					cost.setText("You need to select a date!");
+				}
+				else {
+					cost.setText("The period is " + period + " days and it costs " + costVal);
+					buttonPurchase.setDisable(false);
+					buttonPurchase.setVisible(true);
 				}
 			 });
+		
 			
 			DatePicker = new DatePicker();
 			
@@ -393,20 +453,15 @@ public class DefPageController {
 	                                    setDisable(true);
 	                                    setStyle("-fx-background-color: #ffc0cb;");
 	                            }
-	                            long p = ChronoUnit.DAYS.between(
-	                                    checkInDatePicker.getValue(), item
-	                            );
-	                            setTooltip(new Tooltip(
-	                                "You're about to stay for " + p + " days")
-	                            );
+	                   
 	                    }
 	                };
 	            }
 	        };
+	        
 	        DatePicker.setDayCellFactory(dayCellFactory);
 	       
-	     
-	
+	        
 	        GridPane gridPane = new GridPane();
 		    gridPane.setHgap(10);
 		    gridPane.setVgap(10);
@@ -417,26 +472,85 @@ public class DefPageController {
 	        GridPane.setHalignment(checkInlabel, HPos.LEFT);
 	        gridPane.add(DatePicker, 0, 1);
 	        
+	        gridPane.add(buttonSet, 2, 1);
+	        
+	        GridPane gridPanePayment = new GridPane();
+	        gridPanePayment.setHgap(10);
+	        gridPanePayment.setVgap(10);
+	        
+	        Text textPayment =  new Text("Payment method");
+	        textPayment.setFont(Font.font("Verdana", FontWeight.BOLD, 15));
+	        gridPanePayment.add(textPayment, 0, 0);
+	        
+	        Button buttonChange= new Button("Change"); 
+	        gridPanePayment.add(buttonChange, 1, 0);
+	        
+	        ToggleGroup group = new ToggleGroup();
+	        RadioButton rb1 = new RadioButton();
+	        rb1.setText("   VISA ("+ Globals.user.getPayment() +")");
+	        gridPanePayment.add(rb1, 0, 1);
+	        rb1.setToggleGroup(group);
+	        rb1.setSelected(true);
+	        
+	        RadioButton rb2 = new RadioButton();	        
+			TextField newPayment = new TextField();
+			HBox h = new HBox(20);
+	        h.getChildren().add(rb2);
+	        h.getChildren().add(newPayment);
+	        h.setAlignment(Pos.CENTER);
+	        gridPanePayment.add(h, 0, 2);
+			newPayment.setVisible(false);
+			rb2.setToggleGroup(group);
+			rb2.setVisible(false);
+			
+			buttonPurchase.setOnAction(e -> {
+				try {
+					if(rb2.isSelected() && newPayment.getText().contentEquals("")) {
+						JOptionPane.showMessageDialog(null, "Please insert payment method!");
+					}
+					else {
+						savePurchase();
+						FixedPurchaseWindow.close();
+						JOptionPane.showMessageDialog(null, "thanks for purchace,you will enjoy");
+					}
+					
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			 });
+	        
+			buttonChange.setOnAction(e -> {
+				newPayment.setVisible(true);
+				rb2.setVisible(true);
+			});
+			
 	        HBox layout = new HBox(20);
 	        layout.getChildren().add(buttonCancel);
 	        layout.getChildren().add(buttonPurchase);
 	        layout.setAlignment(Pos.CENTER);
-	
+	        
 	        HBox hbox2 = new HBox(20);
 	        hbox2.getChildren().add(gridPane);
 	        hbox2.setAlignment(Pos.CENTER);
 	        
+	        HBox hbox3 = new HBox(20);
+	        hbox3.getChildren().add(gridPanePayment);
+	        hbox3.setAlignment(Pos.CENTER);
+	 
+	        HBox hbox1 = new HBox(20);
+	        hbox1.getChildren().add(cost);
+	        hbox1.setAlignment(Pos.CENTER);
 	        
 	        VBox layoutV = new VBox(20);
 	        layoutV.getChildren().add(text);
 	        layoutV.getChildren().add(hbox2);
-	        layoutV.getChildren().add(buttonSet);
-	        layoutV.getChildren().add(cost);
-	        //layoutV.getChildren().add(hbox);
+	        layoutV.getChildren().add(hbox1);
+	        layoutV.getChildren().add(hbox3);
 	        layoutV.getChildren().add(layout);
 	        layoutV.setAlignment(Pos.CENTER);
 	        
-	        Scene dialogScene = new Scene(layoutV, 400, 300);
+	        Scene dialogScene = new Scene(layoutV, 500, 400);
 	        FixedPurchaseWindow.setScene(dialogScene);
 	        FixedPurchaseWindow.show();
 		}
@@ -596,7 +710,7 @@ public class DefPageController {
 			try {
 	 				Object data=objectInput.readObject();
 	 				
-	 				if((data).equals("Yes")){ System.out.println("here");
+	 				if((data).equals("Yes")){
 	 					return "Yes";
 	 				}
 			} catch (ClassNotFoundException e) {
@@ -1067,18 +1181,18 @@ public class DefPageController {
 	private void calculate() {
     	LocalDate date = DatePicker.getValue();
     	if(date != null) {
-    	Date endDate = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
-		double cost = Globals.city.getFixedCost();    
-		Date today = Calendar.getInstance().getTime();
-		
-        double diffInDays = (double)( (endDate.getTime() - today.getTime())/(1000 * 60 * 60 * 24) );
-        diffInDays++;
-		period = (int) diffInDays;
-
-        double m = diffInDays/30;
-		double months = Math.ceil(m);
-        
-        costVal = Double.toString(months * cost);
+	    	Date endDate = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+			double cost = Globals.city.getFixedCost();    
+			Date today = Calendar.getInstance().getTime();
+			
+	        double diffInDays = (double)( (endDate.getTime() - today.getTime())/(1000 * 60 * 60 * 24) );
+	        diffInDays++;
+			period = (int) diffInDays;
+	
+	        double m = diffInDays/30;
+			double months = Math.ceil(m);
+	        
+	        costVal = Double.toString(months * cost);
     	}
 	}
 	
@@ -1086,51 +1200,28 @@ public class DefPageController {
 		    LocalDate date = DatePicker.getValue();
 	    	if(date != null) {
 	    	
-	    	Date enddate = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
-	        String user = Globals.user.getUserName();;
-	        Date sdate = Calendar.getInstance().getTime();
-	        double price = (int)Globals.city.getFixedCost();
-	        String city=Globals.city.getCity();
-	        FixedPurchase fp=new FixedPurchase(user,period,city,sdate,enddate,price);
-
-	        
-	        @SuppressWarnings("resource")
-	    	Socket	 socket = new Socket("localhost",5555);
-	        Object[] set = new Object[4];
-	        set[0] = "dofixedpurchase";
-	        set[1]= fp;
-	       // set[2]=payinfo.getText();
-	        //set[3]=infopay.getValue();
-	        try {
-	            ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
-	            objectOutput.writeObject(set); 
-	            ObjectInputStream  objectInput = new ObjectInputStream(socket.getInputStream());
-	            try {
-	 				Object data=objectInput.readObject();
-	 				
-//	 				if((data).equals("we need the payinfo to continue")){
-//	 					JOptionPane.showMessageDialog(null, "we need the payinfo to continue");
-//	 				}
-	 				if((data).equals("thanks for purchace,you will enjoy")){
-//	 					JOptionPane.showMessageDialog(null, "thanks for purchace,you will enjoy");
-//	 					Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-//	 					URL url = getClass().getResource("MyMapsScene.fxml");
-//	 					AnchorPane pane = FXMLLoader.load(url);
-//	 					Globals.backLink = "DefaultPage.fxml";
-//	 					Scene scene = new Scene(pane);
-//	 					scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-//	 					primaryStage.setScene(scene);
-//	 					primaryStage.show();
-	 				}
-	            } catch (ClassNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} 
-	        }
-	        catch (IOException e) 
-	        {
-	            e.printStackTrace();
-	        } 
+		    	Date enddate = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+		        String user = Globals.user.getUserName();;
+		        Date sdate = Calendar.getInstance().getTime();
+		        double price = (int)Globals.city.getFixedCost();
+		        String city=Globals.city.getCity();
+		        FixedPurchase fp=new FixedPurchase(user,period,city,sdate,enddate,price);
+		
+		        
+		        @SuppressWarnings("resource")
+		    	Socket	 socket = new Socket("localhost",5555);
+		        Object[] set = new Object[4];
+		        set[0] = "dofixedpurchase";
+		        set[1]= fp;
+		      
+		        try {
+		            ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
+		            objectOutput.writeObject(set); 
+		        }
+		        catch (IOException e) 
+		        {
+		            e.printStackTrace();
+		        } 
 	        }
 	    	
 	    }

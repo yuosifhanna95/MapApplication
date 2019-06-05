@@ -152,7 +152,7 @@ public class RegisterController {
 		String user = usernamme.getText();
 		String password = pass.getText();
 		String type = "member";// we have to fix this
-		User Client = new User(fname1, lname1, email, user, password, phone, pay, type, "");
+		User Client = new User(0,fname1, lname1, email, user, password, phone, pay, type, "");
 
 		@SuppressWarnings("resource")
 		Socket socket = new Socket("localhost", 5555);
