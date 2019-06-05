@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
@@ -9,7 +8,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="mainPane" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.AddLocController">
+<AnchorPane fx:id="mainPane" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.AddMapController">
    <children>
       <TextField fx:id="NewLocation" layoutX="505.0" layoutY="14.0" prefHeight="25.0" prefWidth="135.0" />
       <Label fx:id="label_message" centerShape="true" layoutX="614.0" layoutY="343.0" textAlignment="CENTER">
@@ -25,10 +24,10 @@
       <Button fx:id="btn_AddLoc" layoutX="387.0" layoutY="14.0" mnemonicParsing="false" onAction="#AddLocation" text="Set new location" />
       <Button fx:id="btn_UpdateMap" layoutX="728.0" layoutY="14.0" mnemonicParsing="false" onAction="#UpdateMap" text="Update map" />
       <Button fx:id="ConfirmUpdate" layoutX="823.0" layoutY="14.0" mnemonicParsing="false" onAction="#ConfirmUpdate" text="Confirm Update" />
-      <TextArea fx:id="TF_Description" layoutX="14.0" layoutY="65.0" prefHeight="160.0" prefWidth="260.0" promptText="Place description" />
-      <TextField fx:id="TF_Classification" layoutX="14.0" layoutY="250.0" prefHeight="25.0" prefWidth="260.0" promptText="Classification" />
-      <TextField fx:id="TF_Accessibility" layoutX="14.0" layoutY="297.0" prefHeight="25.0" prefWidth="260.0" promptText="Accessibility" />
-      <Button fx:id="btn_SaveDet" layoutX="14.0" layoutY="343.0" mnemonicParsing="false" onAction="#SaveDetailsFunc" text="Save Details" />
-      <ComboBox fx:id="comboBox" layoutX="937.0" layoutY="14.0" prefHeight="25.0" prefWidth="122.0" promptText="Status" />
+      <TextField fx:id="TF_CityName" layoutX="25.0" layoutY="104.0" promptText="City Name" />
+      <TextField fx:id="TF_ImageLink" layoutX="25.0" layoutY="383.0" prefHeight="25.0" prefWidth="235.0" promptText="Image Link" />
+      <TextArea fx:id="TF_MapDes" layoutX="25.0" layoutY="264.0" prefHeight="102.0" prefWidth="235.0" promptText="Map Description" />
+      <TextArea fx:id="TF_CityDes" layoutX="25.0" layoutY="148.0" prefHeight="102.0" prefWidth="235.0" promptText="City Description(Optional)" />
+      <Button fx:id="btn_AddMap" layoutX="25.0" layoutY="420.0" mnemonicParsing="false" onAction="#AddMapFunc" text="Add Map" />
    </children>
 </AnchorPane>

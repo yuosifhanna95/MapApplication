@@ -311,7 +311,7 @@ public class ConfirmMapsController {
 		UpdateCol.setStyle("-fx-alignment: CENTER;");
 		UpdateCol.setMinWidth(50);
 		UpdateCol.setCellValueFactory(new PropertyValueFactory<>("numOfPaths"));
-
+		Globals.ThereIsCityUpdate = false;
 		Callback<TableColumn<City, String>, TableCell<City, String>> cellFactory = new Callback<TableColumn<City, String>, TableCell<City, String>>() {
 
 			@Override
@@ -331,7 +331,7 @@ public class ConfirmMapsController {
 							City city1 = getTableView().getItems().get(getIndex());
 							if (!city1.getNewUpdate()) {
 								btn.setText("Edit");
-								Globals.ThereIsCityUpdate = false;
+								// Globals.ThereIsCityUpdate = false;
 							} else
 								Globals.ThereIsCityUpdate = true;
 

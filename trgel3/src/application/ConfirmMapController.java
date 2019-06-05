@@ -299,7 +299,7 @@ public class ConfirmMapController {
 		UpdateCol.setStyle("-fx-alignment: CENTER;");
 		UpdateCol.setMinWidth(50);
 		UpdateCol.setCellValueFactory(new PropertyValueFactory<>("numOfPaths"));
-
+		Globals.ThereIsMapUpdate = false;
 		Callback<TableColumn<Map, String>, TableCell<Map, String>> cellFactory = new Callback<TableColumn<Map, String>, TableCell<Map, String>>() {
 
 			@Override
@@ -319,7 +319,7 @@ public class ConfirmMapController {
 							Map map1 = getTableView().getItems().get(getIndex());
 							if (!map1.getNewUpdate()) {
 								btn.setText("Edit");
-								Globals.ThereIsMapUpdate = false;
+
 							} else
 								Globals.ThereIsMapUpdate = true;
 

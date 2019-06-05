@@ -3,26 +3,42 @@ package application;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.HPos;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.time.LocalDate;
+import java.util.Date;
+import java.time.temporal.ChronoUnit;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 
+import java.time.Month;
+import java.time.ZoneId;
 
 public class MyMapsController {
 
@@ -47,15 +63,119 @@ public class MyMapsController {
 
     @FXML
     private Button Paths;
-
+    
+    private DatePicker DatePicker;
+    
+    private String renewVal;
+    
     private ObservableList<FixedPurchase> data = null;
 
     @FXML
     void RenewBtn(ActionEvent event) {
+    	final Stage onePurchaseWindow = new Stage();
+		onePurchaseWindow.initModality(Modality.APPLICATION_MODAL);
+		 
+		Text text = new Text("The purchase is until " + Globals.FixedPurchase.getEndDate());
+		Button buttonSet = new Button("Calculate");
+		Button buttonCancel = new Button("Cancel");
+		Button buttonSave = new Button("Save"); 
+		Text cost = new Text();
+		
+		buttonCancel.setOnAction(e -> onePurchaseWindow.close());
+		buttonSet.setOnAction(e -> {
+			calculate();
+			cost.setText(renewVal);
+		 });
+		buttonSave.setOnAction(e -> {
+			try {
+				saveNewPurchaseToDB();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		 });
+		
+		DatePicker = new DatePicker();
 
+        GridPane gridPane = new GridPane();
+	    gridPane.setHgap(10);
+	    gridPane.setVgap(10);
+	      
+	    Label checkInlabel = new Label("Set Date:");
+	    gridPane.add(checkInlabel, 0, 0);
+
+        GridPane.setHalignment(checkInlabel, HPos.LEFT);
+        gridPane.add(DatePicker, 0, 1);
+        
+        HBox layout = new HBox(20);
+        layout.getChildren().add(buttonCancel);
+        layout.getChildren().add(buttonSave);
+        layout.setAlignment(Pos.CENTER);
+
+        HBox hbox = new HBox(20);
+        hbox.getChildren().add(buttonSet);
+        hbox.getChildren().add(cost);
+        hbox.setAlignment(Pos.CENTER);
+        
+        HBox hbox2 = new HBox(20);
+        hbox2.getChildren().add(gridPane);
+        hbox2.setAlignment(Pos.CENTER);
+        
+        
+        VBox layoutV = new VBox(20);
+        layoutV.getChildren().add(text);
+        layoutV.getChildren().add(hbox2);
+        layoutV.getChildren().add(hbox);
+        layoutV.getChildren().add(layout);
+        layoutV.setAlignment(Pos.CENTER);
+        
+        Scene dialogScene = new Scene(layoutV, 300, 200);
+        onePurchaseWindow.setScene(dialogScene);
+        onePurchaseWindow.show();
     }
 
-    @FXML
+    private void saveNewPurchaseToDB() throws UnknownHostException, IOException {
+    	LocalDate date = DatePicker.getValue();
+    	if(date != null) {
+    	Date newDate = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+    	
+    	Socket socket = new Socket("localhost",5555);
+   
+    	Object[] set = new Object[4];
+        set[0] = "addNewDate";
+        set[1] = newDate;	
+        set[2] = Globals.FixedPurchase.getUser();
+        set[3] = Globals.FixedPurchase.getCity();
+		try {
+		    ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
+		    objectOutput.writeObject(set); 
+		  } 
+		  catch (IOException e) 
+		  {
+		      e.printStackTrace();
+		  } 
+		
+    	}
+	}
+
+	private void calculate() {
+    	LocalDate date = DatePicker.getValue();
+    	if(date != null) {
+    	Date newDate = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+		double cost = Globals.FixedPurchase.getPrice();
+        Date oldDate = Globals.FixedPurchase.getEndDate();
+        
+        double diffInDays = (double)( (newDate.getTime() - oldDate.getTime())/(1000 * 60 * 60 * 24) );
+		double m = diffInDays/30;
+		double months = Math.ceil(m);
+        
+        renewVal = Double.toString(months * cost);
+    	}
+	}
+
+	
+
+	@FXML
     void ShowMapsBtn(ActionEvent event) throws IOException {
 		Stage primaryStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
         URL url = getClass().getResource("ShowMapsScene.fxml");

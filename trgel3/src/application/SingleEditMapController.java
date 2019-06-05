@@ -76,12 +76,13 @@ public class SingleEditMapController {
 
 					String urll = mapRow.getLinkCustomer();
 					System.out.println(urll);
-					Globals.backLink = urll;
+					// Globals.backLink = urll;
 					Globals.map = mapRow;
 
 					try {
 						Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 						URL url = getClass().getResource("AddLocations.fxml");
+						Globals.backLink = "SingleEditMap.fxml";
 						AnchorPane pane;
 						pane = FXMLLoader.load(url);
 						Scene scene = new Scene(pane);

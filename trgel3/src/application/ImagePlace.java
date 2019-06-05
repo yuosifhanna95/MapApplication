@@ -9,6 +9,7 @@ public class ImagePlace {
 	private Label label;
 	private Place place;
 	private int X, Y;
+	private Boolean Changed;
 
 	public ImagePlace() {
 		this.X = 0;
@@ -19,7 +20,7 @@ public class ImagePlace {
 		this.place = null;
 	}
 
-	public ImagePlace(int Id, ImageView imageview, Label label, Place place, int X, int Y) {
+	public ImagePlace(int Id, ImageView imageview, Label label, Place place, int X, int Y, Boolean Changed) {
 		this.Id = Id;
 		this.imageview = imageview;
 		this.label = label;
@@ -74,6 +75,14 @@ public class ImagePlace {
 
 	public int getY() {
 		return Y;
+	}
+
+	public void setChanged(Boolean changed) {
+		Changed = changed;
+	}
+
+	public Boolean getChanged() {
+		return Changed;
 	}
 
 }

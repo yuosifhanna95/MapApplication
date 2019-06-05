@@ -1,6 +1,5 @@
 package application;
 
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -21,10 +20,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-
-
-
-
 
 public class ViewController {
 
@@ -55,7 +50,6 @@ public class ViewController {
 		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 		URL url = getClass().getResource(Globals.backLink);
 		AnchorPane pane = FXMLLoader.load(url);
-
 
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
@@ -118,7 +112,8 @@ public class ViewController {
 				newLoc.setFitWidth(im.getWidth() * aspect);
 				newLoc.setId("imv" + Counter);
 
-				ImagePlaces[counter] = new ImagePlace(counter, newLoc, label, p, list[i].getLocX(), list[i].getLocY());
+				ImagePlaces[counter] = new ImagePlace(counter, newLoc, label, p, list[i].getLocX(), list[i].getLocY(),
+						false);
 				counter++;
 				Counter++;
 			}

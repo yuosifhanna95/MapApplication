@@ -12,20 +12,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-
 import java.util.Calendar;
+import java.util.Date;
 
 import javax.swing.JOptionPane;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
-import java.util.Calendar;
-import java.util.Date;
-
 
 public class Server {
 
@@ -45,123 +41,167 @@ public class Server {
 				Socket skt = myServerSocket.accept();
 				ObjectInputStream objectInput = new ObjectInputStream(skt.getInputStream());
 				data = objectInput.readObject();
-				
-				if (data instanceof Object[] && !(data instanceof String[])) {
-					if(((String)((Object[])(data))[0]).equals("dofixedpurchase")) {
-						int x=0;
-						Connection conn = null;
-            			Statement stmt = null;
-            			FixedPurchase fp=((FixedPurchase)((Object[])(data))[1]);
-            			int period=fp.getPeriod();
-            			String user2=fp.getUser();
-            			
-            			if(period<=3) {
-            				ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
-  		    				String message="the period should be bigger than 3";
-  		    				x=1;
-	     	                objectOutput.writeObject(message);
-            			}
-            			else if(period>180) {
-            				ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
-  		    				String message="the period is very big,you can purchase until 180 day";
-	     	                x=1;
-  		    				objectOutput.writeObject(message);
-            			}
-            			else if(((String)((Object[])(data))[2]).equals("")&&((String)((Object[])(data))[3]).equals("Yes")) {
-            				ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
-  		    				x=1;
-            				String message="we need the payinfo to continue";
-	     	                objectOutput.writeObject(message);
-            			}
-            			else if(x==0) {
-            				
-    							Class.forName(JDBC_DRIVER);
 
-    							conn = DriverManager.getConnection(DB_URL, USER, PASS);
-    							PreparedStatement pr;
-    							String sql="INSERT INTO fixedPurchase(`user`, `city`, `period`, `startdate`, `endDate`, `purchaseprice`) VALUES (?,?,?,?,?,?)";
-    							if (conn != null) {
-    								pr = conn.prepareStatement(sql);
-    								SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-    								Calendar c = Calendar.getInstance();
-    								c.setTime(new Date());
-    								c.add(Calendar.DATE, fp.getPeriod());
-    								String output = sdf.format(c.getTime());
-    								Date s=sdf.parse(output);
-    								fp.setEndDate(s);
-									pr.setString(1,fp.getUser() );
-									pr.setString(2, fp.getCity());
-									pr.setString(3,Integer.toString(fp.getPeriod()));
-									pr.setDate(4, (java.sql.Date) fp.getStartDate());
-									pr.setDate(5, (java.sql.Date) fp.getEndDate());
-									pr.setString(6,Double.toString(fp.getPrice()));
-									if (pr.executeUpdate() > 0) {
-										ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
-              		    				String message="thanks for purchace,you will enjoy";
-            	     	                objectOutput.writeObject(message);
-									}
-									
-    							}
-            			}
+				if (data instanceof Object[] && !(data instanceof String[])) {
+					if (((String) ((Object[]) (data))[0]).equals("dofixedpurchase")) {
+						int x = 0;
+						Connection conn = null;
+						Statement stmt = null;
+						FixedPurchase fp = ((FixedPurchase) ((Object[]) (data))[1]);
+						int period = fp.getPeriod();
+						String user2 = fp.getUser();
+
+						if (period <= 3) {
+							ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
+							String message = "the period should be bigger than 3";
+							x = 1;
+							objectOutput.writeObject(message);
+						} else if (period > 180) {
+							ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
+							String message = "the period is very big,you can purchase until 180 day";
+							x = 1;
+							objectOutput.writeObject(message);
+						} else if (((String) ((Object[]) (data))[2]).equals("")
+								&& ((String) ((Object[]) (data))[3]).equals("Yes")) {
+							ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
+							x = 1;
+							String message = "we need the payinfo to continue";
+							objectOutput.writeObject(message);
+						} else if (x == 0) {
+
+							Class.forName(JDBC_DRIVER);
+
+							conn = DriverManager.getConnection(DB_URL, USER, PASS);
+							PreparedStatement pr;
+							String sql = "INSERT INTO fixedPurchase(`user`, `city`, `period`, `startdate`, `endDate`, `purchaseprice`) VALUES (?,?,?,?,?,?)";
+							if (conn != null) {
+								pr = conn.prepareStatement(sql);
+								SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+								Calendar c = Calendar.getInstance();
+								c.setTime(new Date());
+								c.add(Calendar.DATE, fp.getPeriod());
+								String output = sdf.format(c.getTime());
+								Date s = sdf.parse(output);
+								fp.setEndDate(s);
+								pr.setString(1, fp.getUser());
+								pr.setString(2, fp.getCity());
+								pr.setString(3, Integer.toString(fp.getPeriod()));
+								pr.setDate(4, (java.sql.Date) fp.getStartDate());
+								pr.setDate(5, (java.sql.Date) fp.getEndDate());
+								pr.setString(6, Double.toString(fp.getPrice()));
+								if (pr.executeUpdate() > 0) {
+									AddPurchaseToHistory(fp.getUser(), fp.getCity(), "FP", conn);
+									ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
+									String message = "thanks for purchace,you will enjoy";
+									objectOutput.writeObject(message);
+								}
+
+							}
+						}
+					} else if (((String) ((Object[]) (data))[0]).equals("getfixedcostandpayinfo")) {
+
+						Connection conn = null;
+						Statement stmt = null;
+						Statement stmt1 = null;
+						Object[] ob = new Object[2];
+						double i = -1;
+						String pay = "";
+						String cityname = ((String) ((Object[]) (data))[1]);
+						String username = ((String) ((Object[]) (data))[2]);
+						System.out.println(cityname);
+						try {
+							Class.forName(JDBC_DRIVER);
+
+							conn = DriverManager.getConnection(DB_URL, USER, PASS);
+							stmt = conn.createStatement();
+							stmt1 = conn.createStatement();
+							String sql = "SELECT * FROM CityCatalog";
+							String sql1 = "SELECT * FROM user";
+							ResultSet rs = stmt.executeQuery(sql);
+							ResultSet rs1 = stmt1.executeQuery(sql1);
+
+							while (rs.next()) {
+								String x = rs.getString("name");
+								if (x.equals(cityname)) {
+									i = rs.getDouble("fixedCost");
+
+								}
+							}
+							while (rs1.next()) {
+								String y = rs1.getString("userName");
+								if (y.equals(username)) {
+									pay = rs1.getString("payment");
+
+								}
+
+							}
+
+							ob[0] = i;
+							ob[1] = pay;
+							ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
+							objectOutput.writeObject(ob);
+							stmt.close();
+							conn.close();
+
+						} catch (SQLException se) {
+							se.printStackTrace();
+							System.out.println("SQLException: " + se.getMessage());
+							System.out.println("SQLState: " + se.getSQLState());
+							System.out.println("VendorError: " + se.getErrorCode());
+						}
+					} else if (((String) ((Object[]) (data))[0]).equals("OneTimePurchase")) {
+						Connection conn = null;
+						User user = (User) ((Object[]) (data))[1];
+						String city = (String) ((Object[]) (data))[2];
+						Class.forName(JDBC_DRIVER);
+						conn = DriverManager.getConnection(DB_URL, USER, PASS);
+						AddPurchaseToHistory(city, user.getUserName(), "OT", conn);
+
 					}
-					if(((String)((Object[])(data))[0]).equals("getfixedcostandpayinfo")) {
-						
-                		Connection conn = null;
-            			Statement stmt = null;
-            			Statement stmt1 = null;
-            			Object[] ob = new Object[2];
-            			double i=-1;
-            			String pay="";
-            			String cityname=((String)((Object[])(data))[1]);
-            			String username=((String)((Object[])(data))[2]);
-            			 System.out.println(cityname);
-            			try {
-            				Class.forName(JDBC_DRIVER);
-            				 
-            				conn = DriverManager.getConnection(DB_URL, USER, PASS);
-            				stmt = conn.createStatement();
-            				stmt1=conn.createStatement();
-            				String sql = "SELECT * FROM CityCatalog"   ;
-            				String sql1 = "SELECT * FROM user"   ;
-            				ResultSet rs = stmt.executeQuery(sql);
-            				ResultSet rs1 = stmt1.executeQuery(sql1);
-            				
-            				while (rs.next()) {
-            					 String x=rs.getString("name");
-            					if(x.equals(cityname)) {
-            						 i=rs.getDouble("fixedCost");
-            						 
-            					}
-            				}
-            					while (rs1.next()) {
-               					 String y=rs1.getString("userName");
-               					if(y.equals(username)) {
-               						 pay=rs1.getString("payment");
-               						 
-               					}
-            					
-            				}
-            				 
-            				ob[0]=i;
-            				ob[1]=pay;
-            				ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
-            				 objectOutput.writeObject(ob);
-            				 stmt.close();
-            					conn.close();
-            					
-            					
-            				
-            			}
-            				catch (SQLException se) {
-            					se.printStackTrace();
-            					System.out.println("SQLException: " + se.getMessage());
-            				    System.out.println("SQLState: " + se.getSQLState());
-            				    System.out.println("VendorError: " + se.getErrorCode());
-            				}
-                	}
-					
-					if (((String) ((Object[]) (data))[0]).equals("Register")) {
-						
+
+					else if (((String) ((Object[]) (data))[0]).equals("addNewDate")) {
+						Connection conn = null;
+						Statement stmt = null;
+
+						Date NewDate = ((Date) ((Object[]) (data))[1]);
+						DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+						Calendar c = Calendar.getInstance();
+
+						String NewDateAsString = df.format(NewDate);
+						c.setTime(df.parse(NewDateAsString));
+						c.add(Calendar.DATE, 1);
+						NewDateAsString = df.format(c.getTime());
+						String cityname = ((String) ((Object[]) (data))[3]);
+						String username = ((String) ((Object[]) (data))[2]);
+
+						try {
+							Class.forName(JDBC_DRIVER);
+
+							conn = DriverManager.getConnection(DB_URL, USER, PASS);
+							stmt = conn.createStatement();
+
+							String sql = "update fixedPurchase set endDate = ? where user = ? and city = ?";
+							PreparedStatement pr;
+
+							if (conn != null) {
+								pr = conn.prepareStatement(sql);
+								pr.setDate(1, java.sql.Date.valueOf(NewDateAsString));
+								pr.setString(2, username);
+								pr.setString(3, cityname);
+								pr.executeUpdate();
+							}
+
+							stmt.close();
+							conn.close();
+
+						} catch (SQLException se) {
+							se.printStackTrace();
+							System.out.println("SQLException: " + se.getMessage());
+							System.out.println("SQLState: " + se.getSQLState());
+							System.out.println("VendorError: " + se.getErrorCode());
+						}
+					} else if (((String) ((Object[]) (data))[0]).equals("Register")) {
+
 						User client = ((User) ((Object[]) (data))[1]);
 						String fname1 = client.getFirstName();
 						String lname1 = client.getLastName();
@@ -170,6 +210,7 @@ public class Server {
 						String pay = client.getPayment();
 						String user = client.getUserName();
 						String password = client.getPassword();
+						String history = client.getHistory();
 
 						Connection conn = null;
 						Statement stmt = null;
@@ -180,7 +221,7 @@ public class Server {
 							// stmt = conn.createStatement();
 
 							PreparedStatement pr;
-							String sql = "INSERT INTO user (`firstName`, `lastName`, `phoneNumber`, `email`, `payment`, `userName`, `password`) VALUES (?,?,?,?,?,?,?)";
+							String sql = "INSERT INTO user (`firstName`, `lastName`, `phoneNumber`, `email`, `payment`, `userName`, `password`,`History`) VALUES (?,?,?,?,?,?,?,?)";
 							// ResultSet rs = stmt.executeQuery(sql);
 
 							if (conn != null) {
@@ -189,8 +230,8 @@ public class Server {
 											|| (email.equals("")) || (pay.equals("")) || (user.equals(""))
 											|| (password.equals(""))) {
 										ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
-              		    				String message="fill all the fields";
-            	     	                objectOutput.writeObject(message);
+										String message = "fill all the fields";
+										objectOutput.writeObject(message);
 
 									} else if (checkuser(user, conn) == 1) {
 										// System.out.println("please");
@@ -204,10 +245,12 @@ public class Server {
 										pr.setString(5, pay);
 										pr.setString(6, user);
 										pr.setString(7, password);
+										pr.setString(8, history);
 										if (pr.executeUpdate() > 0) {
-											ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
-	              		    				String message="thanks for registeration";
-	            	     	                objectOutput.writeObject(message);
+											ObjectOutputStream objectOutput = new ObjectOutputStream(
+													skt.getOutputStream());
+											String message = "thanks for registeration";
+											objectOutput.writeObject(message);
 										}
 									}
 								} catch (SQLException e) {
@@ -216,7 +259,7 @@ public class Server {
 								}
 							}
 
-							stmt.close();
+							// stmt.close();
 							conn.close();
 
 						} catch (SQLException se) {
@@ -236,7 +279,7 @@ public class Server {
 								se.printStackTrace();
 							}
 						}
-						} else if (((String) ((Object[]) (data))[0]).equals("UpdatePlace")) {
+					} else if (((String) ((Object[]) (data))[0]).equals("UpdatePlace")) {
 
 						System.out.println("this is update");
 						Place place;
@@ -329,7 +372,38 @@ public class Server {
 							}
 						}
 
+					} else if (((String) ((Object[]) (data))[0]).equals("AddMap")) {
+						int x = 0;
+						Connection conn = null;
+						Statement stmt = null;
+						Map map = ((Map) ((Object[]) (data))[1]);
+
+						Class.forName(JDBC_DRIVER);
+
+						conn = DriverManager.getConnection(DB_URL, USER, PASS);
+						PreparedStatement pr;
+
+						AddCityIfNotExist(map, conn, ((String) ((Object[]) (data))[2]));
+						String sql = "INSERT INTO maps(`city`, `description`, `linkCustomer`, `linkEmployee`, NewUpdate) VALUES (?,?,?,?,?)";
+						if (conn != null) {
+							pr = conn.prepareStatement(sql);
+							pr.setString(1, map.getCity());
+							pr.setString(2, map.getDescription());
+							pr.setString(3, map.getLinkCustomer());
+							pr.setString(4, map.getLinkEmployee());
+							pr.setBoolean(5, map.getNewUpdate());
+							if (pr.executeUpdate() > 0) {
+								// ObjectOutputStream objectOutput = new
+								// ObjectOutputStream(skt.getOutputStream());
+								// String message = "thanks for adding map";
+								// objectOutput.writeObject(message);
+								System.out.println("thanks for adding map");
+							}
+
+						}
+
 					}
+
 				} else if (data instanceof String[]) {
 
 					if (((String[]) (data))[0].equals("Exit"))
@@ -519,11 +593,12 @@ public class Server {
 								String lastname = rs.getString("lastName");
 								String payment = rs.getString("payment");
 								String type = rs.getString("type");
+								String history = rs.getString("History");
 								// String pathnum = rs.getString("pathNum");
 
 								// data.add(new User(username, description, mapsnum , placesnum, pathnum ));
 								User user = new User(firstname, lastname, email, username, password, phonenumber,
-										payment, type);
+										payment, type, history);
 
 								result[1] = user;
 
@@ -558,7 +633,7 @@ public class Server {
 						}
 
 						/////////////////////
-					}					else if (((String[]) (data))[0].equals("getUsers")) {
+					} else if (((String[]) (data))[0].equals("getUsers")) {
 						ObservableList<User> userList = getUserFromDB();
 
 						Object[] data = new Object[userList.size() + 1];
@@ -574,8 +649,7 @@ public class Server {
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
-					} 
-					else if (((String[]) (data))[0].equals("getCatalog")) {
+					} else if (((String[]) (data))[0].equals("getCatalog")) {
 						ObservableList<City> cityList = getCityFromDB();
 
 						Object[] data = new Object[cityList.size() + 1];
@@ -642,8 +716,7 @@ public class Server {
 							e.printStackTrace();
 						}
 
-					}
-					else if (((String[]) (data))[0].equals("getMyRoutes")) {
+					} else if (((String[]) (data))[0].equals("getMyRoutes")) {
 						ObservableList<Route> RouteList = getMyRoutesFromDB(((String[]) (data))[1]);
 
 						Object[] data = new Object[RouteList.size() + 1];
@@ -659,9 +732,9 @@ public class Server {
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
-					}
-					else if (((String[]) (data))[0].equals("getRoutePlaces")) {
-						ObservableList<RoutePlace> RouteList = getRoutePlacesFromDB(Integer.parseInt(((String[]) (data))[1]));
+					} else if (((String[]) (data))[0].equals("getRoutePlaces")) {
+						ObservableList<RoutePlace> RouteList = getRoutePlacesFromDB(
+								Integer.parseInt(((String[]) (data))[1]));
 
 						Object[] data = new Object[RouteList.size() + 1];
 						data[0] = RouteList.size();
@@ -676,74 +749,70 @@ public class Server {
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
-					}
-                    else if(((String[])(data))[0].equals("getFixedPurchase")) { 
-        	            ObservableList<FixedPurchase> FixedPurchaseList = getFixedPurchaseFromDB(((String[])(data))[1]);
-        	           
-        	            Object[] data = new Object[FixedPurchaseList.size()+1];
-        	            data[0] = FixedPurchaseList.size();
-        	            int counter = 1;
-        	            for(FixedPurchase tu: FixedPurchaseList) {
-        	                data[counter] = tu;
-        	                counter++;
-        	            }
-        	            try {
-        	                ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
-        	                objectOutput.writeObject(data);       
-        	            } 
-        	            catch (IOException e) 
-        	            {
-        	                e.printStackTrace();
-        	            } 
-                	}
-					else if (((String[]) (data))[0].equals("addCityToMember")) {
-						
-							Connection conn = null;
-	            			Statement stmt = null;
-	            			try {
-	            				Class.forName(JDBC_DRIVER);
-	            				conn = DriverManager.getConnection(DB_URL, USER, PASS);             				
-	              				PreparedStatement pr;
-	              				String sql = "INSERT INTO fixedPurchase (`user`, `city`, `startDate`, `endDate`, `period`, `purchaseprice`) VALUES (?,?,?,?,?,?)"; 
-	              				
-	              			
-	              				if(conn!=null) {
-	              		    		try {
-	              		    			
-	              						pr=conn.prepareStatement(sql);
-	              						pr.setString(1, ((String[])(data))[1]);
-	              						pr.setString(2, ((String[])(data))[2]);
-	              						pr.setDate(3, java.sql.Date.valueOf("2013-09-04"));
-	              						pr.setDate(4, java.sql.Date.valueOf("2013-09-04"));
-	              						pr.setInt(5, 30);
-	              						pr.setInt(6, 30);
-	              						pr.executeUpdate();
-	              					} catch (SQLException e) {
-	              						// TODO Auto-generated catch block
-	              						e.printStackTrace();
-	              					}
-	              		    	} 
-	            			    
-	            			
-	            				conn.close();
+					} else if (((String[]) (data))[0].equals("getFixedPurchase")) {
+						ObservableList<FixedPurchase> FixedPurchaseList = getFixedPurchaseFromDB(
+								((String[]) (data))[1]);
 
-					}catch (SQLException se) {
-						se.printStackTrace();
-						System.out.println("SQLException: " + se.getMessage());
-						System.out.println("SQLState: " + se.getSQLState());
-						System.out.println("VendorError: " + se.getErrorCode());
-					} catch (Exception e) {
-						e.printStackTrace();
-					} finally {
+						Object[] data = new Object[FixedPurchaseList.size() + 1];
+						data[0] = FixedPurchaseList.size();
+						int counter = 1;
+						for (FixedPurchase tu : FixedPurchaseList) {
+							data[counter] = tu;
+							counter++;
+						}
 						try {
-							if (stmt != null)
-								stmt.close();
-							if (conn != null)
-								conn.close();
+							ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
+							objectOutput.writeObject(data);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					} else if (((String[]) (data))[0].equals("addCityToMember")) {
+
+						Connection conn = null;
+						Statement stmt = null;
+						try {
+							Class.forName(JDBC_DRIVER);
+							conn = DriverManager.getConnection(DB_URL, USER, PASS);
+							PreparedStatement pr;
+							String sql = "INSERT INTO fixedPurchase (`user`, `city`, `startDate`, `endDate`, `period`, `purchaseprice`) VALUES (?,?,?,?,?,?)";
+
+							if (conn != null) {
+								try {
+
+									pr = conn.prepareStatement(sql);
+									pr.setString(1, ((String[]) (data))[1]);
+									pr.setString(2, ((String[]) (data))[2]);
+									pr.setDate(3, java.sql.Date.valueOf("2013-09-04"));
+									pr.setDate(4, java.sql.Date.valueOf("2013-09-04"));
+									pr.setInt(5, 30);
+									pr.setInt(6, 30);
+									pr.executeUpdate();
+								} catch (SQLException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+							}
+
+							conn.close();
+
 						} catch (SQLException se) {
 							se.printStackTrace();
+							System.out.println("SQLException: " + se.getMessage());
+							System.out.println("SQLState: " + se.getSQLState());
+							System.out.println("VendorError: " + se.getErrorCode());
+						} catch (Exception e) {
+							e.printStackTrace();
+						} finally {
+							try {
+								if (stmt != null)
+									stmt.close();
+								if (conn != null)
+									conn.close();
+							} catch (SQLException se) {
+								se.printStackTrace();
+							}
 						}
-					}} else if (((String[]) (data))[0].equals("getPlaces")) {
+					} else if (((String[]) (data))[0].equals("getPlaces")) {
 
 						Place[] list;
 						int k = ((String[]) (data)).length;
@@ -1037,6 +1106,7 @@ public class Server {
 				String pathnum = rs.getString("pathNum");
 				int oneTimeCost = rs.getInt("oneTimeCost");
 				int FixedCost = rs.getInt("FixedCost");
+				int Version = rs.getInt("version");
 				String places = null;
 				Boolean NewUpdate = rs.getBoolean("NewUpdate");
 				String sql2 = "SELECT * FROM places WHERE Name ='" + city + "'";
@@ -1047,8 +1117,8 @@ public class Server {
 					places += (" + " + place);
 				}
 
-
-				data.add(new City(city, description, mapsnum, placesnum, pathnum, places, oneTimeCost, FixedCost,NewUpdate));
+				data.add(new City(city, description, mapsnum, placesnum, pathnum, places, oneTimeCost, FixedCost,
+						Version, NewUpdate));
 
 			}
 
@@ -1229,44 +1299,39 @@ public class Server {
 		return data;
 	}
 
-	   
 	static ObservableList<Route> getMyRoutesFromDB(String city) {
 		ObservableList<Route> data = FXCollections.observableArrayList();
-		
-	    
+
 		Connection conn = null;
 		Statement stmt = null;
 		Statement stmt2 = null;
 		try {
 			Class.forName(JDBC_DRIVER);
-			 
+
 			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			stmt = conn.createStatement();
 			stmt2 = conn.createStatement();
-			
 
-			String sql = "SELECT * FROM Routes WHERE city ='" + city + "'"  ;
-			   ResultSet rs = stmt2.executeQuery(sql);
-			   
-				while (rs.next()) {
-				  int id = rs.getInt("id");
-				  String description = rs.getString("description");
-				  String link = rs.getString("link");
-				 
-				  data.add(new Route(id, city,description, link ));
-				}
+			String sql = "SELECT * FROM Routes WHERE city ='" + city + "'";
+			ResultSet rs = stmt2.executeQuery(sql);
 
-			
+			while (rs.next()) {
+				int id = rs.getInt("id");
+				String description = rs.getString("description");
+				String link = rs.getString("link");
+
+				data.add(new Route(id, city, description, link));
+			}
+
 			stmt.close();
 			conn.close();
-			
+
 			return data;
-		}
-		catch (SQLException se) {
+		} catch (SQLException se) {
 			se.printStackTrace();
 			System.out.println("SQLException: " + se.getMessage());
-		    System.out.println("SQLState: " + se.getSQLState());
-		    System.out.println("VendorError: " + se.getErrorCode());
+			System.out.println("SQLState: " + se.getSQLState());
+			System.out.println("VendorError: " + se.getErrorCode());
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -1279,47 +1344,42 @@ public class Server {
 				se.printStackTrace();
 			}
 		}
-	   
-	   
-	   return data;
+
+		return data;
 	}
-	
+
 	static ObservableList<RoutePlace> getRoutePlacesFromDB(int id) {
 		ObservableList<RoutePlace> data = FXCollections.observableArrayList();
-		
-	    
+
 		Connection conn = null;
 		Statement stmt = null;
 		Statement stmt2 = null;
 		try {
 			Class.forName(JDBC_DRIVER);
-			 
+
 			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			stmt = conn.createStatement();
 			stmt2 = conn.createStatement();
-			
 
-			String sql = "SELECT * FROM RoutePlaces WHERE RootId ='" + id + "'"  ;
-			   ResultSet rs = stmt2.executeQuery(sql);
-			   
-				while (rs.next()) {
-				  String place = rs.getString("place");
-				  int time = rs.getInt("time");
-				 
-				  data.add(new RoutePlace(id, place, time ));
-				}
+			String sql = "SELECT * FROM RoutePlaces WHERE RootId ='" + id + "'";
+			ResultSet rs = stmt2.executeQuery(sql);
 
-			
+			while (rs.next()) {
+				String place = rs.getString("place");
+				int time = rs.getInt("time");
+
+				data.add(new RoutePlace(id, place, time));
+			}
+
 			stmt.close();
 			conn.close();
-			
+
 			return data;
-		}
-		catch (SQLException se) {
+		} catch (SQLException se) {
 			se.printStackTrace();
 			System.out.println("SQLException: " + se.getMessage());
-		    System.out.println("SQLState: " + se.getSQLState());
-		    System.out.println("VendorError: " + se.getErrorCode());
+			System.out.println("SQLState: " + se.getSQLState());
+			System.out.println("VendorError: " + se.getErrorCode());
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -1332,10 +1392,10 @@ public class Server {
 				se.printStackTrace();
 			}
 		}
-	   
-	   
-	   return data;
+
+		return data;
 	}
+
 	static UPlace[] getPlaces(String MapId) {
 		Connection conn = null;
 		Statement stmt = null;
@@ -1657,6 +1717,7 @@ public class Server {
 		}
 		return -1;
 	}
+
 	static ObservableList<User> getUserFromDB() {
 		ObservableList<User> data = FXCollections.observableArrayList();
 
@@ -1683,10 +1744,9 @@ public class Server {
 				String password = rs.getString("password");
 				String payment = rs.getString("payment");
 				String type = rs.getString("type");
-				
+				String history = rs.getString("History");
 
-	
-				data.add(new User(fname, lname, email, username, password, pnumber, payment,type));
+				data.add(new User(fname, lname, email, username, password, pnumber, payment, type, history));
 			}
 
 			stmt.close();
@@ -1714,6 +1774,76 @@ public class Server {
 		return data;
 	}
 
-	
+	static void AddCityIfNotExist(Map map, Connection conn, String CityDes) {
 
+		Statement pr;
+		PreparedStatement pr2;
+
+		ResultSet rs = null;
+
+		String sqlfind = "";
+		String sql = "INSERT INTO CityCatalog(`name`, `description`, mapsNum, placesNum, pathNum, version, fixedCost, oneTimeCost, NewUpdate) VALUES (?,?,?,?,?,?,?,?,?)";
+		sqlfind = "Select * FROM CityCatalog WHERE name ='" + map.getCity() + "'";
+
+		if (conn != null) {
+			try {
+				pr = conn.createStatement();
+				rs = pr.executeQuery(sqlfind);
+				if (!rs.next()) {
+					pr2 = conn.prepareStatement(sql);
+					pr2.setString(1, map.getCity());
+					pr2.setString(2, CityDes);
+					pr2.setInt(3, 1);
+					pr2.setInt(4, 0);
+					pr2.setInt(5, 0);
+					pr2.setInt(6, 1);
+					pr2.setInt(7, 0);
+					pr2.setInt(8, 0);
+					pr2.setBoolean(9, false);
+
+					int k = pr2.executeUpdate();
+				}
+
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+
+	}
+
+	static void AddPurchaseToHistory(String city, String user, String Type, Connection conn) {
+
+		Statement pr;
+		PreparedStatement pr2;
+
+		String sqlfind = "";
+		String sql = "UPDATE user SET History='";
+		sqlfind = "Select * FROM user WHERE userName='" + user + "'";
+
+		if (conn != null) {
+			try {
+				pr = conn.createStatement();
+				ResultSet rs = pr.executeQuery(sqlfind);
+				while (rs.next()) {
+					String History = rs.getString("History");
+					if (History.equals("")) {
+						History = city + "," + Type;
+					} else {
+						History += "#" + city + "," + Type;
+					}
+					sql += History + "' WHERE userName='" + user + "'";
+					pr2 = conn.prepareStatement(sql);
+					int k = pr2.executeUpdate();
+
+				}
+
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+	}
 }
