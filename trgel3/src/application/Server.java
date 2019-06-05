@@ -167,9 +167,10 @@ public class Server {
 						Connection conn = null;
 						User user = (User) ((Object[]) (data))[1];
 						String city = (String) ((Object[]) (data))[2];
+						int version = (int) ((Object[]) (data))[3];
 						Class.forName(JDBC_DRIVER);
 						conn = DriverManager.getConnection(DB_URL, USER, PASS);
-						AddPurchaseToHistory(city, user.getUserName(), "OT", conn);
+						AddPurchaseToHistory(city, version, user.getUserName(), "OT", conn);
 
 					}
 
@@ -1832,7 +1833,7 @@ public class Server {
 
 	}
 
-	static void AddPurchaseToHistory(String city, String user, String Type, Connection conn) {
+	static void AddPurchaseToHistory(String city, int version, String user, String Type, Connection conn) {
 
 		Statement pr;
 		PreparedStatement pr2;
@@ -1848,9 +1849,9 @@ public class Server {
 				while (rs.next()) {
 					String History = rs.getString("History");
 					if (History.equals("")) {
-						History = city + "," + Type;
+						History = city + "," + Type + "," + version;
 					} else {
-						History += "#" + city + "," + Type;
+						History += "#" + city + "," + Type + "," + version;
 					}
 					sql += History + "' WHERE userName='" + user + "'";
 					pr2 = conn.prepareStatement(sql);
