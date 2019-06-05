@@ -1,5 +1,6 @@
 package application;
 
+import java.awt.HeadlessException;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.File;
@@ -259,81 +260,82 @@ public class DefPageController {
 	}
 
 	@FXML
-	void OnePurchase(ActionEvent event) {
-		final Stage onePurchaseWindow = new Stage();
-		onePurchaseWindow.initModality(Modality.APPLICATION_MODAL);
-
-		Text text = new Text(Globals.city.getCity() + "'s package is " + Globals.city.getOneTimeCost() + "$");
-
-		area = new TextField("No file selected");
-		area.setDisable(true);
-
-		Button buttonSelect = new Button("Select File");
-		Button buttonSave = new Button("Save");
-		Button buttonCancel = new Button("Cancel");
-		buttonCancel.setOnAction(e -> onePurchaseWindow.close());
-		buttonSelect.setOnAction(e -> {
-			selectFolder();
-		});
-		buttonSave.setOnAction(e -> {
-			try {
-				// saveToFile();
-				saveAllMaps();
-				@SuppressWarnings("resource")
-				Socket socket = new Socket("localhost", 5555);
-				Object[] array = new Object[3];
-				array[0] = "OneTimePurchase";
-				// get[1] = "" + ImagePlaces[i].getPlace().getCityName();
-				array[1] = Globals.user;
-				array[2] = Globals.city.getCity();
-
-				ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
-				objectOutput.writeObject(array);
-
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (ClassNotFoundException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+	void OnePurchase(ActionEvent event) throws HeadlessException, UnknownHostException, IOException {
+		if(checkIfCityExist().equals("Yes")) {
+			JOptionPane.showMessageDialog(null, "You already have this city in your Fixed purchase!");
+		}
+		else {
+			if(checkIfVersionExist().equals("Yes")) {
+				JOptionPane.showMessageDialog(null, "You already have this version!");
 			}
-			onePurchaseWindow.close();
-		});
-
-		HBox layout = new HBox(20);
-
-		layout.getChildren().add(buttonCancel);
-		layout.getChildren().add(buttonSave);
-		layout.setAlignment(Pos.CENTER);
-
-		HBox hbox = new HBox(area, buttonSelect);
-		hbox.setAlignment(Pos.CENTER);
-
-		VBox layoutV = new VBox(20);
-		layoutV.getChildren().add(text);
-		layoutV.getChildren().add(hbox);
-		layoutV.getChildren().add(layout);
-		layoutV.setAlignment(Pos.CENTER);
-		Scene dialogScene = new Scene(layoutV, 300, 200);
-		onePurchaseWindow.setScene(dialogScene);
-		onePurchaseWindow.show();
-
+			else {
+			final Stage onePurchaseWindow = new Stage();
+			onePurchaseWindow.initModality(Modality.APPLICATION_MODAL);
+	
+			Text text = new Text(Globals.city.getCity() + "'s package is " + Globals.city.getOneTimeCost() + "$");
+	
+			area = new TextField("No file selected");
+			area.setDisable(true);
+	
+			Button buttonSelect = new Button("Select File");
+			Button buttonSave = new Button("Save");
+			Button buttonCancel = new Button("Cancel");
+			buttonCancel.setOnAction(e -> onePurchaseWindow.close());
+			buttonSelect.setOnAction(e -> {
+				selectFolder();
+			});
+			buttonSave.setOnAction(e -> {
+				try {
+					// saveToFile();
+					saveAllMaps();
+					@SuppressWarnings("resource")
+					Socket socket = new Socket("localhost", 5555);
+					Object[] array = new Object[4];
+					array[0] = "OneTimePurchase";
+					// get[1] = "" + ImagePlaces[i].getPlace().getCityName();
+					array[1] = Globals.user;
+					array[2] = Globals.city.getCity();
+					array[3] = Globals.city.getVersion();
+					String history = Globals.user.getHistory();
+					history += "#" + array[2] + ",OT," + array[3];
+					Globals.user.setHistory(history);
+					ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
+					objectOutput.writeObject(array);
+	
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (ClassNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				onePurchaseWindow.close();
+			});
+	
+			HBox layout = new HBox(20);
+	
+			layout.getChildren().add(buttonCancel);
+			layout.getChildren().add(buttonSave);
+			layout.setAlignment(Pos.CENTER);
+	
+			HBox hbox = new HBox(area, buttonSelect);
+			hbox.setAlignment(Pos.CENTER);
+	
+			VBox layoutV = new VBox(20);
+			layoutV.getChildren().add(text);
+			layoutV.getChildren().add(hbox);
+			layoutV.getChildren().add(layout);
+			layoutV.setAlignment(Pos.CENTER);
+			Scene dialogScene = new Scene(layoutV, 300, 200);
+			onePurchaseWindow.setScene(dialogScene);
+			onePurchaseWindow.show();
+			}
+		}
 	}
 
 	@FXML
     void FixedPurchase(ActionEvent event) throws UnknownHostException, IOException {
-//		addDataBasetoMember();
-//		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();			
-//		URL url = getClass().getResource("payementforpurchase.fxml");
-//		AnchorPane pane = FXMLLoader.load(url);
-//				
-//		Globals.backLink = "DefaultPage.fxml";
-//				
-//		Scene scene = new Scene(pane);
-//		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());			
-//		primaryStage.setScene(scene);			
-//		primaryStage.show();
-		
+	
 		if(checkIfCityExist().equals("Yes")) {
 			JOptionPane.showMessageDialog(null, "You already purchased this city!");
 		}
@@ -561,6 +563,23 @@ public class DefPageController {
 
 	}
 
+	
+	public String checkIfVersionExist(){
+		String History = Globals.user.getHistory();
+		String city = Globals.city.getCity();
+		int version = Globals.city.getVersion();
+        String[] arrOfHistory = History.split("#|\\,");
+        for(int i=0 ; i<arrOfHistory.length ; i++) {
+        	if(arrOfHistory[i].equals(city) && arrOfHistory[i+1].equals("OT")) {
+        		if(arrOfHistory[i+2].equals(Integer.toString(version))) {
+        			return "Yes";
+        		}
+        	}
+        }
+		
+		return "No";
+	}
+	
 	public String checkIfCityExist() throws UnknownHostException, IOException {
 		@SuppressWarnings("resource")
 		Socket socket = new Socket("localhost", 5555);
@@ -784,7 +803,7 @@ public class DefPageController {
 
 		ObjectInputStream objectInput = new ObjectInputStream(socket.getInputStream());
 		Object data = objectInput.readObject();
-		selectFolder();
+		//selectFolder();
 		for (int i = 1; i < ((Object[]) data).length; i++) {
 
 			Map map = (Map) (((Object[]) data)[i]);
@@ -1115,5 +1134,7 @@ public class DefPageController {
 	        }
 	    	
 	    }
+	 
+	 
 
 }
