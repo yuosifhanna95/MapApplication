@@ -13,6 +13,10 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 public class ManagerPageController {
+
+	@FXML
+	private Button btn_AddMap;
+
 	@FXML
 	private Button btn_message;
 
@@ -24,16 +28,28 @@ public class ManagerPageController {
 
 	@FXML
 	private Button btn_editMaps;
-	
+
 	@FXML
 	private Button memberfile;
+
+	@FXML
+	void AddMapFunc(ActionEvent event) throws IOException {
+		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+		URL url = getClass().getResource("AddMap.fxml");
+		AnchorPane pane = FXMLLoader.load(url);
+		Globals.backLink = "ManagerPage.fxml";
+		Scene scene = new Scene(pane);
+		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		primaryStage.setScene(scene);
+		primaryStage.show();
+	}
 
 	@FXML
 	void confirmMapsFunc(ActionEvent event) throws IOException {
 		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 		URL url = getClass().getResource("ConfirmMaps.fxml");
 		AnchorPane pane = FXMLLoader.load(url);
-
+		Globals.backLink = "ManagerPage.fxml";
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
@@ -46,15 +62,14 @@ public class ManagerPageController {
 		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 		URL url = getClass().getResource("MemberFile.fxml");
 		AnchorPane pane = FXMLLoader.load(url);
-
+		Globals.backLink = "ManagerPage.fxml";
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
 		primaryStage.show();
 
 	}
-	
-	
+
 	@FXML // This method is called by the FXMLLoader when initialization is complete
 	void initialize() throws IOException, Exception {
 
@@ -83,7 +98,7 @@ public class ManagerPageController {
 		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 		URL url = getClass().getResource("EditMaps.fxml");
 		AnchorPane pane = FXMLLoader.load(url);
-		Globals.backLink = "EmployeePage.fxml";
+		Globals.backLink = "ManagerPage.fxml";
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
