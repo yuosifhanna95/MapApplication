@@ -62,10 +62,9 @@ public class Server {
 					if(((String)((Object[])(data))[0]).equals("dofixedpurchase")) {
 						int x=0;
 						Connection conn = null;
-            			Statement stmt = null;
+            			
             			FixedPurchase fp=((FixedPurchase)((Object[])(data))[1]);
-            			int period=fp.getPeriod();
-            			String user2=fp.getUser();
+            			
             			
             		
 //            			else if(((String)((Object[])(data))[2]).equals("")&&((String)((Object[])(data))[3]).equals("Yes")) {
@@ -81,6 +80,7 @@ public class Server {
     							conn = DriverManager.getConnection(DB_URL, USER, PASS);
     							PreparedStatement pr;
     							String sql="INSERT INTO fixedPurchase(`user`, `city`, `period`, `startdate`, `endDate`, `purchaseprice`) VALUES (?,?,?,?,?,?)";
+    			
     							if (conn != null) {
     								pr = conn.prepareStatement(sql);
 
@@ -108,6 +108,9 @@ public class Server {
               		    				String message="thanks for purchace,you will enjoy";
             	     	                objectOutput.writeObject(message);
 									}
+								
+									AddPurchaseToHistory(fp.getCity(), 1, fp.getUser(), "FT", conn);
+									
 									
     							}
             			}
