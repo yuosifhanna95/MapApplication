@@ -39,13 +39,29 @@ public class Server {
 	static private final String USER = "eCp4XWJvNw";// sql2293675
 	static private final String PASS = "eSS7xZeTpg";// bW3%jS1%
 	static private Object data;
-
+	static private int checked=0;
+	@SuppressWarnings("deprecation")
 	public static void main(String[] args) throws ClassNotFoundException, SQLException, ParseException {
 
 		try {
 			@SuppressWarnings("resource")
 			ServerSocket myServerSocket = new ServerSocket(5555);
 			while (true) {
+				
+
+				   
+			    Date date2 = new Date();
+			   
+			   
+			    if((date2.getHours()==14||date2.getHours()==1)&&(checked==0)){
+			    	new Thread(new ScheduleMessage()).start();
+			    	checked=1;
+			    }
+			    
+			    if((date2.getHours()==23&&date2.getMinutes()==59)){
+			    	checked=0;
+			    }	
+				
 				Socket skt = myServerSocket.accept();
 				ObjectInputStream objectInput = new ObjectInputStream(skt.getInputStream());
 				data = objectInput.readObject();
@@ -566,28 +582,21 @@ public class Server {
 
 					else if (((String[]) (data))[0].equals("getMessages")) {
 
-						Connection conn = null;
-						Statement stmt = null;
-						Class.forName(JDBC_DRIVER);
-						conn = DriverManager.getConnection(DB_URL, USER, PASS);
-						stmt = conn.createStatement();
-						String userN = ((String[]) (data))[1];
-						String sql = "SELECT * FROM messages where userName='" + userN + "'";
-						ResultSet rs = stmt.executeQuery(sql);
-						Object[] result = new Object[2];
-						if (rs.next()) {
-							System.out.println("there is message");
-							String message = rs.getString("message");
-
-							stmt.close();
-							conn.close();
-
-							ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
-							objectOutput.writeObject(message);
-						} else {
-							ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
-							objectOutput.writeObject("No Message");
+						ObservableList<Message> messageList = getMyMessagesFromDB(((String[]) (data))[1]);
+						Object[] data = new Object[messageList.size() + 1];
+						data[0] = messageList.size();
+						int counter = 1;
+						for (Message ms : messageList) {
+							data[counter] = ms;
+							counter++;
 						}
+						try {
+							ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
+							objectOutput.writeObject(data);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+						
 					} else if (((String[]) (data))[0].equals("Login")) {
 
 						int k = ((String[]) (data)).length;
@@ -777,6 +786,24 @@ public class Server {
 							e.printStackTrace();
 						}
 
+					}
+					else if (((String[]) (data))[0].equals("getRoutesCity")) {
+
+						ObservableList<Route> userList = getRoutesFromDB(((String[]) (data))[1]);
+
+						Object[] data = new Object[userList.size() + 1];
+						data[0] = userList.size();
+						int counter = 1;
+						for (Route tu : userList) {
+							data[counter] = tu;
+							counter++;
+						}
+						try {
+							ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
+							objectOutput.writeObject(data);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
 					}
                     else if(((String[])(data))[0].equals("getFixedPurchase")) { 
         	            ObservableList<FixedPurchase> FixedPurchaseList = getFixedPurchaseFromDB(((String[])(data))[1]);
@@ -1845,7 +1872,60 @@ public class Server {
 		}
 
 	}
+	static ObservableList<Message> getMyMessagesFromDB(String user){
+		ObservableList<Message> data = FXCollections.observableArrayList();
+		Connection conn = null;
+		Statement stmt = null;
+		try {
+			Class.forName(JDBC_DRIVER);
+			
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			stmt = conn.createStatement();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		String sql = "SELECT * FROM messages where userName='" + user + "'";
+		try {
+			ResultSet rs = stmt.executeQuery(sql);
+			while(rs.next()) {
+				String mss=rs.getString("message");
+				String tmss=rs.getString("typemessage");
+				Date d1=rs.getDate("Datesend");
+				data.add(new Message(user,mss,d1,tmss));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			stmt.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			conn.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
+		return data;
+			
+	}
+	
 	static void AddPurchaseToHistory(String city, int version, String user, String Type, Connection conn) {
 
 		Statement pr;
@@ -1878,5 +1958,54 @@ public class Server {
 			}
 
 		}
+	}
+	static ObservableList<Route> getRoutesFromDB(String city) {
+		ObservableList<Route> data = FXCollections.observableArrayList();
+
+		Connection conn = null;
+		Statement stmt = null;
+		Statement stmt2 = null;
+
+		try {
+			Class.forName(JDBC_DRIVER);
+
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			stmt = conn.createStatement();
+			stmt2 = conn.createStatement();
+
+			String sql = "SELECT * FROM Routes Where city='" + city + "'";
+			ResultSet rs = stmt.executeQuery(sql);
+
+			while (rs.next()) {
+				int id = rs.getInt("id");
+				String description = rs.getString("description");
+				String link = rs.getString("link");
+
+				data.add(new Route(id, city, description, link));
+			}
+
+			stmt.close();
+			conn.close();
+
+			return data;
+		} catch (SQLException se) {
+			se.printStackTrace();
+			System.out.println("SQLException: " + se.getMessage());
+			System.out.println("SQLState: " + se.getSQLState());
+			System.out.println("VendorError: " + se.getErrorCode());
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			}
+		}
+
+		return data;
 	}
 }
