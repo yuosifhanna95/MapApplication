@@ -317,7 +317,7 @@ public class ConfirmMapController {
 							setText(null);
 						} else {
 							Map map1 = getTableView().getItems().get(getIndex());
-							if (!map1.getNewUpdate()) {
+							if (map1.getNewUpdate() == 0) {
 								btn.setText("Edit");
 
 							} else
@@ -400,14 +400,16 @@ public class ConfirmMapController {
 		@SuppressWarnings("resource")
 		Socket socket = new Socket("localhost", 5555);
 
-		String[] get = new String[1];
+		String[] get = new String[2];
 		get[0] = "getCatalog";
+		get[1] = "-1";
 		if (type.equals("place")) {
 			get[0] = "getPlaceCatalog";
 		} else if (type.equals("map")) {
-			get = new String[2];
+			get = new String[3];
 			get[0] = "getMaps";
 			get[1] = Globals.city.getCity();
+			get[2] = "-1";
 		}
 		try {
 			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());

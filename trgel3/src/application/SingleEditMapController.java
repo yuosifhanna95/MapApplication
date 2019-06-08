@@ -133,9 +133,10 @@ public class SingleEditMapController {
 		Socket socket = new Socket("localhost", 5555);
 		data = FXCollections.observableArrayList();
 
-		String[] get = new String[2];
+		String[] get = new String[3];
 		get[0] = "getMaps";
 		get[1] = Globals.city.getCity();
+		get[2] = "-1";
 		try {
 			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			objectOutput.writeObject(get);

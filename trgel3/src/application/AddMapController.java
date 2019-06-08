@@ -110,7 +110,7 @@ public class AddMapController {
 			array[0] = "AddMap";
 			// get[1] = "" + ImagePlaces[i].getPlace().getCityName();
 			Map map = new Map(-1, TF_CityName.getText(), TF_MapDes.getText(), TF_ImageLink.getText(),
-					TF_ImageLink.getText(), false);
+					TF_ImageLink.getText(), -1);
 			array[1] = map;
 			array[2] = TF_CityDes.getText();
 			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());

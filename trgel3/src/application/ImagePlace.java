@@ -8,6 +8,7 @@ public class ImagePlace {
 	private ImageView imageview;
 	private Label label;
 	private Place place;
+	private RoutePlace Rplace;
 	private int X, Y;
 	private Boolean Changed;
 
@@ -25,6 +26,16 @@ public class ImagePlace {
 		this.imageview = imageview;
 		this.label = label;
 		this.place = place;
+		this.X = X;
+		this.Y = Y;
+		this.Changed = Changed;
+	}
+
+	public ImagePlace(int Id, ImageView imageview, Label label, RoutePlace Rplace, int X, int Y, Boolean Changed) {
+		this.Id = Id;
+		this.imageview = imageview;
+		this.label = label;
+		this.Rplace = Rplace;
 		this.X = X;
 		this.Y = Y;
 		this.Changed = Changed;
@@ -86,4 +97,11 @@ public class ImagePlace {
 		return Changed;
 	}
 
+	public void setRplace(RoutePlace rplace) {
+		Rplace = rplace;
+	}
+
+	public RoutePlace getRplace() {
+		return Rplace;
+	}
 }

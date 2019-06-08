@@ -81,7 +81,7 @@ public class SingleEditRouteController {
 
 					try {
 						Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-						URL url = getClass().getResource("AddLocations.fxml");
+						URL url = getClass().getResource("AddRLocations.fxml");
 						Globals.backLink = "SingleEditRoute.fxml";
 						AnchorPane pane;
 						pane = FXMLLoader.load(url);
@@ -133,9 +133,10 @@ public class SingleEditRouteController {
 		Socket socket = new Socket("localhost", 5555);
 		data = FXCollections.observableArrayList();
 
-		String[] get = new String[2];
+		String[] get = new String[3];
 		get[0] = "getRoutesCity";
 		get[1] = Globals.city.getCity();
+		get[2] = "-1";
 		try {
 			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			objectOutput.writeObject(get);

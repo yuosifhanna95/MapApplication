@@ -33,6 +33,36 @@ public class ManagerPageController {
 	private Button memberfile;
 
 	@FXML
+	private Button btn_AddRoute;
+
+	@FXML
+	private Button btn_ConfirmRoutes;
+
+	@FXML
+	void confirmRoutesFunc(ActionEvent event) throws IOException {
+		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+		URL url = getClass().getResource("ConfirmRoutes.fxml");
+		AnchorPane pane = FXMLLoader.load(url);
+		Globals.backLink = "ManagerPage.fxml";
+		Scene scene = new Scene(pane);
+		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		primaryStage.setScene(scene);
+		primaryStage.show();
+	}
+
+	@FXML
+	void AddRouteFunc(ActionEvent event) throws IOException {
+		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+		URL url = getClass().getResource("AddRoute.fxml");
+		AnchorPane pane = FXMLLoader.load(url);
+		Globals.backLink = "ManagerPage.fxml";
+		Scene scene = new Scene(pane);
+		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		primaryStage.setScene(scene);
+		primaryStage.show();
+	}
+
+	@FXML
 	void AddMapFunc(ActionEvent event) throws IOException {
 		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 		URL url = getClass().getResource("AddMap.fxml");

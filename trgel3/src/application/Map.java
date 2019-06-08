@@ -13,9 +13,9 @@ public class Map implements Serializable {
 	private String Description;
 	private String linkCustomer;
 	private String linkEmployee;
-	private Boolean NewUpdate;
+	private int NewUpdate;
 
-	Map(int id, String city, String Description, String linkCustomer, String linkEmployee, Boolean NewUpdate) {
+	Map(int id, String city, String Description, String linkCustomer, String linkEmployee, int NewUpdate) {
 		this.id = id;
 		this.city = city;
 		this.Description = Description;
@@ -65,11 +65,11 @@ public class Map implements Serializable {
 		this.linkEmployee = linkEmployee;
 	}
 
-	public void setNewUpdate(Boolean newUpdate) {
+	public void setNewUpdate(int newUpdate) {
 		NewUpdate = newUpdate;
 	}
 
-	public Boolean getNewUpdate() {
+	public int getNewUpdate() {
 		return NewUpdate;
 	}
 }

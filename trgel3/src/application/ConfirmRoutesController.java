@@ -21,6 +21,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -28,15 +29,34 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
-public class CatalogController {
+public class ConfirmRoutesController {
+
+	@FXML
+	private Button btn_message;
+
+	@FXML
+	private Button myMaps;
+
+	@FXML
+	private Button Back;
+
+	@FXML
+	private Button OneTimePurchase;
+
+	@FXML
+	private Button FixedTimePurchase;
 
 	@FXML
 	private ComboBox<String> comboBox;
+
 	@FXML
 	private TextField searchText = new TextField();
+
 	@FXML
 	private TableView<City> searchTable;
+
 	@FXML
 	private TableColumn<City, String> CityCol;
 
@@ -52,6 +72,10 @@ public class CatalogController {
 	@FXML
 	private TableColumn<City, String> pathCol;
 
+	@FXML
+	private TableColumn<City, String> UpdateCol;
+
+	private TableColumn buttonCol;
 	@FXML
 	private TableView<Place> searchTable1;
 
@@ -71,8 +95,9 @@ public class CatalogController {
 
 	private ObservableList<Place> dataPlace = FXCollections.observableArrayList();
 
-	@FXML
-	private Button back;
+	FilteredList<City> flCity = null;
+
+	FilteredList<Place> flPlace = null;
 
 	@FXML
 	private Button searchCity;
@@ -80,9 +105,8 @@ public class CatalogController {
 	@FXML
 	private Button searchPlace;
 
-	FilteredList<City> flCity = null;
-
-	FilteredList<Place> flPlace = null;
+	@FXML
+	private Button btn_AddLoc;
 
 	@FXML
 	void searchCityBtn(ActionEvent event) {
@@ -151,20 +175,50 @@ public class CatalogController {
 	}
 
 	@FXML
-	void backFunc(ActionEvent event) throws IOException {
-		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-		URL url = getClass().getResource("MainPage.fxml");
-		AnchorPane pane = FXMLLoader.load(url);
+	void showMymaps(ActionEvent event) throws IOException {
 
+		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+		URL url = getClass().getResource("MyMapsScene.fxml");
+		AnchorPane pane = FXMLLoader.load(url);
+		Globals.backLink = "DefaultPage.fxml";
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
 		primaryStage.show();
+
+	}
+
+	@FXML
+	void OnePurchase(ActionEvent event) {
+
+	}
+
+	@FXML
+	void FixedPurchase(ActionEvent event) throws UnknownHostException, IOException {
+
+		addDataBasetoMember();
+
+		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+		URL url = getClass().getResource("mapCatalogScene.fxml");
+		Globals.backLink = "DefaultPage.fxml";
+		AnchorPane pane;
+		try {
+			pane = FXMLLoader.load(url);
+			Scene scene = new Scene(pane);
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			primaryStage.setScene(scene);
+			primaryStage.show();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@SuppressWarnings("unchecked")
-	@FXML
-	public void initialize() throws UnknownHostException, IOException {
+	@FXML // This method is called by the FXMLLoader when initialization is complete
+	void initialize() throws IOException, Exception {
+		Globals.backLink = "MainPage.fxml";
+
 		searchCity.getStyleClass().removeAll("addBobOk, focus");
 		searchCity.getStyleClass().add("addBobOk");
 
@@ -213,6 +267,18 @@ public class CatalogController {
 		searchTable.getColumns().clear();
 		searchTable.setEditable(true);
 
+		searchTable.setRowFactory(tv -> {
+			TableRow<City> row = new TableRow<>();
+			row.setOnMouseClicked(event -> {
+				if (event.getClickCount() == 1 && (!row.isEmpty())) {
+					City cityRow = searchTable.getSelectionModel().getSelectedItem();
+					Globals.city = (City) cityRow;
+
+				}
+			});
+			return row;
+		});
+
 		CityCol.setStyle("-fx-alignment: CENTER;");
 		CityCol.setMinWidth(100);
 		CityCol.setCellValueFactory(new PropertyValueFactory<City, String>("city"));
@@ -242,9 +308,65 @@ public class CatalogController {
 		pathCol.setMinWidth(50);
 		pathCol.setCellValueFactory(new PropertyValueFactory<City, String>("numOfPaths"));
 
-		flCity = new FilteredList<City>(dataCity, p -> true);// Pass the dataCity to a filtered list
+		UpdateCol.setStyle("-fx-alignment: CENTER;");
+		UpdateCol.setMinWidth(50);
+		UpdateCol.setCellValueFactory(new PropertyValueFactory<>("numOfPaths"));
+		Globals.ThereIsCityUpdate = false;
+		Callback<TableColumn<City, String>, TableCell<City, String>> cellFactory = new Callback<TableColumn<City, String>, TableCell<City, String>>() {
+
+			@Override
+			public TableCell<City, String> call(TableColumn<City, String> param) {
+				// TODO Auto-generated method stub
+				final TableCell<City, String> cell = new TableCell<City, String>() {
+
+					final Button btn = new Button("New Update");
+
+					@Override
+					public void updateItem(String item, boolean empty) {
+						super.updateItem(item, empty);
+						if (empty) {
+							setGraphic(null);
+							setText(null);
+						} else {
+							City city1 = getTableView().getItems().get(getIndex());
+							if (city1.getNewUpdate() == 0) {
+								btn.setText("Edit");
+								// Globals.ThereIsCityUpdate = false;
+							} else {
+								Globals.ThereIsCityUpdate = true;
+								btn.setText("New Update");
+							}
+							btn.setOnAction(event -> {
+								Globals.city = city1;
+								Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+								URL url = getClass().getResource("ConfirmRoute.fxml");
+								AnchorPane pane;
+								try {
+									pane = FXMLLoader.load(url);
+									Scene scene = new Scene(pane);
+									scene.getStylesheets()
+											.add(getClass().getResource("application.css").toExternalForm());
+									primaryStage.setScene(scene);
+									primaryStage.show();
+								} catch (IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+
+							});
+							setGraphic(btn);
+							setText(null);
+						}
+					}
+				};
+				return cell;
+			}
+		};
+		UpdateCol.setCellFactory(cellFactory);
+
+		flCity = new FilteredList<City>(dataCity, p -> true);// Pass the data to a filtered list
 		searchTable.setItems(flCity);// Set the table's items using the filtered list
-		searchTable.getColumns().addAll(CityCol, DescriptionCol, mapCol, placeCol, pathCol);
+		searchTable.getColumns().addAll(CityCol, DescriptionCol, mapCol, placeCol, pathCol, UpdateCol);
 
 		searchText.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent ke) {
@@ -269,16 +391,35 @@ public class CatalogController {
 
 	}
 
+	public void addDataBasetoMember() throws UnknownHostException, IOException {
+		@SuppressWarnings("resource")
+		Socket socket = new Socket("localhost", 5555);
+		dataCity = FXCollections.observableArrayList();
+
+		String[] set = new String[3];
+		set[0] = "addCityToMember";
+		set[1] = Globals.user.getUserName();
+		set[2] = Globals.city.getCity();
+		try {
+			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
+			objectOutput.writeObject(set);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public void buildData(String type) throws UnknownHostException, IOException {
 		@SuppressWarnings("resource")
 		Socket socket = new Socket("localhost", 5555);
 
 		String[] get = new String[2];
 		get[0] = "getCatalog";
+		get[1] = "-1";
 		if (type.equals("place")) {
 			get[0] = "getPlaceCatalog";
+
 		}
-		get[1] = "0";
+
 		try {
 			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			objectOutput.writeObject(get);
@@ -307,6 +448,45 @@ public class CatalogController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+	}
+
+	@FXML
+	void backFunc(ActionEvent event) throws IOException {
+
+		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+		URL url = getClass().getResource("ManagerPage.fxml");
+		AnchorPane pane = FXMLLoader.load(url);
+		Scene scene = new Scene(pane);
+		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		primaryStage.setScene(scene);
+		primaryStage.show();
+	}
+
+	@FXML
+	void addLoc(ActionEvent event) throws IOException {
+
+		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+		URL url = getClass().getResource("AddLocations.fxml");
+		AnchorPane pane = FXMLLoader.load(url);
+		Globals.backLink = "DefaultPage.fxml";
+		Scene scene = new Scene(pane);
+		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		primaryStage.setScene(scene);
+		primaryStage.show();
+	}
+
+	@FXML
+	void messageFunc(ActionEvent event) throws IOException {
+
+		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+		URL url = getClass().getResource("Messages.fxml");
+		AnchorPane pane = FXMLLoader.load(url);
+		Globals.backLink = "ConfirmRoutes.fxml";
+		Scene scene = new Scene(pane);
+		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		primaryStage.setScene(scene);
+		primaryStage.show();
 
 	}
 

@@ -144,6 +144,7 @@ public class AddLocController {
 		Object data;
 		ObjectInputStream objectInput = new ObjectInputStream(socket.getInputStream());
 		data = objectInput.readObject();
+		Boolean TherewasUpdate = false;
 		// System.out.println(((Object[]) data)[0]);
 		UPlace[] list = (UPlace[]) ((Object[]) data)[1];
 		for (int i = 0; i < ImagePlaces.length; i++) {
@@ -173,6 +174,7 @@ public class AddLocController {
 						objectOutput = new ObjectOutputStream(socket2.getOutputStream());
 						objectOutput.writeObject(array2);
 						flagnew = 0;
+						TherewasUpdate = true;
 
 					} else {
 
@@ -200,6 +202,7 @@ public class AddLocController {
 								objectOutput = new ObjectOutputStream(socket2.getOutputStream());
 								objectOutput.writeObject(array2);
 								flagnew = 0;
+								TherewasUpdate = true;
 								break;
 
 							}
@@ -232,14 +235,18 @@ public class AddLocController {
 							Socket socket2 = new Socket("localhost", 5555);
 							objectOutput = new ObjectOutputStream(socket2.getOutputStream());
 							objectOutput.writeObject(array2);
+							TherewasUpdate = true;
 						}
 					}
 				}
 		}
-		ConfirmUpdate.setVisible(true);
-		BuildAllPlaces();
-		BuildOldMap();
+		if (Globals.MODE >= 4 && Globals.ThereIsMapUpdate)
+			ConfirmUpdate.setVisible(true);
+		if (TherewasUpdate) {
+			BuildAllPlaces();
+			BuildOldMap();
 
+		}
 	}
 
 	@SuppressWarnings("deprecation")

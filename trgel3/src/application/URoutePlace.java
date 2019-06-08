@@ -6,8 +6,8 @@ public class URoutePlace extends RoutePlace implements Serializable {
 
 	private int RPlaceId;
 
-	URoutePlace(int id, int RPlaceId, String place, int time) {
-		super(id, place, time);
+	URoutePlace(int id, int RPlaceId, String place, int time, int LocX, int LocY, long serialId, String Type) {
+		super(id, place, time, LocX, LocY, serialId, Type);
 		this.RPlaceId = RPlaceId;
 		// TODO Auto-generated constructor stub
 	}
@@ -19,4 +19,5 @@ public class URoutePlace extends RoutePlace implements Serializable {
 	public void setRPlaceId(int rPlaceId) {
 		RPlaceId = rPlaceId;
 	}
+
 }

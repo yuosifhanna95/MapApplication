@@ -329,11 +329,13 @@ public class ConfirmMapsController {
 							setText(null);
 						} else {
 							City city1 = getTableView().getItems().get(getIndex());
-							if (!city1.getNewUpdate()) {
+							if (city1.getNewUpdate() == 0) {
 								btn.setText("Edit");
 								// Globals.ThereIsCityUpdate = false;
-							} else
+							} else {
 								Globals.ThereIsCityUpdate = true;
+								btn.setText("New Update");
+							}
 
 							btn.setOnAction(event -> {
 								Globals.city = city1;
@@ -411,10 +413,12 @@ public class ConfirmMapsController {
 		@SuppressWarnings("resource")
 		Socket socket = new Socket("localhost", 5555);
 
-		String[] get = new String[1];
+		String[] get = new String[2];
 		get[0] = "getCatalog";
+		get[1] = "-1";
 		if (type.equals("place")) {
 			get[0] = "getPlaceCatalog";
+
 		}
 
 		try {
