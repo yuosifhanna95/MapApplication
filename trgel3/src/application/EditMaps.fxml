@@ -12,7 +12,7 @@
    <children>
       <Button fx:id="btn_message" layoutX="455.0" layoutY="599.0" mnemonicParsing="false" onAction="#messageFunc" text="Messages" />
       <Button fx:id="Back" layoutX="413.0" layoutY="131.0" mnemonicParsing="false" onAction="#backFunc" text="Back" />
-      <HBox layoutX="490.0" layoutY="129.0" prefHeight="30.0" prefWidth="320.0">
+      <HBox fx:id="hbox" layoutX="490.0" layoutY="129.0" prefHeight="30.0" prefWidth="320.0">
          <children>
             <ComboBox fx:id="comboBox" prefWidth="130.0" promptText="Search by" />
             <TextField fx:id="searchText" prefWidth="200.0" />

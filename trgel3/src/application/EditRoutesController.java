@@ -7,6 +7,8 @@ import java.net.Socket;
 import java.net.URL;
 import java.net.UnknownHostException;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -27,6 +29,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -99,18 +102,29 @@ public class EditRoutesController {
 
 	@FXML
 	private Button btn_AddLoc;
+	
+	@FXML
+	private HBox hbox;
+	
+	TextField placeField= new TextField();
 
 	@FXML
 	void searchCityBtn(ActionEvent event) {
 		searchPlace.getStyleClass().remove("addBobOk");
 		searchCity.getStyleClass().removeAll("addBobOk, focus");
 		searchCity.getStyleClass().add("addBobOk");
+		
+	    searchText.setPrefWidth(200);
+  	    hbox.getChildren().remove(placeField);
 
 		searchTable1.setVisible(false);
 		searchTable1.setDisable(true);
 
 		searchTable.setVisible(true);
 		searchTable.setDisable(false);
+		
+	
+		comboBox.getItems().remove("City & place");
 
 		searchText.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent ke) {
@@ -138,13 +152,58 @@ public class EditRoutesController {
 		searchCity.getStyleClass().remove("addBobOk");
 		searchPlace.getStyleClass().removeAll("addBobOk, focus");
 		searchPlace.getStyleClass().add("addBobOk");
+		
+		comboBox.getItems().add("City & place");
 
 		searchTable.setVisible(false);
 		searchTable.setDisable(true);
 
 		searchTable1.setVisible(true);
 		searchTable1.setDisable(false);
-
+		
+		comboBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+		      @Override public void changed(ObservableValue<? extends String> selected, String old, String newVal) {
+		          if (newVal != null) {
+		            switch(newVal) {
+		            case "City & place": 
+		            	  hbox.getChildren().remove(placeField);
+		            	  searchText.setPrefWidth(100);
+		            	  placeField.setPrefWidth(100);
+		            	  searchText.setPromptText("City");
+		            	  placeField.setPromptText("Place");
+		            	  hbox.getChildren().addAll(placeField);
+		            	  break;
+		            case "City": 
+		            	  searchText.setPrefWidth(200);
+		            	  searchText.setPromptText("City");
+		            	  hbox.getChildren().remove(placeField);
+		            	  break;
+		            case "Description": 
+		            	  searchText.setPrefWidth(200);
+		            	  searchText.setPromptText("Description");
+		            	  hbox.getChildren().remove(placeField);
+		            	  break;
+		            case "Place": 
+		            	  searchText.setPrefWidth(200);
+		            	  searchText.setPromptText("Place");
+		            	  hbox.getChildren().remove(placeField);
+		            	  break;
+		            }
+		          }
+		        }
+		});
+		
+		placeField.setOnKeyReleased(new EventHandler<KeyEvent>() {
+			public void handle(KeyEvent ke) {
+				switch (comboBox.getValue()) {
+				case "City & place":
+					flPlace.setPredicate(
+							p -> p.getPlaceName().toLowerCase().contains(placeField.getText().toLowerCase().trim()));
+					break;
+				}
+			}
+		});
+	
 		searchText.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent ke) {
 				switch (comboBox.getValue()) {
@@ -160,11 +219,16 @@ public class EditRoutesController {
 					flPlace.setPredicate(
 							p -> p.getDescription().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
 					break;
+				case "City & place":
+					flPlace.setPredicate(
+							p -> p.getCityName().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
+					break;
 				}
 			}
 		});
 
 	}
+
 
 	@FXML
 	void showMymaps(ActionEvent event) throws IOException {
