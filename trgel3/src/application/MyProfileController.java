@@ -117,6 +117,7 @@ public class MyProfileController {
     	phone.setText(userInfo.getPhoneNumber());
     	user.setText(userInfo.getUserName());
     	payment.setText(userInfo.getPayment());
+    	password.setText("");
 	}
 
 }

@@ -89,7 +89,11 @@ public class Controller {
 		System.out.println(((Object[]) data)[0]);
 
 		if (((Object[]) (data))[0] instanceof Boolean) {
-			if ((Boolean) ((Object[]) (data))[0]) {
+			if((int) ((Object[]) (data))[2] == 1) {
+				Messege.setText("The user is already logged in");
+				Globals.user = null;
+			}
+			else if ((Boolean) ((Object[]) (data))[0]) {
 
 				Globals.user = (User) ((Object[]) (data))[1];
 				URL url = getClass().getResource("DefaultPage.fxml");
@@ -111,12 +115,38 @@ public class Controller {
 				scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 				primaryStage.setScene(scene);
 				primaryStage.show();
+				primaryStage.setOnCloseRequest(e-> {
+					try {
+						logOut();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				});
 
 			} else {
 				Messege.setText("Username or password is wrong");
 				Globals.user = null;
 			}
 		}
+	}
+
+	private Object logOut() throws UnknownHostException, IOException {
+		String[] array = new String[3];
+		array[0] = "LogOut";
+		array[1] = Username.getText();
+		array[2] = Password.getText();
+		
+		@SuppressWarnings("resource")
+		Socket socket = new Socket("localhost", 5555);
+		try {
+			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
+			objectOutput.writeObject(array);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 
 	@FXML
