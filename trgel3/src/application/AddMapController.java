@@ -7,6 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.URL;
+import java.net.UnknownHostException;
 
 import javax.imageio.ImageIO;
 
@@ -704,6 +705,14 @@ public class AddMapController {
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
+		primaryStage.setOnCloseRequest(e-> {
+			try {
+				logOut();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
 		primaryStage.show();
 	}
 
@@ -759,6 +768,24 @@ public class AddMapController {
 		SnapshotParameters spa = params;
 		spa.setTransform(Transform.scale(pixelScale, pixelScale));
 		return node.snapshot(spa, writableImage);
+	}
+	
+	private Object logOut() throws UnknownHostException, IOException {
+		String[] array = new String[3];
+		array[0] = "LogOut";
+		array[1] = Globals.user.getUserName();
+		array[2] = Globals.user.getPassword();
+		
+		@SuppressWarnings("resource")
+		Socket socket = new Socket("localhost", 5555);
+		try {
+			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
+			objectOutput.writeObject(array);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 
 }

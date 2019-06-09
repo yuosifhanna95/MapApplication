@@ -891,13 +891,14 @@ public class Server {
 							Class.forName(JDBC_DRIVER);
 
 							conn = DriverManager.getConnection(DB_URL, USER, PASS);
-							stmt = conn.createStatement();
+							stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
+					                   ResultSet.CONCUR_UPDATABLE);
 							String userN = ((String[]) (data))[1];
 							String passW = ((String[]) (data))[2];
 							String sql = "SELECT * FROM user where userName='" + userN + "' and password='" + passW
 									+ "'";
 							ResultSet rs = stmt.executeQuery(sql);
-							Object[] result = new Object[2];
+							Object[] result = new Object[3];
 							while (rs.next()) {
 
 								System.out.println("Hello User");
@@ -913,12 +914,15 @@ public class Server {
 								String payment = rs.getString("payment");
 								String type = rs.getString("type");
 								String history = rs.getString("History");
-								// String pathnum = rs.getString("pathNum");
-
-								// data.add(new User(username, description, mapsnum , placesnum, pathnum ));
+								int online = rs.getInt("online");
+								
 								User user = new User(id, firstname, lastname, email, username, password, phonenumber,
 										payment, type, history);
-
+								if(online == 0) {
+									rs.updateInt("online", 1);
+									rs.updateRow();
+								}
+								result[2] = online;
 								result[1] = user;
 
 							}
@@ -952,6 +956,52 @@ public class Server {
 						}
 
 						/////////////////////
+					} else if (((String[]) (data))[0].equals("LogOut")) {
+						Connection conn = null;
+						Statement stmt = null;
+						
+						try {
+							Class.forName(JDBC_DRIVER);
+
+							conn = DriverManager.getConnection(DB_URL, USER, PASS);
+							stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
+					                   ResultSet.CONCUR_UPDATABLE);
+							String userN = ((String[]) (data))[1];
+							String passW = ((String[]) (data))[2];
+							String sql = "SELECT * FROM user where userName='" + userN + "' and password='" + passW
+									+ "'";
+							ResultSet rs = stmt.executeQuery(sql);
+						
+							while (rs.next()) {
+								System.out.println("Bye User");
+								int online = rs.getInt("online");
+								
+								if(online == 1) {
+									rs.updateInt("online", 0);
+									rs.updateRow();
+								}
+							}
+
+							stmt.close();
+							conn.close();
+						
+						} catch (SQLException se) {
+							se.printStackTrace();
+							System.out.println("SQLException: " + se.getMessage());
+							System.out.println("SQLState: " + se.getSQLState());
+							System.out.println("VendorError: " + se.getErrorCode());
+						} catch (Exception e) {
+							e.printStackTrace();
+						} finally {
+							try {
+								if (stmt != null)
+									stmt.close();
+								if (conn != null)
+									conn.close();
+							} catch (SQLException se) {
+								se.printStackTrace();
+							}
+						}
 					} else if (((String[]) (data))[0].equals("getUsers")) {
 						ObservableList<User> userList = getUserFromDB();
 
