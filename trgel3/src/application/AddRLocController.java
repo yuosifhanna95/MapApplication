@@ -55,6 +55,9 @@ public class AddRLocController {
 	private URoutePlace[] URoutePlaceList;
 
 	@FXML
+	private Button btn_UpdateVer;
+
+	@FXML
 	private Button btn_UpdateRoute;
 
 	@FXML
@@ -110,6 +113,11 @@ public class AddRLocController {
 
 	@FXML
 	private ComboBox<String> comboboxLoc;
+
+	@FXML
+	void UpdateVersion(ActionEvent event) {
+
+	}
 
 	@FXML
 	void SaveDetailsFunc(ActionEvent event) {

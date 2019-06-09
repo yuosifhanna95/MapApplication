@@ -106,6 +106,23 @@ public class AddLocController {
 	private ComboBox<String> comboBox;
 
 	@FXML
+	private Button btn_UpdateVer;
+
+	@FXML
+	void UpdateVersion(ActionEvent event) throws Exception, IOException {
+
+		@SuppressWarnings("resource")
+		Socket socket = new Socket("localhost", 5555);
+		String[] array = new String[2];
+		ObjectOutputStream objectOutput;
+		array[0] = "VersionUpdate";
+		array[1] = "" + Globals.map.getCity();
+		objectOutput = new ObjectOutputStream(socket.getOutputStream());
+		objectOutput.writeObject(array);
+
+	}
+
+	@FXML
 	void SaveDetailsFunc(ActionEvent event) {
 		if (CurImagePlace != null) {
 			try {
@@ -240,6 +257,8 @@ public class AddLocController {
 					}
 				}
 		}
+		if (TherewasUpdate)
+			Globals.ThereIsMapUpdate = true;
 		if (Globals.MODE >= 4 && Globals.ThereIsMapUpdate)
 			ConfirmUpdate.setVisible(true);
 		if (TherewasUpdate) {

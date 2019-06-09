@@ -554,7 +554,68 @@ public class Server {
 
 					if (((String[]) (data))[0].equals("Exit"))
 						break;
-					else if (((String) ((String[]) (data))[0]).equals("ConfirmUpdate")) {
+					else if (((String) ((String[]) (data))[0]).equals("VersionUpdate")) {
+
+						System.out.println("this is version");
+						String City = ((String[]) (data))[1];
+						String sql = "UPDATE CityCatalog SET VersionUpdate=" + true + " WHERE name='" + City + "'";
+						Class.forName(JDBC_DRIVER);
+						Connection conn = null;
+						PreparedStatement pr;
+						conn = DriverManager.getConnection(DB_URL, USER, PASS);
+						pr = conn.prepareStatement(sql);
+						if (pr.executeUpdate() > 0) {
+							System.out.println("thanks for requesting new version");
+						}
+
+					} else if (((String) ((String[]) (data))[0]).equals("AgreeVUpdate")) {
+
+						System.out.println("this is confirm version");
+
+						String City = ((String[]) (data))[1];
+						String sql = "UPDATE CityCatalog SET VersionUpdate=" + false + " WHERE name='" + City + "'";
+						String sqlfind = "SELECT * FROM CityCatalog WHERE name='" + City + "'";
+
+						Class.forName(JDBC_DRIVER);
+						Connection conn = null;
+						Statement stmt = null;
+						PreparedStatement pr;
+						conn = DriverManager.getConnection(DB_URL, USER, PASS);
+						stmt = conn.createStatement();
+
+						pr = conn.prepareStatement(sql);
+						if (pr.executeUpdate() > 0) {
+						}
+						ResultSet rs = stmt.executeQuery(sqlfind);
+						if (rs.next()) {
+							int Version = rs.getInt("version");
+							Version++;
+							sql = "UPDATE CityCatalog SET version=" + Version + " WHERE name='" + City + "'";
+							pr = conn.prepareStatement(sql);
+							if (pr.executeUpdate() > 0) {
+								System.out.println("thanks for Confirming new version");
+							}
+						}
+
+					} else if (((String) ((String[]) (data))[0]).equals("DisagreeVUpdate")) {
+
+						System.out.println("this is disagree version");
+
+						String City = ((String[]) (data))[1];
+						String sql = "UPDATE CityCatalog SET VersionUpdate=" + false + " WHERE name='" + City + "'";
+						Class.forName(JDBC_DRIVER);
+						Connection conn = null;
+						Statement stmt = null;
+						PreparedStatement pr;
+						conn = DriverManager.getConnection(DB_URL, USER, PASS);
+						stmt = conn.createStatement();
+
+						pr = conn.prepareStatement(sql);
+						if (pr.executeUpdate() > 0) {
+						}
+						System.out.println("thanks for Canceling new version");
+
+					} else if (((String) ((String[]) (data))[0]).equals("ConfirmUpdate")) {
 
 						System.out.println("this is confirm");
 						Boolean flag = false;
@@ -1515,14 +1576,14 @@ public class Server {
 				int NewUpdate = rs.getInt("NewUpdate");
 				String sql2 = "SELECT * FROM places WHERE Name ='" + city + "'";
 				ResultSet rs2 = stmt2.executeQuery(sql2);
-
+				Boolean VersionUpdate = rs.getBoolean("VersionUpdate");
 				while (rs2.next()) {
 					String place = rs2.getString("Place");
 					places += (" + " + place);
 				}
 
 				data.add(new City(city, description, mapsnum, placesnum, pathnum, places, oneTimeCost, FixedCost,
-						Version, NewUpdate));
+						Version, NewUpdate, VersionUpdate));
 
 			}
 
@@ -2435,7 +2496,7 @@ public class Server {
 		ResultSet rs = null;
 
 		String sqlfind = "";
-		String sql = "INSERT INTO CityCatalog(`name`, `description`, mapsNum, placesNum, pathNum, version, fixedCost, oneTimeCost, NewUpdate) VALUES (?,?,?,?,?,?,?,?,?)";
+		String sql = "INSERT INTO CityCatalog(`name`, `description`, mapsNum, placesNum, pathNum, version, fixedCost, oneTimeCost, NewUpdate, VersionUpdate) VALUES (?,?,?,?,?,?,?,?,?,?)";
 		sqlfind = "Select * FROM CityCatalog WHERE name ='" + map.getCity() + "'";
 
 		if (conn != null) {
@@ -2453,6 +2514,7 @@ public class Server {
 					pr2.setInt(7, 0);
 					pr2.setInt(8, 0);
 					pr2.setInt(9, -1);
+					pr2.setBoolean(10, false);
 
 					int k = pr2.executeUpdate();
 				}
@@ -2474,7 +2536,7 @@ public class Server {
 		ResultSet rs = null;
 
 		String sqlfind = "";
-		String sql = "INSERT INTO CityCatalog(`name`, `description`, mapsNum, placesNum, pathNum, version, fixedCost, oneTimeCost, NewUpdate) VALUES (?,?,?,?,?,?,?,?,?)";
+		String sql = "INSERT INTO CityCatalog(`name`, `description`, mapsNum, placesNum, pathNum, version, fixedCost, oneTimeCost, NewUpdate, VersionUpdate) VALUES (?,?,?,?,?,?,?,?,?,?)";
 		sqlfind = "Select * FROM CityCatalog WHERE name ='" + route.getCity() + "'";
 
 		if (conn != null) {
@@ -2492,6 +2554,7 @@ public class Server {
 					pr2.setInt(7, 0);
 					pr2.setInt(8, 0);
 					pr2.setInt(9, -1);
+					pr2.setBoolean(10, false);
 
 					int k = pr2.executeUpdate();
 				}
