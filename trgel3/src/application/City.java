@@ -16,9 +16,10 @@ public class City implements Serializable {
 	private int fixedCost;
 	private int Version;
 	private int NewUpdate;
+	private Boolean VersionUpdate;
 
 	City(String city, String Description, String numOfMaps, String numOfPlaces, String numOfPaths, String Places,
-			int oneTimeCost, int fixedCost, int Version, int NewUpdate) {
+			int oneTimeCost, int fixedCost, int Version, int NewUpdate, Boolean VersionUpdate) {
 		this.city = city;
 		this.Description = Description;
 		this.numOfMaps = numOfMaps;
@@ -29,6 +30,7 @@ public class City implements Serializable {
 		this.fixedCost = fixedCost;
 		this.NewUpdate = NewUpdate;
 		this.Version = Version;
+		this.VersionUpdate = VersionUpdate;
 	}
 
 	public int getVersion() {
@@ -109,5 +111,13 @@ public class City implements Serializable {
 
 	public void setNewUpdate(int newUpdate) {
 		NewUpdate = newUpdate;
+	}
+
+	public Boolean getVersionUpdate() {
+		return VersionUpdate;
+	}
+
+	public void setVersionUpdate(Boolean versionUpdate) {
+		VersionUpdate = versionUpdate;
 	}
 }

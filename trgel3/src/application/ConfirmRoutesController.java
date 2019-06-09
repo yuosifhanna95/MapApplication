@@ -110,28 +110,27 @@ public class ConfirmRoutesController {
 
 	@FXML
 	private Button btn_AddLoc;
-	
+
 	@FXML
 	private HBox hbox;
-	
-	TextField placeField= new TextField();
+
+	TextField placeField = new TextField();
 
 	@FXML
 	void searchCityBtn(ActionEvent event) {
 		searchPlace.getStyleClass().remove("addBobOk");
 		searchCity.getStyleClass().removeAll("addBobOk, focus");
 		searchCity.getStyleClass().add("addBobOk");
-		
-	    searchText.setPrefWidth(200);
-  	    hbox.getChildren().remove(placeField);
+
+		searchText.setPrefWidth(200);
+		hbox.getChildren().remove(placeField);
 
 		searchTable1.setVisible(false);
 		searchTable1.setDisable(true);
 
 		searchTable.setVisible(true);
 		searchTable.setDisable(false);
-		
-	
+
 		comboBox.getItems().remove("City & place");
 
 		searchText.setOnKeyReleased(new EventHandler<KeyEvent>() {
@@ -160,7 +159,7 @@ public class ConfirmRoutesController {
 		searchCity.getStyleClass().remove("addBobOk");
 		searchPlace.getStyleClass().removeAll("addBobOk, focus");
 		searchPlace.getStyleClass().add("addBobOk");
-		
+
 		comboBox.getItems().add("City & place");
 
 		searchTable.setVisible(false);
@@ -168,39 +167,40 @@ public class ConfirmRoutesController {
 
 		searchTable1.setVisible(true);
 		searchTable1.setDisable(false);
-		
+
 		comboBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-		      @Override public void changed(ObservableValue<? extends String> selected, String old, String newVal) {
-		          if (newVal != null) {
-		            switch(newVal) {
-		            case "City & place": 
-		            	  hbox.getChildren().remove(placeField);
-		            	  searchText.setPrefWidth(100);
-		            	  placeField.setPrefWidth(100);
-		            	  searchText.setPromptText("City");
-		            	  placeField.setPromptText("Place");
-		            	  hbox.getChildren().addAll(placeField);
-		            	  break;
-		            case "City": 
-		            	  searchText.setPrefWidth(200);
-		            	  searchText.setPromptText("City");
-		            	  hbox.getChildren().remove(placeField);
-		            	  break;
-		            case "Description": 
-		            	  searchText.setPrefWidth(200);
-		            	  searchText.setPromptText("Description");
-		            	  hbox.getChildren().remove(placeField);
-		            	  break;
-		            case "Place": 
-		            	  searchText.setPrefWidth(200);
-		            	  searchText.setPromptText("Place");
-		            	  hbox.getChildren().remove(placeField);
-		            	  break;
-		            }
-		          }
-		        }
+			@Override
+			public void changed(ObservableValue<? extends String> selected, String old, String newVal) {
+				if (newVal != null) {
+					switch (newVal) {
+					case "City & place":
+						hbox.getChildren().remove(placeField);
+						searchText.setPrefWidth(100);
+						placeField.setPrefWidth(100);
+						searchText.setPromptText("City");
+						placeField.setPromptText("Place");
+						hbox.getChildren().addAll(placeField);
+						break;
+					case "City":
+						searchText.setPrefWidth(200);
+						searchText.setPromptText("City");
+						hbox.getChildren().remove(placeField);
+						break;
+					case "Description":
+						searchText.setPrefWidth(200);
+						searchText.setPromptText("Description");
+						hbox.getChildren().remove(placeField);
+						break;
+					case "Place":
+						searchText.setPrefWidth(200);
+						searchText.setPromptText("Place");
+						hbox.getChildren().remove(placeField);
+						break;
+					}
+				}
+			}
 		});
-		
+
 		placeField.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent ke) {
 				switch (comboBox.getValue()) {
@@ -211,7 +211,7 @@ public class ConfirmRoutesController {
 				}
 			}
 		});
-	
+
 		searchText.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent ke) {
 				switch (comboBox.getValue()) {
@@ -383,6 +383,8 @@ public class ConfirmRoutesController {
 				final TableCell<City, String> cell = new TableCell<City, String>() {
 
 					final Button btn = new Button("New Update");
+					final Button btn2 = new Button("Click to update Ver!");
+					final Button btn3 = new Button("Cancel update Ver");
 
 					@Override
 					public void updateItem(String item, boolean empty) {
@@ -392,6 +394,8 @@ public class ConfirmRoutesController {
 							setText(null);
 						} else {
 							City city1 = getTableView().getItems().get(getIndex());
+							final AnchorPane Pane = new AnchorPane();
+							Pane.setId("An" + city1.getCity());
 							if (city1.getNewUpdate() == 0) {
 								btn.setText("Edit");
 								// Globals.ThereIsCityUpdate = false;
@@ -399,6 +403,49 @@ public class ConfirmRoutesController {
 								Globals.ThereIsCityUpdate = true;
 								btn.setText("New Update");
 							}
+							if (city1.getVersionUpdate()) {
+								btn2.setVisible(true);
+								btn3.setVisible(true);
+							} else {
+								btn2.setVisible(false);
+								btn3.setVisible(false);
+							}
+
+							btn2.setOnAction(event -> {
+								try {
+									@SuppressWarnings("resource")
+									Socket socket = new Socket("localhost", 5555);
+									String[] array = new String[2];
+									ObjectOutputStream objectOutput;
+									array[0] = "AgreeVUpdate";
+									array[1] = "" + city1.getCity();
+									objectOutput = new ObjectOutputStream(socket.getOutputStream());
+									objectOutput.writeObject(array);
+									btn2.setVisible(false);
+									btn3.setVisible(false);
+
+								} catch (Exception e) {
+									// TODO: handle exception
+								}
+
+							});
+							btn3.setOnAction(event -> {
+								try {
+									@SuppressWarnings("resource")
+									Socket socket = new Socket("localhost", 5555);
+									String[] array = new String[2];
+									ObjectOutputStream objectOutput;
+									array[0] = "DisagreeVUpdate";
+									array[1] = "" + city1.getCity();
+									objectOutput = new ObjectOutputStream(socket.getOutputStream());
+									objectOutput.writeObject(array);
+									btn2.setVisible(false);
+									btn3.setVisible(false);
+								} catch (Exception e) {
+									// TODO: handle exception
+								}
+
+							});
 							btn.setOnAction(event -> {
 								Globals.city = city1;
 								Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -417,7 +464,12 @@ public class ConfirmRoutesController {
 								}
 
 							});
-							setGraphic(btn);
+
+							btn2.relocate(btn.getLayoutX() + 100, btn.getLayoutY());
+							btn3.relocate(btn2.getLayoutX() + 130, btn2.getLayoutY());
+							Pane.getChildren().addAll(btn, btn2, btn3);
+							setGraphic(Pane);
+							// setGraphic(btn);
 							setText(null);
 						}
 					}
