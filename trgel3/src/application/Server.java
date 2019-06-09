@@ -895,6 +895,52 @@ public class Server {
 						}
 
 						/////////////////////
+					} else if (((String[]) (data))[0].equals("LogOut")) {
+						Connection conn = null;
+						Statement stmt = null;
+						
+						try {
+							Class.forName(JDBC_DRIVER);
+
+							conn = DriverManager.getConnection(DB_URL, USER, PASS);
+							stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
+					                   ResultSet.CONCUR_UPDATABLE);
+							String userN = ((String[]) (data))[1];
+							String passW = ((String[]) (data))[2];
+							String sql = "SELECT * FROM user where userName='" + userN + "' and password='" + passW
+									+ "'";
+							ResultSet rs = stmt.executeQuery(sql);
+						
+							while (rs.next()) {
+								System.out.println("Bye User");
+								int online = rs.getInt("online");
+								
+								if(online == 1) {
+									rs.updateInt("online", 0);
+									rs.updateRow();
+								}
+							}
+
+							stmt.close();
+							conn.close();
+						
+						} catch (SQLException se) {
+							se.printStackTrace();
+							System.out.println("SQLException: " + se.getMessage());
+							System.out.println("SQLState: " + se.getSQLState());
+							System.out.println("VendorError: " + se.getErrorCode());
+						} catch (Exception e) {
+							e.printStackTrace();
+						} finally {
+							try {
+								if (stmt != null)
+									stmt.close();
+								if (conn != null)
+									conn.close();
+							} catch (SQLException se) {
+								se.printStackTrace();
+							}
+						}
 					} else if (((String[]) (data))[0].equals("getUsers")) {
 						ObservableList<User> userList = getUserFromDB();
 
