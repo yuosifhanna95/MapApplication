@@ -37,6 +37,7 @@ import java.net.Socket;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -80,6 +81,10 @@ public class MyMapsController {
     
     private DatePicker DatePicker;
     
+    private int oldPeriod;
+    
+    private int newPeriod;
+    
     private String renewVal;
     
     private ObservableList<FixedPurchase> data = null;
@@ -94,11 +99,21 @@ public class MyMapsController {
 		Button buttonCancel = new Button("Cancel");
 		Button buttonSave = new Button("Save"); 
 		Text cost = new Text();
-		
+		oldPeriod = Globals.FixedPurchase.getPeriod();
+	
 		buttonCancel.setOnAction(e -> RenewPurchaseWindow.close());
 		buttonSet.setOnAction(e -> {
 			calculate();
-			cost.setText("The price is " + renewVal);
+			String str = "The price is " + renewVal;
+			if(oldPeriod != newPeriod) {
+				try {
+					str += "! You will get 10% discount if you select: " + calcNewDate(oldPeriod);
+				} catch (ParseException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+			cost.setText(str);
 		 });
 		
 		
@@ -128,12 +143,6 @@ public class MyMapsController {
                                     setDisable(true);
                                     setStyle("-fx-background-color: #ffc0cb;");
                             }
-                            long p = ChronoUnit.DAYS.between(
-                                    checkInDatePicker.getValue(), item
-                            );
-                            setTooltip(new Tooltip(
-                                "You're about to stay for " + p + " days")
-                            );
                     }
                 };
             }
@@ -232,6 +241,20 @@ public class MyMapsController {
     }
 
 
+	private String calcNewDate(int oldPeriod) throws ParseException {
+		Date oldDate = Globals.FixedPurchase.getEndDate();
+		
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		Calendar c = Calendar.getInstance();
+		String oldDateAsString = df.format(oldDate);
+		c.setTime(df.parse(oldDateAsString));
+		c.add(Calendar.DATE, oldPeriod);
+		oldDateAsString = df.format(c.getTime());
+		
+		return oldDateAsString;
+	}
+
+
 	@FXML
     void ShowMapsBtn(ActionEvent event) throws IOException {
 		Stage primaryStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
@@ -309,7 +332,7 @@ public class MyMapsController {
     	Renew.setDisable(true);
     		
     	buildData();
-    	
+   
     	mapTable.getColumns().clear();
     	mapTable.setEditable(true);
     
@@ -381,11 +404,13 @@ public class MyMapsController {
     	
     	Socket socket = new Socket("localhost",5555);
    
-    	Object[] set = new Object[4];
+    	Object[] set = new Object[6];
         set[0] = "addNewDate";
         set[1] = newDate;	
-        set[2] = Globals.FixedPurchase.getUser();
-        set[3] = Globals.FixedPurchase.getCity();
+        set[2] = Globals.FixedPurchase.getEndDate();
+        set[3] = newPeriod;
+        set[4] = Globals.FixedPurchase.getUser();
+        set[5] = Globals.FixedPurchase.getCity();
 		try {
 		    ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 		    objectOutput.writeObject(set); 
@@ -407,11 +432,17 @@ public class MyMapsController {
         
         double diffInDays = (double)( (newDate.getTime() - oldDate.getTime())/(1000 * 60 * 60 * 24) );
         diffInDays++;
+        
+        newPeriod = (int) diffInDays;
    
 		double m = diffInDays/30;
 		double months = Math.ceil(m);
+		Double price = months * cost;
+		if(newPeriod == oldPeriod) {
+			price *= 0.9;
+		}
         
-        renewVal = Double.toString(months * cost);
+        renewVal = Double.toString(price);
     	}
 	}
 	
