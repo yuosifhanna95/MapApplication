@@ -95,7 +95,7 @@ public class Server {
 								String message = "thanks for purchace,you will enjoy";
 								objectOutput.writeObject(message);
 							}
-							
+
 							Date sdate = Calendar.getInstance().getTime();
 							String date = df.format(sdate);
 							AddPurchaseToHistory(fp.getCity(), 1, fp.getUser(), "FT", date, conn);
@@ -203,13 +203,13 @@ public class Server {
 						c.setTime(df.parse(NewEndDateAsString));
 						c.add(Calendar.DATE, 1);
 						NewEndDateAsString = df.format(c.getTime());
-						
+
 						Date NewStartDate = ((Date) ((Object[]) (data))[2]);
 						String NewStartDateAsString = df.format(NewStartDate);
 						c.setTime(df.parse(NewStartDateAsString));
 						c.add(Calendar.DATE, 1);
 						NewStartDateAsString = df.format(c.getTime());
-						
+
 						String cityname = ((String) ((Object[]) (data))[5]);
 						String username = ((String) ((Object[]) (data))[4]);
 						int newPeriod = ((int) ((Object[]) (data))[3]);
@@ -667,14 +667,24 @@ public class Server {
 								stmt2 = conn.createStatement();
 								PreparedStatement pr, pr2;
 
-								String sql, sql2;// = "INSERT INTO places (`MapId` ,`Name`, `Place`, `description`,
+								String sql = "", sql2 = "", sql1 = "";// = "INSERT INTO places (`MapId` ,`Name`,
+																		// `Place`,
+								// `description`,
 								// `classification`, accessibility, LocX, LocY, `Type`) VALUES
 								// (?,?,?,?,?,?,?,?,?)";
 								// ResultSet rs = stmt.executeQuery(sql);
 
 								if (place.getType().equals("NEW")) {
 									sql = "INSERT INTO places (`MapId` ,`Name`, `Place`, `description`, `classification`, accessibility, LocX, LocY, mapsNum) VALUES (?,?,?,?,?,?,?,?,?)";
+									sql1 = "SELECT * FROM places WHERE Place='";
 									sql2 = "INSERT INTO placeMap (`Name`,`MapId` ,LocX, LocY) VALUES (?,?,?,?)";
+								} else if (place instanceof UPlace) {
+									if (place.getType().equals("DELETE")) {
+										sql = "DELETE FROM places WHERE id =" + place.getPlaceId();
+										sql1 = "SELECT * FROM placeMap WHERE Name='" + place.getPlaceName() + "'";
+										sql2 = "DELETE FROM placeMap WHERE Name='" + place.getPlaceName()
+												+ "' AND mapID=" + place.getMapId();
+									}
 								} else {
 									sql = "UPDATE places SET `Place` = '" + PlaceName + "', `description` = '"
 											+ description + "', `classification` = '" + classification
@@ -726,6 +736,20 @@ public class Server {
 												System.out.println("thanks for confirmation");
 												flag = true;
 											}
+										}
+
+									} else if (place.getType().equals("DELETE")) {
+										if (stmt.executeUpdate(sql2) > 0) {
+											// JOptionPane.showMessageDialog(null, "thanks for Update");
+
+											System.out.println("thanks for confirmation");
+											ResultSet rs = stmt.executeQuery(sql1);
+											if (!rs.next())
+												if (stmt2.executeUpdate(sql) > 0) {
+													// JOptionPane.showMessageDialog(null, "thanks for Update");
+													System.out.println("thanks for confirmation");
+													flag = true;
+												}
 										}
 
 									}
@@ -902,8 +926,7 @@ public class Server {
 							Class.forName(JDBC_DRIVER);
 
 							conn = DriverManager.getConnection(DB_URL, USER, PASS);
-							stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
-					                   ResultSet.CONCUR_UPDATABLE);
+							stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 							String userN = ((String[]) (data))[1];
 							String passW = ((String[]) (data))[2];
 							String sql = "SELECT * FROM user where userName='" + userN + "' and password='" + passW
@@ -926,11 +949,11 @@ public class Server {
 								String type = rs.getString("type");
 								String history = rs.getString("History");
 								int online = rs.getInt("online");
-								
+
 								User user = new User(id, firstname, lastname, email, username, password, phonenumber,
 										payment, type, history);
-								if(online == 0) {
-									rs.updateInt("online", 1);
+								if (online == 0) {
+									rs.updateInt("online", 0);// 1
 									rs.updateRow();
 								}
 								result[2] = online;
@@ -970,24 +993,23 @@ public class Server {
 					} else if (((String[]) (data))[0].equals("LogOut")) {
 						Connection conn = null;
 						Statement stmt = null;
-						
+
 						try {
 							Class.forName(JDBC_DRIVER);
 
 							conn = DriverManager.getConnection(DB_URL, USER, PASS);
-							stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
-					                   ResultSet.CONCUR_UPDATABLE);
+							stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 							String userN = ((String[]) (data))[1];
 							String passW = ((String[]) (data))[2];
 							String sql = "SELECT * FROM user where userName='" + userN + "' and password='" + passW
 									+ "'";
 							ResultSet rs = stmt.executeQuery(sql);
-						
+
 							while (rs.next()) {
 								System.out.println("Bye User");
 								int online = rs.getInt("online");
-								
-								if(online == 1) {
+
+								if (online == 1) {
 									rs.updateInt("online", 0);
 									rs.updateRow();
 								}
@@ -995,7 +1017,7 @@ public class Server {
 
 							stmt.close();
 							conn.close();
-						
+
 						} catch (SQLException se) {
 							se.printStackTrace();
 							System.out.println("SQLException: " + se.getMessage());

@@ -115,6 +115,7 @@ public class AddLocController {
 	@FXML
 	void DeletePlace(ActionEvent event) throws Exception, IOException {
 		if (CurImagePlace != null) {
+			Place p = ImagePlaces[CurImagePlace.getId()].getPlace();
 			CurImagePlace.getPlace().setType("DELETE");
 			ImagePlaces[CurImagePlace.getId()].getPlace().setType("DELETE");
 			mainPane.getChildren().removeAll(ImagePlaces[CurImagePlace.getId()].getImageview());
@@ -122,8 +123,17 @@ public class AddLocController {
 			mainPane.getChildren().removeAll(ImagePlacesOld[CurImagePlace.getId()].getImageview());
 			mainPane.getChildren().removeAll(ImagePlacesOld[CurImagePlace.getId()].getLabel());
 			ImagePlaces[CurImagePlace.getId()].setChanged(true);
+			ImagePlaces[CurImagePlace.getId()].setPlace(new UPlace(p.getMapId(), p.getCityName(), p.getPlaceName(),
+					p.getDescription(), p.getClassification(), p.getAccessibility(), p.getLocX(), p.getLocY(),
+					p.getType(), (int) p.getSerialID()));
 
-			// ImagePlaces[CurImagePlace.getId()] = null;
+			// new UPlace(p.getMapId(), p.getCityName(), p.getPlaceName(),
+			// p.getDescription(), p.getClassification(), p.getAccessibility(),
+			// p.getSerialID(), p.getLocX(),
+			// p.getLocY(), p.getType(), p.getNumOfmaps(),p.getSerialID()));
+
+			// ImagePlaces[CurImagePlace.getId()] =
+			// null;
 		}
 		// BuildAllPlaces();
 		// BuildOldMap();
@@ -267,8 +277,6 @@ public class AddLocController {
 									type = "DELETE";
 								else
 									type = "UPDATE";
-							else if ((ImagePlaces[i].getPlace()).getType().equals("DELETE"))
-								type = "DELETE";
 							else
 								type = "UPDATE";
 
@@ -360,8 +368,7 @@ public class AddLocController {
 		for (int i = 0; i < OPlacelist.length; i++) {
 			for (int c = 0; c < UPlacelist.length; c++) {
 				// if (Globals.map.getId() == list2[c].getSerialID()) {
-				if (OPlacelist[i].getSerialID() == UPlacelist[c].getPlaceId()
-						&& !UPlacelist[c].getType().equals("DELETE")) {
+				if (OPlacelist[i].getSerialID() == UPlacelist[c].getPlaceId()) {
 					Image im = new Image("File:editedloc.png");
 					ImageView newLoc = new ImageView(im);
 					// newLoc.relocate((double) list2[c].getLocX(), (double) list2[c].getLocY());
@@ -501,18 +508,30 @@ public class AddLocController {
 		for (int i = 0; i < ImagePlaces.length; i++) {
 
 			if (ImagePlaces[i] != null) {
+				if (ImagePlaces[i].getPlace() instanceof UPlace) {
+					if (!ImagePlaces[i].getPlace().getType().equals("DELETE")) {
 
-				mainPane.getChildren().removeAll(ImagePlaces[i].getImageview());
-				mainPane.getChildren().removeAll(ImagePlaces[i].getLabel());
-
+						mainPane.getChildren().removeAll(ImagePlaces[i].getImageview());
+						mainPane.getChildren().removeAll(ImagePlaces[i].getLabel());
+					}
+				} else {
+					mainPane.getChildren().removeAll(ImagePlaces[i].getImageview());
+					mainPane.getChildren().removeAll(ImagePlaces[i].getLabel());
+				}
 			}
 		}
 		for (int i = 0; i < ImagePlacesOld.length; i++) {
 
 			if (ImagePlacesOld[i] != null) {
-
-				mainPane.getChildren().addAll(ImagePlacesOld[i].getImageview());
-				mainPane.getChildren().addAll(ImagePlacesOld[i].getLabel());
+				if (ImagePlacesOld[i].getPlace() instanceof UPlace) {
+					if (!ImagePlacesOld[i].getPlace().getType().equals("DELETE")) {
+						mainPane.getChildren().addAll(ImagePlacesOld[i].getImageview());
+						mainPane.getChildren().addAll(ImagePlacesOld[i].getLabel());
+					}
+				} else {
+					mainPane.getChildren().addAll(ImagePlacesOld[i].getImageview());
+					mainPane.getChildren().addAll(ImagePlacesOld[i].getLabel());
+				}
 
 			}
 		}
@@ -525,21 +544,34 @@ public class AddLocController {
 
 		for (int i = 0; i < ImagePlaces.length; i++) {
 
-			if (ImagePlaces[i] != null) {
+			if (ImagePlaces[i] != null)
+				if (ImagePlaces[i].getPlace() instanceof UPlace) {
+					if (!ImagePlaces[i].getPlace().getType().equals("DELETE")) {
 
-				mainPane.getChildren().addAll(ImagePlaces[i].getImageview());
-				mainPane.getChildren().addAll(ImagePlaces[i].getLabel());
+						mainPane.getChildren().addAll(ImagePlaces[i].getImageview());
+						mainPane.getChildren().addAll(ImagePlaces[i].getLabel());
 
-			}
+					}
+				} else if (ImagePlaces[i].getPlace() instanceof Place) {
+					mainPane.getChildren().addAll(ImagePlaces[i].getImageview());
+					mainPane.getChildren().addAll(ImagePlaces[i].getLabel());
+				}
 		}
 		for (int i = 0; i < ImagePlacesOld.length; i++) {
 
-			if (ImagePlacesOld[i] != null) {
+			if (ImagePlacesOld[i] != null)
+				if (ImagePlacesOld[i].getPlace() instanceof UPlace) {
+					if (!ImagePlacesOld[i].getPlace().getType().equals("DELETE")) {
 
-				mainPane.getChildren().removeAll(ImagePlacesOld[i].getImageview());
-				mainPane.getChildren().removeAll(ImagePlacesOld[i].getLabel());
+						mainPane.getChildren().removeAll(ImagePlacesOld[i].getImageview());
+						mainPane.getChildren().removeAll(ImagePlacesOld[i].getLabel());
 
-			}
+					}
+				} else {
+					mainPane.getChildren().removeAll(ImagePlacesOld[i].getImageview());
+					mainPane.getChildren().removeAll(ImagePlacesOld[i].getLabel());
+				}
+
 		}
 
 		// AddMethodsForIP();
