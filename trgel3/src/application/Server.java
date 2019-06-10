@@ -676,15 +676,14 @@ public class Server {
 
 								if (place.getType().equals("NEW")) {
 									sql = "INSERT INTO places (`MapId` ,`Name`, `Place`, `description`, `classification`, accessibility, LocX, LocY, mapsNum) VALUES (?,?,?,?,?,?,?,?,?)";
-									sql1 = "SELECT * FROM places WHERE Place='";
+									sql1 = "SELECT * FROM places WHERE Place='" + place.getPlaceName() + "' AND Name='"
+											+ place.getCityName() + "'";
 									sql2 = "INSERT INTO placeMap (`Name`,`MapId` ,LocX, LocY) VALUES (?,?,?,?)";
-								} else if (place instanceof UPlace) {
-									if (place.getType().equals("DELETE")) {
-										sql = "DELETE FROM places WHERE id =" + place.getPlaceId();
-										sql1 = "SELECT * FROM placeMap WHERE Name='" + place.getPlaceName() + "'";
-										sql2 = "DELETE FROM placeMap WHERE Name='" + place.getPlaceName()
-												+ "' AND mapID=" + place.getMapId();
-									}
+								} else if (place.getType().equals("DELETE")) {
+									sql = "DELETE FROM places WHERE id =" + place.getPlaceId();
+									sql1 = "SELECT * FROM placeMap WHERE Name='" + place.getPlaceName() + "'";
+									sql2 = "DELETE FROM placeMap WHERE Name='" + place.getPlaceName() + "' AND mapID="
+											+ place.getMapId();
 								} else {
 									sql = "UPDATE places SET `Place` = '" + PlaceName + "', `description` = '"
 											+ description + "', `classification` = '" + classification
@@ -717,9 +716,19 @@ public class Server {
 										pr2.setString(2, MapId);
 										pr2.setInt(3, LocX);
 										pr2.setInt(4, LocY);
-										if (pr.executeUpdate() > 0) {
-											// JOptionPane.showMessageDialog(null, "thanks for Update");
-											System.out.println("thanks for confirmation");
+
+										ResultSet rs = stmt.executeQuery(sql1);
+										if (!rs.next()) {
+											if (pr.executeUpdate() > 0) {
+												// JOptionPane.showMessageDialog(null, "thanks for Update");
+												System.out.println("thanks for confirmation");
+												if (pr2.executeUpdate() > 0) {
+													// JOptionPane.showMessageDialog(null, "thanks for Update");
+													System.out.println("thanks for confirmation");
+													flag = true;
+												}
+											}
+										} else {
 											if (pr2.executeUpdate() > 0) {
 												// JOptionPane.showMessageDialog(null, "thanks for Update");
 												System.out.println("thanks for confirmation");
@@ -824,6 +833,11 @@ public class Server {
 
 								if (place.getType().equals("NEW")) {
 									sql = "INSERT INTO RoutePlaces (RouteId, `Place`, time, LocX, LocY) VALUES (?,?,?,?,?)";
+								}
+								if (place.getType().equals("DELETE")) {
+									// sql = "DELETE FROM RoutePlaces WHERE id =" + place.getPlaceId();
+									sql = "DELETE FROM RoutePlaces WHERE place='" + place.getPlace() + "' AND RouteID="
+											+ place.getRouteId();
 								} else {
 									sql = "UPDATE RoutePlaces SET `Place` = '" + PlaceName + "' , time=" + time
 											+ " ,LocX=" + LocX + ", LocY=" + LocY + " WHERE id=" + RPlaceId;
@@ -860,7 +874,7 @@ public class Server {
 											// }
 										}
 
-									} else if (place.getType().equals("UPDATE")) {
+									} else if (place.getType().equals("UPDATE") || place.getType().equals("DELETE")) {
 										if (stmt.executeUpdate(sql) > 0) {
 											// JOptionPane.showMessageDialog(null, "thanks for Update");
 											System.out.println("thanks for R confirmation");
@@ -1283,7 +1297,7 @@ public class Server {
 
 					else if (((String[]) (data))[0].equals("getPlaces")) {
 
-						Place[] list;
+						Place[] list, list2, list3;
 						int k = ((String[]) (data)).length;
 
 						Connection conn = null;
@@ -1295,8 +1309,11 @@ public class Server {
 							conn = DriverManager.getConnection(DB_URL, USER, PASS);
 							stmt = conn.createStatement();
 							String mapid = ((String[]) (data))[1];
-							String sql = "SELECT * FROM places where MapId='" + mapid + "'";
+							String City = ((String[]) (data))[2];
+							// String sql = "SELECT * FROM places where MapId='" + mapid + "'";
+							String sql = "SELECT * FROM places where Name='" + City + "'";
 							ResultSet rs = stmt.executeQuery(sql);
+
 							int index = 0;
 							while (rs.next()) {
 								index++;
@@ -1330,8 +1347,58 @@ public class Server {
 								index++;
 
 							}
+							String sql2 = "SELECT * FROM placeMap where mapID=" + mapid;
+							ResultSet rs2 = stmt.executeQuery(sql2);
+							index = 0;
+							while (rs2.next()) {
+								index++;
+							}
+							rs2.first();
+							rs2.previous();
+							Object[] result2 = new Object[2];
+							list2 = new Place[index];
+							index = 0;
+							while (rs2.next()) {
+
+								Connected = true;
+
+								int id = rs2.getInt("id");
+								String MapId = rs2.getString("MapId");
+								String Name = City;
+								String Place = rs2.getString("Name");
+								String description = "";
+								String classification = "";
+								int accessibility = 0;
+
+								// Point p = GetLocationFromDB(Integer.parseInt(MapId), Place);
+								int LocX = rs2.getInt("LocX");
+								int LocY = rs2.getInt("LocY");
+								// rs.getString("pathNum");
+
+								// data.add(new User(username, description, mapsnum , placesnum, pathnum ));
+								Place place = new Place(MapId, Name, Place, description, classification, accessibility,
+										id, LocX, LocY);
+								list2[index] = (place);
+								index++;
+
+							}
+							list3 = new Place[list2.length];
+							for (int i = 0; i < list2.length; i++) {
+								for (int c = 0; c < list.length; c++) {
+									if (list2[i].getPlaceName().equals(list[c].getPlaceName())) {
+
+										list3[i] = new Place(list2[i].getMapId(), list[c].getCityName(),
+												list[c].getPlaceName(), list[c].getDescription(),
+												list[c].getClassification(), list[c].getAccessibility(),
+												list[c].getSerialID(), list2[i].getLocX(), list2[i].getLocY());
+									}
+
+								}
+
+							}
+
 							result[0] = Connected;
-							result[1] = list;
+							result[1] = list3;
 
 							stmt.close();
 							conn.close();

@@ -335,11 +335,12 @@ public class AddLocController {
 
 		@SuppressWarnings("resource")
 		Socket socket = new Socket("localhost", 5555);
-		String[] array = new String[2];
+		String[] array = new String[3];
 		String[] array2 = new String[2];
 		array[0] = "getPlaces";
 		// get[1] = "" + ImagePlaces[i].getPlace().getCityName();
 		array[1] = "" + Globals.map.getId();
+		array[2] = "" + Globals.map.getCity();
 
 		ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 		objectOutput.writeObject(array);
@@ -707,7 +708,7 @@ public class AddLocController {
 	@FXML
 	void AddLocation(ActionEvent event) {
 		Mode = 0;
-		if (!NewLocation.getText().equals("") && Counter < 10) {
+		if (!NewLocation.getText().equals("") && Counter < 10 && ThereIsNoLocation(NewLocation.getText())) {
 			EventHandler<MouseEvent> OkEventHandler = new EventHandler<MouseEvent>() {
 
 				@Override
@@ -1053,6 +1054,14 @@ public class AddLocController {
 		}
 
 		return null;
+	}
+
+	public Boolean ThereIsNoLocation(String Loc) {
+		for (int i = 0; i < ImagePlaces.length; i++)
+			if (ImagePlaces[i] != null)
+				if (ImagePlaces[i].getPlace().getPlaceName().toLowerCase().equals(Loc.toLowerCase()))
+					return false;
+		return true;
 	}
 
 }

@@ -11,7 +11,6 @@
 
 <AnchorPane fx:id="mainPane" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.AddRLocController">
    <children>
-      <TextField fx:id="NewLocation" layoutX="1131.0" layoutY="14.0" prefHeight="25.0" prefWidth="135.0" />
       <Label fx:id="label_message" centerShape="true" layoutX="614.0" layoutY="343.0" textAlignment="CENTER">
          <font>
             <Font name="Andalus" size="64.0" />
@@ -31,5 +30,6 @@
       <Button fx:id="btn_SaveDet" layoutX="14.0" layoutY="343.0" mnemonicParsing="false" onAction="#SaveDetailsFunc" text="Save Details" />
       <ComboBox fx:id="comboBox" layoutX="937.0" layoutY="14.0" prefHeight="25.0" prefWidth="122.0" promptText="Status" />
       <ComboBox fx:id="comboboxLoc" layoutX="490.0" layoutY="14.0" prefWidth="150.0" promptText="Choose Location" />
+      <Button fx:id="btn_DeletePlace" layoutX="1072.0" layoutY="14.0" mnemonicParsing="false" onAction="#DeletePlace" text="Delete Place" />
    </children>
 </AnchorPane>
