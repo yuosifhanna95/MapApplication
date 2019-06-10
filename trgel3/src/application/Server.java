@@ -95,8 +95,10 @@ public class Server {
 								String message = "thanks for purchace,you will enjoy";
 								objectOutput.writeObject(message);
 							}
-
-							AddPurchaseToHistory(fp.getCity(), 1, fp.getUser(), "FT", conn);
+							
+							Date sdate = Calendar.getInstance().getTime();
+							String date = df.format(sdate);
+							AddPurchaseToHistory(fp.getCity(), 1, fp.getUser(), "FT", date, conn);
 
 						}
 
@@ -183,9 +185,10 @@ public class Server {
 						User user = (User) ((Object[]) (data))[1];
 						String city = (String) ((Object[]) (data))[2];
 						int version = (int) ((Object[]) (data))[3];
+						String date = (String) ((Object[]) (data))[4];
 						Class.forName(JDBC_DRIVER);
 						conn = DriverManager.getConnection(DB_URL, USER, PASS);
-						AddPurchaseToHistory(city, version, user.getUserName(), "OT", conn);
+						AddPurchaseToHistory(city, version, user.getUserName(), "OT", date, conn);
 
 					}
 
@@ -193,31 +196,39 @@ public class Server {
 						Connection conn = null;
 						Statement stmt = null;
 
-						Date NewDate = ((Date) ((Object[]) (data))[1]);
+						Date NewEndDate = ((Date) ((Object[]) (data))[1]);
 						DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 						Calendar c = Calendar.getInstance();
-
-						String NewDateAsString = df.format(NewDate);
-						c.setTime(df.parse(NewDateAsString));
+						String NewEndDateAsString = df.format(NewEndDate);
+						c.setTime(df.parse(NewEndDateAsString));
 						c.add(Calendar.DATE, 1);
-						NewDateAsString = df.format(c.getTime());
-						String cityname = ((String) ((Object[]) (data))[3]);
-						String username = ((String) ((Object[]) (data))[2]);
-
+						NewEndDateAsString = df.format(c.getTime());
+						
+						Date NewStartDate = ((Date) ((Object[]) (data))[2]);
+						String NewStartDateAsString = df.format(NewStartDate);
+						c.setTime(df.parse(NewStartDateAsString));
+						c.add(Calendar.DATE, 1);
+						NewStartDateAsString = df.format(c.getTime());
+						
+						String cityname = ((String) ((Object[]) (data))[5]);
+						String username = ((String) ((Object[]) (data))[4]);
+						int newPeriod = ((int) ((Object[]) (data))[3]);
 						try {
 							Class.forName(JDBC_DRIVER);
 
 							conn = DriverManager.getConnection(DB_URL, USER, PASS);
 							stmt = conn.createStatement();
 
-							String sql = "update fixedPurchase set endDate = ? where user = ? and city = ?";
+							String sql = "update fixedPurchase set endDate = ? , startDate = ? , period = ? where user = ? and city = ?";
 							PreparedStatement pr;
 
 							if (conn != null) {
 								pr = conn.prepareStatement(sql);
-								pr.setDate(1, java.sql.Date.valueOf(NewDateAsString));
-								pr.setString(2, username);
-								pr.setString(3, cityname);
+								pr.setDate(1, java.sql.Date.valueOf(NewEndDateAsString));
+								pr.setDate(2, java.sql.Date.valueOf(NewStartDateAsString));
+								pr.setInt(3, newPeriod);
+								pr.setString(4, username);
+								pr.setString(5, cityname);
 								pr.executeUpdate();
 							}
 
@@ -2672,7 +2683,7 @@ public class Server {
 
 	}
 
-	static void AddPurchaseToHistory(String city, int version, String user, String Type, Connection conn) {
+	static void AddPurchaseToHistory(String city, int version, String user, String Type, String date, Connection conn) {
 
 		Statement pr;
 		PreparedStatement pr2;
@@ -2688,9 +2699,9 @@ public class Server {
 				while (rs.next()) {
 					String History = rs.getString("History");
 					if (History.equals("")) {
-						History = city + "," + Type + "," + version;
+						History = city + "," + Type + "," + version + "," + date;
 					} else {
-						History += "#" + city + "," + Type + "," + version;
+						History += "#" + city + "," + Type + "," + version + "," + date;
 					}
 					sql += History + "' WHERE userName='" + user + "'";
 					pr2 = conn.prepareStatement(sql);

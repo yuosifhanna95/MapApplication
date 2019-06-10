@@ -3,6 +3,8 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
@@ -82,5 +84,13 @@
       <Button fx:id="saveBtn" layoutX="662.0" layoutY="383.0" mnemonicParsing="false" onAction="#save" prefHeight="26.0" prefWidth="70.0" text="Save" />
       <Button fx:id="back" layoutX="202.0" layoutY="66.0" mnemonicParsing="false" onAction="#onBack" text="Back" />
       <Button fx:id="resetBtn" layoutX="546.0" layoutY="383.0" mnemonicParsing="false" onAction="#reset" prefHeight="26.0" prefWidth="70.0" text="Reset" />
+      <TableView fx:id="historyTable" layoutX="430.0" layoutY="490.0" prefHeight="200.0" prefWidth="420.0">
+        <columns>
+          <TableColumn fx:id="cityCol" prefWidth="140.0" text="City" />
+          <TableColumn fx:id="typeCol" prefWidth="150.0" text="Type" />
+            <TableColumn fx:id="dateCol" prefWidth="129.0" text="Date" />
+        </columns>
+      </TableView>
+      <Text layoutX="616.0" layoutY="464.0" strokeType="OUTSIDE" strokeWidth="0.0" text="HISTORY" />
    </children>
 </AnchorPane>

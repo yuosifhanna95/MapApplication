@@ -11,6 +11,8 @@ import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Calendar;
@@ -399,6 +401,7 @@ public class DefPageController {
 					newPayment.setVisible(true);
 					rb2.setVisible(true);
 				});
+				
 
 				buttonSave.setOnAction(e -> {
 					if (rb2.isSelected() && newPayment.getText().contentEquals("")) {
@@ -410,13 +413,24 @@ public class DefPageController {
 							saveAllMaps();
 							@SuppressWarnings("resource")
 							Socket socket = new Socket("localhost", 5555);
-							Object[] array = new Object[4];
+							Object[] array = new Object[5];
 							array[0] = "OneTimePurchase";
 							array[1] = Globals.user;
 							array[2] = Globals.city.getCity();
 							array[3] = Globals.city.getVersion();
+							
+							Date sdate = Calendar.getInstance().getTime();
+							DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+							String date = df.format(sdate);
+							array[4] = date;
+							
 							String history = Globals.user.getHistory();
-							history += "#" + array[2] + ",OT," + array[3];
+							if (history.equals("")) {
+								history = array[2] + "," + ",OT," + "," + array[3] + "," + array[4];
+							} else {
+							  history += "#" + array[2] + ",OT," + array[3] +"," + array[4];
+							}
+							
 							Globals.user.setHistory(history);
 							ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 							objectOutput.writeObject(array);
@@ -983,7 +997,7 @@ public class DefPageController {
 
 		@SuppressWarnings("resource")
 		Socket socket = new Socket("localhost", 5555);
-		String[] array = new String[2];
+		String[] array = new String[3];
 		array[0] = "getMaps";
 		array[1] = Globals.city.getCity();
 		array[2] = "0";
@@ -1278,7 +1292,7 @@ public class DefPageController {
 
 			Date enddate = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
 			String user = Globals.user.getUserName();
-			;
+			
 			Date sdate = Calendar.getInstance().getTime();
 			double price = (int) Globals.city.getFixedCost();
 			String city = Globals.city.getCity();
