@@ -53,6 +53,9 @@ public class AddLocController {
 	private UPlace[] UPlacelist;
 
 	@FXML
+	private Button btn_DeletePlace;
+
+	@FXML
 	private Button btn_UpdateMap;
 
 	@FXML
@@ -108,6 +111,26 @@ public class AddLocController {
 
 	@FXML
 	private Button btn_UpdateVer;
+
+	@FXML
+	void DeletePlace(ActionEvent event) throws Exception, IOException {
+		if (CurImagePlace != null) {
+			CurImagePlace.getPlace().setType("DELETE");
+			ImagePlaces[CurImagePlace.getId()].getPlace().setType("DELETE");
+			mainPane.getChildren().removeAll(ImagePlaces[CurImagePlace.getId()].getImageview());
+			mainPane.getChildren().removeAll(ImagePlaces[CurImagePlace.getId()].getLabel());
+			mainPane.getChildren().removeAll(ImagePlacesOld[CurImagePlace.getId()].getImageview());
+			mainPane.getChildren().removeAll(ImagePlacesOld[CurImagePlace.getId()].getLabel());
+			ImagePlaces[CurImagePlace.getId()].setChanged(true);
+
+			// ImagePlaces[CurImagePlace.getId()] = null;
+		}
+		// BuildAllPlaces();
+		// BuildOldMap();
+		// DrawUpdatedPlaces();
+		// BuildAllPlaces();
+		// BuildOldMap();
+	}
 
 	@FXML
 	void UpdateVersion(ActionEvent event) throws Exception, IOException {
@@ -240,10 +263,15 @@ public class AddLocController {
 							if (ImagePlaces[i].getPlace() instanceof UPlace)
 								if (((UPlace) ImagePlaces[i].getPlace()).getPlaceId() == -1)
 									type = "NEW";
+								else if ((ImagePlaces[i].getPlace()).getType().equals("DELETE"))
+									type = "DELETE";
 								else
 									type = "UPDATE";
+							else if ((ImagePlaces[i].getPlace()).getType().equals("DELETE"))
+								type = "DELETE";
 							else
 								type = "UPDATE";
+
 							array2[0] = "UpdatePlace";
 							Place pp = new Place(MapId, CityName, PlaceName, description, classification, accessibility,
 									LocX, LocY, type);
@@ -332,7 +360,8 @@ public class AddLocController {
 		for (int i = 0; i < OPlacelist.length; i++) {
 			for (int c = 0; c < UPlacelist.length; c++) {
 				// if (Globals.map.getId() == list2[c].getSerialID()) {
-				if (OPlacelist[i].getSerialID() == UPlacelist[c].getPlaceId()) {
+				if (OPlacelist[i].getSerialID() == UPlacelist[c].getPlaceId()
+						&& !UPlacelist[c].getType().equals("DELETE")) {
 					Image im = new Image("File:editedloc.png");
 					ImageView newLoc = new ImageView(im);
 					// newLoc.relocate((double) list2[c].getLocX(), (double) list2[c].getLocY());
@@ -903,7 +932,7 @@ public class AddLocController {
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
-		primaryStage.setOnCloseRequest(e-> {
+		primaryStage.setOnCloseRequest(e -> {
 			try {
 				logOut();
 			} catch (IOException e1) {
@@ -924,7 +953,7 @@ public class AddLocController {
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
-		primaryStage.setOnCloseRequest(e-> {
+		primaryStage.setOnCloseRequest(e -> {
 			try {
 				logOut();
 			} catch (IOException e1) {
@@ -975,13 +1004,13 @@ public class AddLocController {
 		spa.setTransform(Transform.scale(pixelScale, pixelScale));
 		return node.snapshot(spa, writableImage);
 	}
-	
+
 	private Object logOut() throws UnknownHostException, IOException {
 		String[] array = new String[3];
 		array[0] = "LogOut";
 		array[1] = Globals.user.getUserName();
 		array[2] = Globals.user.getPassword();
-		
+
 		@SuppressWarnings("resource")
 		Socket socket = new Socket("localhost", 5555);
 		try {
@@ -990,7 +1019,7 @@ public class AddLocController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
 
