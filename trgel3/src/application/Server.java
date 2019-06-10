@@ -1310,7 +1310,6 @@ public class Server {
 							stmt = conn.createStatement();
 							String mapid = ((String[]) (data))[1];
 							String City = ((String[]) (data))[2];
-							// String sql = "SELECT * FROM places where MapId='" + mapid + "'";
 							String sql = "SELECT * FROM places where Name='" + City + "'";
 							ResultSet rs = stmt.executeQuery(sql);
 
