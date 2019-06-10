@@ -7,6 +7,8 @@ import java.net.Socket;
 import java.net.URL;
 import java.net.UnknownHostException;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -27,11 +29,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
-public class MemberFileController {
+public class ConfirmRouteController {
 
 	@FXML
 	private Button btn_message;
@@ -55,33 +58,26 @@ public class MemberFileController {
 	private TextField searchText = new TextField();
 
 	@FXML
-	private TableView<User> searchTable;
+	private TableView<Route> searchTable;
 
 	@FXML
-	private TableColumn<User, String> fnameCol;
+	private TableColumn<Route, String> CityCol;
 
 	@FXML
-	private TableColumn<User, String> lnameCol;
+	private TableColumn<Route, String> DescriptionCol;
 
 	@FXML
-	private TableColumn<User, String> pnumberCol;
+	private TableColumn<City, String> routeCol;
 
 	@FXML
-	private TableColumn<User, String> emailCol;
+	private TableColumn<City, String> placeCol;
 
 	@FXML
-	private TableColumn<User, String> usernameCol;
-	
-	@FXML
-	private TableColumn<User, String> passwordCol;
-	
-	@FXML
-	private TableColumn<User, String> typeCol;
-	
-	@FXML
-	private TableColumn<User, String> EditCol;
+	private TableColumn<City, String> pathCol;
 
-	private TableColumn buttonCol;
+	@FXML
+	private TableColumn<Route, String> UpdateCol;
+
 	@FXML
 	private TableView<Place> searchTable1;
 
@@ -95,13 +91,17 @@ public class MemberFileController {
 	private TableColumn<Place, String> DescriptionCol1;
 
 	@FXML
-	private TableColumn<Place, String> mapCol1;
+	private TableColumn<Place, String> routeCol1;
 
-	private ObservableList<User> dataUser = FXCollections.observableArrayList();
+	private ObservableList<City> dataCity = FXCollections.observableArrayList();
 
 	private ObservableList<Place> dataPlace = FXCollections.observableArrayList();
 
-	FilteredList<User> flUser = null;
+	private ObservableList<Route> dataRoute = FXCollections.observableArrayList();
+
+	FilteredList<City> flCity = null;
+
+	FilteredList<Route> flRoute = null;
 
 	FilteredList<Place> flPlace = null;
 
@@ -113,33 +113,44 @@ public class MemberFileController {
 
 	@FXML
 	private Button btn_AddLoc;
+	
+	@FXML
+	private HBox hbox;
+	
+	TextField placeField= new TextField();
 
 	@FXML
 	void searchCityBtn(ActionEvent event) {
 		searchPlace.getStyleClass().remove("addBobOk");
 		searchCity.getStyleClass().removeAll("addBobOk, focus");
 		searchCity.getStyleClass().add("addBobOk");
+		
+	    searchText.setPrefWidth(200);
+  	    hbox.getChildren().remove(placeField);
 
 		searchTable1.setVisible(false);
 		searchTable1.setDisable(true);
 
 		searchTable.setVisible(true);
 		searchTable.setDisable(false);
+		
+	
+		comboBox.getItems().remove("City & place");
 
 		searchText.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent ke) {
 				switch (comboBox.getValue()) {
 				case "City":
-					flUser.setPredicate(
-							p -> p.getUserName().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
+					flCity.setPredicate(
+							p -> p.getCity().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
 					break;
 				case "Place":
-					flUser.setPredicate(
-							p -> p.getEmail().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
+					flCity.setPredicate(
+							p -> p.getPlaces().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
 					break;
 				case "Description":
-					flUser.setPredicate(
-							p -> p.getPhoneNumber().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
+					flCity.setPredicate(
+							p -> p.getDescription().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
 					break;
 				}
 			}
@@ -152,13 +163,58 @@ public class MemberFileController {
 		searchCity.getStyleClass().remove("addBobOk");
 		searchPlace.getStyleClass().removeAll("addBobOk, focus");
 		searchPlace.getStyleClass().add("addBobOk");
+		
+		comboBox.getItems().add("City & place");
 
 		searchTable.setVisible(false);
 		searchTable.setDisable(true);
 
 		searchTable1.setVisible(true);
 		searchTable1.setDisable(false);
-
+		
+		comboBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+		      @Override public void changed(ObservableValue<? extends String> selected, String old, String newVal) {
+		          if (newVal != null) {
+		            switch(newVal) {
+		            case "City & place": 
+		            	  hbox.getChildren().remove(placeField);
+		            	  searchText.setPrefWidth(100);
+		            	  placeField.setPrefWidth(100);
+		            	  searchText.setPromptText("City");
+		            	  placeField.setPromptText("Place");
+		            	  hbox.getChildren().addAll(placeField);
+		            	  break;
+		            case "City": 
+		            	  searchText.setPrefWidth(200);
+		            	  searchText.setPromptText("City");
+		            	  hbox.getChildren().remove(placeField);
+		            	  break;
+		            case "Description": 
+		            	  searchText.setPrefWidth(200);
+		            	  searchText.setPromptText("Description");
+		            	  hbox.getChildren().remove(placeField);
+		            	  break;
+		            case "Place": 
+		            	  searchText.setPrefWidth(200);
+		            	  searchText.setPromptText("Place");
+		            	  hbox.getChildren().remove(placeField);
+		            	  break;
+		            }
+		          }
+		        }
+		});
+		
+		placeField.setOnKeyReleased(new EventHandler<KeyEvent>() {
+			public void handle(KeyEvent ke) {
+				switch (comboBox.getValue()) {
+				case "City & place":
+					flPlace.setPredicate(
+							p -> p.getPlaceName().toLowerCase().contains(placeField.getText().toLowerCase().trim()));
+					break;
+				}
+			}
+		});
+	
 		searchText.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent ke) {
 				switch (comboBox.getValue()) {
@@ -173,6 +229,10 @@ public class MemberFileController {
 				case "Description":
 					flPlace.setPredicate(
 							p -> p.getDescription().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
+					break;
+				case "City & place":
+					flPlace.setPredicate(
+							p -> p.getCityName().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
 					break;
 				}
 			}
@@ -241,80 +301,96 @@ public class MemberFileController {
 	void initialize() throws IOException, Exception {
 		Globals.backLink = "MainPage.fxml";
 
-		//searchCity.getStyleClass().removeAll("addBobOk, focus");
-		//searchCity.getStyleClass().add("addBobOk");
+		searchCity.getStyleClass().removeAll("addBobOk, focus");
+		searchCity.getStyleClass().add("addBobOk");
 
-		buildData("user");
-		
+		// buildData("city");
+		buildData("place");
+		buildData("route");
+
 		comboBox.getItems().addAll("City", "Place", "Description");
 		searchText.setPromptText("Write here");
 
+		searchTable1.getColumns().clear();
+		searchTable1.setEditable(true);
+
+		PlaceCol1.setStyle("-fx-alignment: CENTER;");
+		PlaceCol1.setMinWidth(100);
+		PlaceCol1.setCellValueFactory(new PropertyValueFactory<Place, String>("PlaceName"));
+
+		CityCol1.setStyle("-fx-alignment: CENTER;");
+		CityCol1.setMinWidth(100);
+		CityCol1.setCellValueFactory(new PropertyValueFactory<Place, String>("CityName"));
+
+		DescriptionCol1.setCellFactory(tc -> {
+			TableCell<Place, String> cell = new TableCell<>();
+			Text text = new Text();
+			cell.setGraphic(text);
+			cell.setPrefHeight(Control.USE_COMPUTED_SIZE);
+			text.wrappingWidthProperty().bind(DescriptionCol.widthProperty());
+			text.textProperty().bind(cell.itemProperty());
+			return cell;
+		});
+
+		DescriptionCol1.setStyle("-fx-alignment: CENTER;");
+		DescriptionCol1.setMinWidth(150);
+		DescriptionCol1.setCellValueFactory(new PropertyValueFactory<Place, String>("Description"));
+
+		routeCol1.setStyle("-fx-alignment: CENTER;");
+		routeCol1.setMinWidth(50);
+		routeCol1.setCellValueFactory(new PropertyValueFactory<Place, String>("numOfmaps"));
+
 		flPlace = new FilteredList<Place>(dataPlace, p -> true);// Pass the dataCity to a filtered list
+		searchTable1.setItems(flPlace);// Set the table's items using the filtered list
+		searchTable1.getColumns().addAll(PlaceCol1, CityCol1, DescriptionCol1, routeCol1);
+
+		searchTable1.setVisible(false);
+		searchTable1.setDisable(true);
 
 		searchTable.getColumns().clear();
 		searchTable.setEditable(true);
 
 		searchTable.setRowFactory(tv -> {
-			TableRow<User> row = new TableRow<>();
+			TableRow<Route> row = new TableRow<>();
 			row.setOnMouseClicked(event -> {
 				if (event.getClickCount() == 1 && (!row.isEmpty())) {
-					User userRow = searchTable.getSelectionModel().getSelectedItem();
-					//Globals.user = (User) userRow;
+					Route RouteRow = searchTable.getSelectionModel().getSelectedItem();
+					Globals.route = (Route) RouteRow;
 
 				}
 			});
 			return row;
 		});
 
-		fnameCol.setStyle("-fx-alignment: CENTER;");
-		fnameCol.setMinWidth(100);
-		fnameCol.setCellValueFactory(new PropertyValueFactory<User, String>("firstName"));
+		CityCol.setStyle("-fx-alignment: CENTER;");
+		CityCol.setMinWidth(100);
+		CityCol.setCellValueFactory(new PropertyValueFactory<Route, String>("city"));
 
-		usernameCol.setCellFactory(tc -> {
-			TableCell<User, String> cell = new TableCell<>();
+		DescriptionCol.setCellFactory(tc -> {
+			TableCell<Route, String> cell = new TableCell<>();
 			Text text = new Text();
 			cell.setGraphic(text);
 			cell.setPrefHeight(Control.USE_COMPUTED_SIZE);
-			text.wrappingWidthProperty().bind(usernameCol.widthProperty());
+			text.wrappingWidthProperty().bind(DescriptionCol.widthProperty());
 			text.textProperty().bind(cell.itemProperty());
 			return cell;
 		});
-		usernameCol.setStyle("-fx-alignment: CENTER;");
-		usernameCol.setMinWidth(150);
-		usernameCol.setCellValueFactory(new PropertyValueFactory<User, String>("userName"));
+		DescriptionCol.setStyle("-fx-alignment: CENTER;");
+		DescriptionCol.setMinWidth(150);
+		DescriptionCol.setCellValueFactory(new PropertyValueFactory<Route, String>("Description"));
 
-		lnameCol.setStyle("-fx-alignment: CENTER;");
-		lnameCol.setMinWidth(50);
-		lnameCol.setCellValueFactory(new PropertyValueFactory<User, String>("lastName"));
-
-		pnumberCol.setStyle("-fx-alignment: CENTER;");
-		pnumberCol.setMinWidth(50);
-		pnumberCol.setCellValueFactory(new PropertyValueFactory<User, String>("phoneNumber"));
-
-		emailCol.setStyle("-fx-alignment: CENTER;");
-		emailCol.setMinWidth(50);
-		emailCol.setCellValueFactory(new PropertyValueFactory<User, String>("email"));
-		
-		passwordCol.setStyle("-fx-alignment: CENTER;");
-		passwordCol.setMinWidth(50);
-		passwordCol.setCellValueFactory(new PropertyValueFactory<User, String>("password"));
-		
-		typeCol.setStyle("-fx-alignment: CENTER;");
-		typeCol.setMinWidth(50);
-		typeCol.setCellValueFactory(new PropertyValueFactory<User, String>("type"));
-		
-		EditCol.setStyle("-fx-alignment: CENTER;");
-		EditCol.setMinWidth(50);
-		EditCol.setCellValueFactory(new PropertyValueFactory<>("type"));
-
-		Callback<TableColumn<User, String>, TableCell<User, String>> cellFactory = new Callback<TableColumn<User, String>, TableCell<User, String>>() {
+		UpdateCol.setStyle("-fx-alignment: CENTER;");
+		UpdateCol.setMinWidth(50);
+		UpdateCol.setCellValueFactory(new PropertyValueFactory<>("numOfPaths"));
+		Globals.ThereIsRouteUpdate = false;
+		Callback<TableColumn<Route, String>, TableCell<Route, String>> cellFactory = new Callback<TableColumn<Route, String>, TableCell<Route, String>>() {
 
 			@Override
-			public TableCell<User, String> call(TableColumn<User, String> param) {
+			public TableCell<Route, String> call(TableColumn<Route, String> param) {
 				// TODO Auto-generated method stub
-				final TableCell<User, String> cell = new TableCell<User, String>() {
+				final TableCell<Route, String> cell = new TableCell<Route, String>() {
 
-					final Button btn = new Button("Edit");
+					final Button btn = new Button("New Update");
 
 					@Override
 					public void updateItem(String item, boolean empty) {
@@ -323,17 +399,18 @@ public class MemberFileController {
 							setGraphic(null);
 							setText(null);
 						} else {
-							User user1 = getTableView().getItems().get(getIndex());
-							//if (!city1.getNewUpdate()) {
-							//	btn.setText("Edit");
-								//Globals.ThereIsCityUpdate = false;
-							//} else
-								//Globals.ThereIsCityUpdate = true;
+							Route route1 = getTableView().getItems().get(getIndex());
+							if (route1.getNewUpdate() == 0) {
+								btn.setText("Edit");
+
+							} else
+								Globals.ThereIsRouteUpdate = true;
 
 							btn.setOnAction(event -> {
-								//Globals.city = city1;
+								Globals.route = route1;
 								Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-								URL url = getClass().getResource("ConfirmMap.fxml");
+								URL url = getClass().getResource("AddRLocations.fxml");
+								Globals.backLink = "ConfirmRoute.fxml";
 								AnchorPane pane;
 								try {
 									pane = FXMLLoader.load(url);
@@ -364,26 +441,26 @@ public class MemberFileController {
 				return cell;
 			}
 		};
-		EditCol.setCellFactory(cellFactory);
+		UpdateCol.setCellFactory(cellFactory);
 
-		flUser = new FilteredList<User>(dataUser, p -> true);// Pass the data to a filtered list
-		searchTable.setItems(flUser);// Set the table's items using the filtered list
-		searchTable.getColumns().addAll(fnameCol, lnameCol, pnumberCol, emailCol, usernameCol, passwordCol,typeCol,EditCol);
+		flRoute = new FilteredList<Route>(dataRoute, p -> true);// Pass the data to a filtered list
+		searchTable.setItems(flRoute);// Set the table's items using the filtered list
+		searchTable.getColumns().addAll(CityCol, DescriptionCol, UpdateCol);
 
 		searchText.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent ke) {
 				switch (comboBox.getValue()) {
 				case "City":
-					flUser.setPredicate(
-							p -> p.getUserName().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
+					flCity.setPredicate(
+							p -> p.getCity().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
 					break;
 				case "Place":
-					flUser.setPredicate(
-							p -> p.getEmail().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
+					flCity.setPredicate(
+							p -> p.getPlaces().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
 					break;
 				case "Description":
-					flUser.setPredicate(
-							p -> p.getPhoneNumber().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
+					flCity.setPredicate(
+							p -> p.getDescription().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
 					break;
 				}
 			}
@@ -396,7 +473,7 @@ public class MemberFileController {
 	public void addDataBasetoMember() throws UnknownHostException, IOException {
 		@SuppressWarnings("resource")
 		Socket socket = new Socket("localhost", 5555);
-		dataUser = FXCollections.observableArrayList();
+		dataCity = FXCollections.observableArrayList();
 
 		String[] set = new String[3];
 		set[0] = "addCityToMember";
@@ -414,12 +491,17 @@ public class MemberFileController {
 		@SuppressWarnings("resource")
 		Socket socket = new Socket("localhost", 5555);
 
-		String[] get = new String[1];
-		get[0] = "getUsers";
+		String[] get = new String[2];
+		get[0] = "getCatalog";
+		get[1] = "-1";
 		if (type.equals("place")) {
 			get[0] = "getPlaceCatalog";
+		} else if (type.equals("route")) {
+			get = new String[3];
+			get[0] = "getRoutes";
+			get[1] = Globals.city.getCity();
+			get[2] = "-1";
 		}
-
 		try {
 			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			objectOutput.writeObject(get);
@@ -427,11 +509,19 @@ public class MemberFileController {
 				ObjectInputStream objectInput = new ObjectInputStream(socket.getInputStream());
 				try {
 					Object[] object = (Object[]) objectInput.readObject();
-					if (type.equals("user")) {
+					if (type.equals("city")) {
 						for (int i = 1; i <= (int) object[0]; i++) {
-							dataUser.add((User) object[i]);
+							dataCity.add((City) object[i]);
 						}
-					} 
+					} else if (type.equals("place")) {
+						for (int i = 1; i <= (int) object[0]; i++) {
+							dataPlace.add((Place) object[i]);
+						}
+					} else if (type.equals("route")) {
+						for (int i = 1; i <= (int) object[0]; i++) {
+							dataRoute.add((Route) object[i]);
+						}
+					}
 
 				} catch (ClassNotFoundException e) {
 					System.out.println("The title list has not come from the server");
@@ -451,29 +541,8 @@ public class MemberFileController {
 	void backFunc(ActionEvent event) throws IOException {
 
 		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-		URL url = getClass().getResource("ManagerPage.fxml");
+		URL url = getClass().getResource("ConfirmRoutes.fxml");
 		AnchorPane pane = FXMLLoader.load(url);
-		Scene scene = new Scene(pane);
-		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-		primaryStage.setScene(scene);
-		primaryStage.setOnCloseRequest(e-> {
-			try {
-				logOut();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		});
-		primaryStage.show();
-	}
-
-	@FXML
-	void addLoc(ActionEvent event) throws IOException {
-
-		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-		URL url = getClass().getResource("AddLocations.fxml");
-		AnchorPane pane = FXMLLoader.load(url);
-		Globals.backLink = "DefaultPage.fxml";
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
@@ -494,7 +563,7 @@ public class MemberFileController {
 		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 		URL url = getClass().getResource("Messages.fxml");
 		AnchorPane pane = FXMLLoader.load(url);
-		Globals.backLink = "ConfirmMaps.fxml";
+		Globals.backLink = "ConfirmRoute.fxml";
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
@@ -509,7 +578,7 @@ public class MemberFileController {
 		primaryStage.show();
 
 	}
-
+	
 	private Object logOut() throws UnknownHostException, IOException {
 		String[] array = new String[3];
 		array[0] = "LogOut";
@@ -527,4 +596,5 @@ public class MemberFileController {
 		
 		return null;
 	}
+
 }

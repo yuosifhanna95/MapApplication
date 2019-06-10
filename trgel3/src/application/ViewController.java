@@ -1,6 +1,5 @@
 package application;
 
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -21,10 +20,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-
-
-
-
 
 public class ViewController {
 
@@ -56,10 +51,17 @@ public class ViewController {
 		URL url = getClass().getResource(Globals.backLink);
 		AnchorPane pane = FXMLLoader.load(url);
 
-
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
+		primaryStage.setOnCloseRequest(e-> {
+			try {
+				logOut();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
 		primaryStage.show();
 	}
 
@@ -118,7 +120,8 @@ public class ViewController {
 				newLoc.setFitWidth(im.getWidth() * aspect);
 				newLoc.setId("imv" + Counter);
 
-				ImagePlaces[counter] = new ImagePlace(counter, newLoc, label, p, list[i].getLocX(), list[i].getLocY());
+				ImagePlaces[counter] = new ImagePlace(counter, newLoc, label, p, list[i].getLocX(), list[i].getLocY(),
+						false);
 				counter++;
 				Counter++;
 			}
@@ -139,6 +142,24 @@ public class ViewController {
 
 		// AddMethodsForIP();
 
+	}
+	
+	private Object logOut() throws UnknownHostException, IOException {
+		String[] array = new String[3];
+		array[0] = "LogOut";
+		array[1] = Globals.user.getUserName();
+		array[2] = Globals.user.getPassword();
+		
+		@SuppressWarnings("resource")
+		Socket socket = new Socket("localhost", 5555);
+		try {
+			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
+			objectOutput.writeObject(array);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 
 }

@@ -7,6 +7,8 @@ import java.net.Socket;
 import java.net.URL;
 import java.net.UnknownHostException;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -27,6 +29,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -110,28 +113,43 @@ public class ConfirmMapController {
 
 	@FXML
 	private Button btn_AddLoc;
+	
+	@FXML
+	private HBox hbox;
+	
+	TextField placeField= new TextField();
 
 	@FXML
 	void searchCityBtn(ActionEvent event) {
 		searchPlace.getStyleClass().remove("addBobOk");
 		searchCity.getStyleClass().removeAll("addBobOk, focus");
 		searchCity.getStyleClass().add("addBobOk");
+		
+	    searchText.setPrefWidth(200);
+  	    hbox.getChildren().remove(placeField);
 
 		searchTable1.setVisible(false);
 		searchTable1.setDisable(true);
 
 		searchTable.setVisible(true);
 		searchTable.setDisable(false);
+		
+	
+		comboBox.getItems().remove("City & place");
 
 		searchText.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent ke) {
 				switch (comboBox.getValue()) {
 				case "City":
-					flMap.setPredicate(
+					flCity.setPredicate(
 							p -> p.getCity().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
 					break;
+				case "Place":
+					flCity.setPredicate(
+							p -> p.getPlaces().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
+					break;
 				case "Description":
-					flMap.setPredicate(
+					flCity.setPredicate(
 							p -> p.getDescription().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
 					break;
 				}
@@ -145,13 +163,58 @@ public class ConfirmMapController {
 		searchCity.getStyleClass().remove("addBobOk");
 		searchPlace.getStyleClass().removeAll("addBobOk, focus");
 		searchPlace.getStyleClass().add("addBobOk");
+		
+		comboBox.getItems().add("City & place");
 
 		searchTable.setVisible(false);
 		searchTable.setDisable(true);
 
 		searchTable1.setVisible(true);
 		searchTable1.setDisable(false);
-
+		
+		comboBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+		      @Override public void changed(ObservableValue<? extends String> selected, String old, String newVal) {
+		          if (newVal != null) {
+		            switch(newVal) {
+		            case "City & place": 
+		            	  hbox.getChildren().remove(placeField);
+		            	  searchText.setPrefWidth(100);
+		            	  placeField.setPrefWidth(100);
+		            	  searchText.setPromptText("City");
+		            	  placeField.setPromptText("Place");
+		            	  hbox.getChildren().addAll(placeField);
+		            	  break;
+		            case "City": 
+		            	  searchText.setPrefWidth(200);
+		            	  searchText.setPromptText("City");
+		            	  hbox.getChildren().remove(placeField);
+		            	  break;
+		            case "Description": 
+		            	  searchText.setPrefWidth(200);
+		            	  searchText.setPromptText("Description");
+		            	  hbox.getChildren().remove(placeField);
+		            	  break;
+		            case "Place": 
+		            	  searchText.setPrefWidth(200);
+		            	  searchText.setPromptText("Place");
+		            	  hbox.getChildren().remove(placeField);
+		            	  break;
+		            }
+		          }
+		        }
+		});
+		
+		placeField.setOnKeyReleased(new EventHandler<KeyEvent>() {
+			public void handle(KeyEvent ke) {
+				switch (comboBox.getValue()) {
+				case "City & place":
+					flPlace.setPredicate(
+							p -> p.getPlaceName().toLowerCase().contains(placeField.getText().toLowerCase().trim()));
+					break;
+				}
+			}
+		});
+	
 		searchText.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent ke) {
 				switch (comboBox.getValue()) {
@@ -166,6 +229,10 @@ public class ConfirmMapController {
 				case "Description":
 					flPlace.setPredicate(
 							p -> p.getDescription().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
+					break;
+				case "City & place":
+					flPlace.setPredicate(
+							p -> p.getCityName().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
 					break;
 				}
 			}
@@ -183,6 +250,14 @@ public class ConfirmMapController {
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
+		primaryStage.setOnCloseRequest(e-> {
+			try {
+				logOut();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
 		primaryStage.show();
 
 	}
@@ -206,6 +281,14 @@ public class ConfirmMapController {
 			Scene scene = new Scene(pane);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
+			primaryStage.setOnCloseRequest(e-> {
+				try {
+					logOut();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			});
 			primaryStage.show();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -299,7 +382,7 @@ public class ConfirmMapController {
 		UpdateCol.setStyle("-fx-alignment: CENTER;");
 		UpdateCol.setMinWidth(50);
 		UpdateCol.setCellValueFactory(new PropertyValueFactory<>("numOfPaths"));
-
+		Globals.ThereIsMapUpdate = false;
 		Callback<TableColumn<Map, String>, TableCell<Map, String>> cellFactory = new Callback<TableColumn<Map, String>, TableCell<Map, String>>() {
 
 			@Override
@@ -317,9 +400,9 @@ public class ConfirmMapController {
 							setText(null);
 						} else {
 							Map map1 = getTableView().getItems().get(getIndex());
-							if (!map1.getNewUpdate()) {
+							if (map1.getNewUpdate() == 0) {
 								btn.setText("Edit");
-								Globals.ThereIsMapUpdate = false;
+
 							} else
 								Globals.ThereIsMapUpdate = true;
 
@@ -335,6 +418,14 @@ public class ConfirmMapController {
 									scene.getStylesheets()
 											.add(getClass().getResource("application.css").toExternalForm());
 									primaryStage.setScene(scene);
+									primaryStage.setOnCloseRequest(e-> {
+										try {
+											logOut();
+										} catch (IOException e1) {
+											// TODO Auto-generated catch block
+											e1.printStackTrace();
+										}
+									});
 									primaryStage.show();
 								} catch (IOException e) {
 									// TODO Auto-generated catch block
@@ -400,14 +491,16 @@ public class ConfirmMapController {
 		@SuppressWarnings("resource")
 		Socket socket = new Socket("localhost", 5555);
 
-		String[] get = new String[1];
+		String[] get = new String[2];
 		get[0] = "getCatalog";
+		get[1] = "-1";
 		if (type.equals("place")) {
 			get[0] = "getPlaceCatalog";
 		} else if (type.equals("map")) {
-			get = new String[2];
+			get = new String[3];
 			get[0] = "getMaps";
 			get[1] = Globals.city.getCity();
+			get[2] = "-1";
 		}
 		try {
 			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
@@ -453,6 +546,14 @@ public class ConfirmMapController {
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
+		primaryStage.setOnCloseRequest(e-> {
+			try {
+				logOut();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
 		primaryStage.show();
 	}
 
@@ -466,6 +567,14 @@ public class ConfirmMapController {
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
+		primaryStage.setOnCloseRequest(e-> {
+			try {
+				logOut();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
 		primaryStage.show();
 	}
 
@@ -479,8 +588,34 @@ public class ConfirmMapController {
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
+		primaryStage.setOnCloseRequest(e-> {
+			try {
+				logOut();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
 		primaryStage.show();
 
+	}
+	
+	private Object logOut() throws UnknownHostException, IOException {
+		String[] array = new String[3];
+		array[0] = "LogOut";
+		array[1] = Globals.user.getUserName();
+		array[2] = Globals.user.getPassword();
+		
+		@SuppressWarnings("resource")
+		Socket socket = new Socket("localhost", 5555);
+		try {
+			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
+			objectOutput.writeObject(array);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 
 }

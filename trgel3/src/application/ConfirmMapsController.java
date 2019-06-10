@@ -7,6 +7,8 @@ import java.net.Socket;
 import java.net.URL;
 import java.net.UnknownHostException;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -27,6 +29,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -109,16 +112,26 @@ public class ConfirmMapsController {
 	private Button btn_AddLoc;
 
 	@FXML
+	private HBox hbox;
+
+	TextField placeField = new TextField();
+
+	@FXML
 	void searchCityBtn(ActionEvent event) {
 		searchPlace.getStyleClass().remove("addBobOk");
 		searchCity.getStyleClass().removeAll("addBobOk, focus");
 		searchCity.getStyleClass().add("addBobOk");
+
+		searchText.setPrefWidth(200);
+		hbox.getChildren().remove(placeField);
 
 		searchTable1.setVisible(false);
 		searchTable1.setDisable(true);
 
 		searchTable.setVisible(true);
 		searchTable.setDisable(false);
+
+		comboBox.getItems().remove("City & place");
 
 		searchText.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent ke) {
@@ -147,11 +160,57 @@ public class ConfirmMapsController {
 		searchPlace.getStyleClass().removeAll("addBobOk, focus");
 		searchPlace.getStyleClass().add("addBobOk");
 
+		comboBox.getItems().add("City & place");
+
 		searchTable.setVisible(false);
 		searchTable.setDisable(true);
 
 		searchTable1.setVisible(true);
 		searchTable1.setDisable(false);
+
+		comboBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> selected, String old, String newVal) {
+				if (newVal != null) {
+					switch (newVal) {
+					case "City & place":
+						hbox.getChildren().remove(placeField);
+						searchText.setPrefWidth(100);
+						placeField.setPrefWidth(100);
+						searchText.setPromptText("City");
+						placeField.setPromptText("Place");
+						hbox.getChildren().addAll(placeField);
+						break;
+					case "City":
+						searchText.setPrefWidth(200);
+						searchText.setPromptText("City");
+						hbox.getChildren().remove(placeField);
+						break;
+					case "Description":
+						searchText.setPrefWidth(200);
+						searchText.setPromptText("Description");
+						hbox.getChildren().remove(placeField);
+						break;
+					case "Place":
+						searchText.setPrefWidth(200);
+						searchText.setPromptText("Place");
+						hbox.getChildren().remove(placeField);
+						break;
+					}
+				}
+			}
+		});
+
+		placeField.setOnKeyReleased(new EventHandler<KeyEvent>() {
+			public void handle(KeyEvent ke) {
+				switch (comboBox.getValue()) {
+				case "City & place":
+					flPlace.setPredicate(
+							p -> p.getPlaceName().toLowerCase().contains(placeField.getText().toLowerCase().trim()));
+					break;
+				}
+			}
+		});
 
 		searchText.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent ke) {
@@ -167,6 +226,10 @@ public class ConfirmMapsController {
 				case "Description":
 					flPlace.setPredicate(
 							p -> p.getDescription().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
+					break;
+				case "City & place":
+					flPlace.setPredicate(
+							p -> p.getCityName().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
 					break;
 				}
 			}
@@ -184,6 +247,14 @@ public class ConfirmMapsController {
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
+		primaryStage.setOnCloseRequest(e-> {
+			try {
+				logOut();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
 		primaryStage.show();
 
 	}
@@ -207,6 +278,14 @@ public class ConfirmMapsController {
 			Scene scene = new Scene(pane);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
+			primaryStage.setOnCloseRequest(e-> {
+				try {
+					logOut();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			});
 			primaryStage.show();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -311,7 +390,7 @@ public class ConfirmMapsController {
 		UpdateCol.setStyle("-fx-alignment: CENTER;");
 		UpdateCol.setMinWidth(50);
 		UpdateCol.setCellValueFactory(new PropertyValueFactory<>("numOfPaths"));
-
+		Globals.ThereIsCityUpdate = false;
 		Callback<TableColumn<City, String>, TableCell<City, String>> cellFactory = new Callback<TableColumn<City, String>, TableCell<City, String>>() {
 
 			@Override
@@ -320,6 +399,8 @@ public class ConfirmMapsController {
 				final TableCell<City, String> cell = new TableCell<City, String>() {
 
 					final Button btn = new Button("New Update");
+					final Button btn2 = new Button("Click to update Ver!");
+					final Button btn3 = new Button("Cancel update Ver");
 
 					@Override
 					public void updateItem(String item, boolean empty) {
@@ -329,12 +410,57 @@ public class ConfirmMapsController {
 							setText(null);
 						} else {
 							City city1 = getTableView().getItems().get(getIndex());
-							if (!city1.getNewUpdate()) {
+							final AnchorPane Pane = new AnchorPane();
+							Pane.setId("An" + city1.getCity());
+							if (city1.getNewUpdate() == 0) {
 								btn.setText("Edit");
-								Globals.ThereIsCityUpdate = false;
-							} else
+								// Globals.ThereIsCityUpdate = false;
+							} else {
 								Globals.ThereIsCityUpdate = true;
+								btn.setText("New Update");
+							}
+							if (city1.getVersionUpdate()) {
+								btn2.setVisible(true);
+								btn3.setVisible(true);
+							} else {
+								btn2.setVisible(false);
+								btn3.setVisible(false);
+							}
 
+							btn2.setOnAction(event -> {
+								try {
+									@SuppressWarnings("resource")
+									Socket socket = new Socket("localhost", 5555);
+									String[] array = new String[2];
+									ObjectOutputStream objectOutput;
+									array[0] = "AgreeVUpdate";
+									array[1] = "" + city1.getCity();
+									objectOutput = new ObjectOutputStream(socket.getOutputStream());
+									objectOutput.writeObject(array);
+									btn2.setVisible(false);
+									btn3.setVisible(false);
+								} catch (Exception e) {
+									// TODO: handle exception
+								}
+
+							});
+							btn3.setOnAction(event -> {
+								try {
+									@SuppressWarnings("resource")
+									Socket socket = new Socket("localhost", 5555);
+									String[] array = new String[2];
+									ObjectOutputStream objectOutput;
+									array[0] = "DisagreeVUpdate";
+									array[1] = "" + city1.getCity();
+									objectOutput = new ObjectOutputStream(socket.getOutputStream());
+									objectOutput.writeObject(array);
+									btn2.setVisible(false);
+									btn3.setVisible(false);
+								} catch (Exception e) {
+									// TODO: handle exception
+								}
+
+							});
 							btn.setOnAction(event -> {
 								Globals.city = city1;
 								Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -346,6 +472,14 @@ public class ConfirmMapsController {
 									scene.getStylesheets()
 											.add(getClass().getResource("application.css").toExternalForm());
 									primaryStage.setScene(scene);
+									primaryStage.setOnCloseRequest(e-> {
+										try {
+											logOut();
+										} catch (IOException e1) {
+											// TODO Auto-generated catch block
+											e1.printStackTrace();
+										}
+									});
 									primaryStage.show();
 								} catch (IOException e) {
 									// TODO Auto-generated catch block
@@ -353,7 +487,11 @@ public class ConfirmMapsController {
 								}
 
 							});
-							setGraphic(btn);
+							btn2.relocate(btn.getLayoutX() + 100, btn.getLayoutY());
+							btn3.relocate(btn2.getLayoutX() + 130, btn2.getLayoutY());
+							Pane.getChildren().addAll(btn, btn2, btn3);
+							setGraphic(Pane);
+							// setGraphic(btn);
 							setText(null);
 						}
 					}
@@ -411,10 +549,12 @@ public class ConfirmMapsController {
 		@SuppressWarnings("resource")
 		Socket socket = new Socket("localhost", 5555);
 
-		String[] get = new String[1];
+		String[] get = new String[2];
 		get[0] = "getCatalog";
+		get[1] = "-1";
 		if (type.equals("place")) {
 			get[0] = "getPlaceCatalog";
+
 		}
 
 		try {
@@ -457,6 +597,14 @@ public class ConfirmMapsController {
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
+		primaryStage.setOnCloseRequest(e-> {
+			try {
+				logOut();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
 		primaryStage.show();
 	}
 
@@ -470,6 +618,14 @@ public class ConfirmMapsController {
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
+		primaryStage.setOnCloseRequest(e-> {
+			try {
+				logOut();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
 		primaryStage.show();
 	}
 
@@ -483,8 +639,34 @@ public class ConfirmMapsController {
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
+		primaryStage.setOnCloseRequest(e-> {
+			try {
+				logOut();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
 		primaryStage.show();
 
+	}
+	
+	private Object logOut() throws UnknownHostException, IOException {
+		String[] array = new String[3];
+		array[0] = "LogOut";
+		array[1] = Globals.user.getUserName();
+		array[2] = Globals.user.getPassword();
+		
+		@SuppressWarnings("resource")
+		Socket socket = new Socket("localhost", 5555);
+		try {
+			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
+			objectOutput.writeObject(array);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 
 }

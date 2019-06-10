@@ -8,6 +8,7 @@
       <Button fx:id="btn_message" layoutX="606.0" layoutY="208.0" mnemonicParsing="false" onAction="#messageFunc" text="Messeges" />
       <Button fx:id="Back" layoutX="614.0" layoutY="174.0" mnemonicParsing="false" onAction="#backFunc" text="Back" />
       <Button fx:id="btn_editMaps" layoutX="684.0" layoutY="208.0" mnemonicParsing="false" onAction="#editmaps" text="Edit Maps" />
+       <Button fx:id="btn_editRoutes" layoutX="767.0" layoutY="208.0" mnemonicParsing="false" onAction="#editRoutes" text="Edit Routes" />
       
    </children>
 </AnchorPane>

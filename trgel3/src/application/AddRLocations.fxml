@@ -9,27 +9,27 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="mainPane" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.AddLocController">
+<AnchorPane fx:id="mainPane" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.AddRLocController">
    <children>
-      <TextField fx:id="NewLocation" layoutX="505.0" layoutY="14.0" prefHeight="25.0" prefWidth="135.0" />
+      <TextField fx:id="NewLocation" layoutX="1131.0" layoutY="14.0" prefHeight="25.0" prefWidth="135.0" />
       <Label fx:id="label_message" centerShape="true" layoutX="614.0" layoutY="343.0" textAlignment="CENTER">
          <font>
             <Font name="Andalus" size="64.0" />
          </font></Label>
       <Button fx:id="back" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#backFunc" prefHeight="25.0" prefWidth="97.0" text="Back" />
-      <ImageView fx:id="MapImage" fitHeight="621.0" fitWidth="956.0" layoutX="291.0" layoutY="50.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="RouteImage" fitHeight="621.0" fitWidth="956.0" layoutX="291.0" layoutY="50.0" pickOnBounds="true" preserveRatio="true">
       </ImageView>
-      <Button fx:id="btn_save" layoutX="651.0" layoutY="14.0" mnemonicParsing="false" onAction="#saveImage" text="Save Map" />
+      <Button fx:id="btn_save" layoutX="651.0" layoutY="14.0" mnemonicParsing="false" onAction="#saveImage" text="Save Route" />
       <Button fx:id="btn_EditMode" layoutX="162.0" layoutY="14.0" mnemonicParsing="false" onAction="#changeMode" text="Edit Mode" />
       <Button fx:id="btn_ViewMode" layoutX="244.0" layoutY="14.0" mnemonicParsing="false" onAction="#changeMode" text="View Mode" />
-      <Button fx:id="btn_AddLoc" layoutX="387.0" layoutY="14.0" mnemonicParsing="false" onAction="#AddLocation" text="Set new location" />
-      <Button fx:id="btn_UpdateMap" layoutX="728.0" layoutY="14.0" mnemonicParsing="false" onAction="#UpdateMap" text="Update map" />
+      <Button fx:id="btn_AddLoc" layoutX="377.0" layoutY="14.0" mnemonicParsing="false" onAction="#AddLocation" text="Set new location" />
+      <Button fx:id="btn_UpdateRoute" layoutX="728.0" layoutY="14.0" mnemonicParsing="false" onAction="#UpdateRoute" text="Update Route" />
       <Button fx:id="ConfirmUpdate" layoutX="823.0" layoutY="14.0" mnemonicParsing="false" onAction="#ConfirmUpdate" text="Confirm Update" />
       <TextArea fx:id="TF_Description" layoutX="14.0" layoutY="65.0" prefHeight="160.0" prefWidth="260.0" promptText="Place description" />
       <TextField fx:id="TF_Classification" layoutX="14.0" layoutY="250.0" prefHeight="25.0" prefWidth="260.0" promptText="Classification" />
       <TextField fx:id="TF_Accessibility" layoutX="14.0" layoutY="297.0" prefHeight="25.0" prefWidth="260.0" promptText="Accessibility" />
       <Button fx:id="btn_SaveDet" layoutX="14.0" layoutY="343.0" mnemonicParsing="false" onAction="#SaveDetailsFunc" text="Save Details" />
       <ComboBox fx:id="comboBox" layoutX="937.0" layoutY="14.0" prefHeight="25.0" prefWidth="122.0" promptText="Status" />
-      <Button fx:id="btn_UpdateVer" layoutX="1079.0" layoutY="14.0" mnemonicParsing="false" onAction="#UpdateVersion" text="Update Version" />
+      <ComboBox fx:id="comboboxLoc" layoutX="490.0" layoutY="14.0" prefWidth="150.0" promptText="Choose Location" />
    </children>
 </AnchorPane>

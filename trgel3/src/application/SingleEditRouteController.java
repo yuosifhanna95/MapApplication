@@ -27,30 +27,30 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-public class SingleEditMapController {
+public class SingleEditRouteController {
 
 	@FXML
-	private ImageView map;
+	private ImageView route;
 
 	@FXML
-	private TableView<Map> mapTable;
+	private TableView<Route> routeTable;
 
 	@FXML
-	private TableColumn<Map, String> idCol;
+	private TableColumn<Route, String> idCol;
 
 	@FXML
-	private TableColumn<Map, String> DescriptionCol;
+	private TableColumn<Route, String> DescriptionCol;
 
 	@FXML
 	private Button Back;
 
-	private ObservableList<Map> data = null;
+	private ObservableList<Route> data = null;
 
 	@FXML
 	void backFunc(ActionEvent event) throws IOException {
 
 		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-		URL url = getClass().getResource("EditMaps.fxml");
+		URL url = getClass().getResource("EditRoutes.fxml");
 		AnchorPane pane = FXMLLoader.load(url);
 
 		Scene scene = new Scene(pane);
@@ -73,24 +73,24 @@ public class SingleEditMapController {
 
 		buildData();
 
-		mapTable.getColumns().clear();
-		mapTable.setEditable(true);
+		routeTable.getColumns().clear();
+		routeTable.setEditable(true);
 
-		mapTable.setRowFactory(tv -> {
-			TableRow<Map> row = new TableRow<>();
+		routeTable.setRowFactory(tv -> {
+			TableRow<Route> row = new TableRow<>();
 			row.setOnMouseClicked(event -> {
 				if (event.getClickCount() == 2 && (!row.isEmpty())) {
-					Map mapRow = mapTable.getSelectionModel().getSelectedItem();
+					Route routeRow = routeTable.getSelectionModel().getSelectedItem();
 
-					String urll = mapRow.getLinkCustomer();
+					String urll = routeRow.getLink();
 					System.out.println(urll);
 					// Globals.backLink = urll;
-					Globals.map = mapRow;
+					Globals.route = routeRow;
 
 					try {
 						Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-						URL url = getClass().getResource("AddLocations.fxml");
-						Globals.backLink = "SingleEditMap.fxml";
+						URL url = getClass().getResource("AddRLocations.fxml");
+						Globals.backLink = "SingleEditRoute.fxml";
 						AnchorPane pane;
 						pane = FXMLLoader.load(url);
 						Scene scene = new Scene(pane);
@@ -123,10 +123,10 @@ public class SingleEditMapController {
 
 		idCol.setStyle("-fx-alignment: CENTER;");
 		idCol.setMinWidth(100);
-		idCol.setCellValueFactory(new PropertyValueFactory<Map, String>("id"));
+		idCol.setCellValueFactory(new PropertyValueFactory<Route, String>("id"));
 
 		DescriptionCol.setCellFactory(tc -> {
-			TableCell<Map, String> cell = new TableCell<>();
+			TableCell<Route, String> cell = new TableCell<>();
 			Text text = new Text();
 			cell.setGraphic(text);
 			cell.setPrefHeight(Control.USE_COMPUTED_SIZE);
@@ -136,11 +136,11 @@ public class SingleEditMapController {
 		});
 		DescriptionCol.setStyle("-fx-alignment: CENTER;");
 		DescriptionCol.setMinWidth(150);
-		DescriptionCol.setCellValueFactory(new PropertyValueFactory<Map, String>("Description"));
+		DescriptionCol.setCellValueFactory(new PropertyValueFactory<Route, String>("Description"));
 
-		FilteredList<Map> flCity = new FilteredList<Map>(data, p -> true);// Pass the data to a filtered list
-		mapTable.setItems(flCity);// Set the table's items using the filtered list
-		mapTable.getColumns().addAll(idCol, DescriptionCol);
+		FilteredList<Route> flCity = new FilteredList<Route>(data, p -> true);// Pass the data to a filtered list
+		routeTable.setItems(flCity);// Set the table's items using the filtered list
+		routeTable.getColumns().addAll(idCol, DescriptionCol);
 
 	}
 
@@ -150,7 +150,7 @@ public class SingleEditMapController {
 		data = FXCollections.observableArrayList();
 
 		String[] get = new String[3];
-		get[0] = "getMaps";
+		get[0] = "getRoutesCity";
 		get[1] = Globals.city.getCity();
 		get[2] = "-1";
 		try {
@@ -161,7 +161,7 @@ public class SingleEditMapController {
 				try {
 					Object[] object = (Object[]) objectInput.readObject();
 					for (int i = 1; i <= (int) object[0]; i++) {
-						data.add((Map) object[i]);
+						data.add((Route) object[i]);
 					}
 
 				} catch (ClassNotFoundException e) {

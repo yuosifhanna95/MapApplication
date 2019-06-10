@@ -10,12 +10,16 @@ public class FixedPurchase implements Serializable{
 	private String city;
 	private Date startDate;
 	private Date endDate;
+	private double price;
+	private int period;
 	
-	FixedPurchase(String user, String city, Date startDate, Date endDate) {
+	FixedPurchase(String user, int period, String city, Date startDate, Date endDate, double price) {
 		this.user = user;
 		this.city = city;
 		this.startDate = startDate;
 		this.endDate = endDate;
+		this.price = price;
+		this.period = period;
 	}
 
 	public String getUser() {
@@ -48,5 +52,21 @@ public class FixedPurchase implements Serializable{
 
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
+	}
+
+	public double getPrice() {
+		return price;
+	}
+
+	public void setPrice(double price) {
+		this.price = price;
+	}
+
+	public int getPeriod() {
+		return period;
+	}
+
+	public void setPeriod(int period) {
+		this.period = period;
 	}
 }

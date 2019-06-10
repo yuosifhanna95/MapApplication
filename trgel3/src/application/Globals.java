@@ -10,4 +10,5 @@ public class Globals {
 	static String backLink;
 	static Boolean ThereIsCityUpdate = false;
 	static Boolean ThereIsMapUpdate = false;
+	static Boolean ThereIsRouteUpdate = false;
 }

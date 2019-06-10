@@ -6,28 +6,40 @@ public class City implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-    private String city;
-    private String Description;
-    private String  numOfMaps;
-    private String  numOfPlaces;
-    private String  Places;
-    private final String  numOfPaths;
-    private int oneTimeCost;
-    private int fixedCost;
-	private Boolean NewUpdate;
+	private String city;
+	private String Description;
+	private String numOfMaps;
+	private String numOfPlaces;
+	private String Places;
+	private final String numOfPaths;
+	private int oneTimeCost;
+	private int fixedCost;
+	private int Version;
+	private int NewUpdate;
+	private Boolean VersionUpdate;
 
-    City(String city, String Description, String numOfMaps, String numOfPlaces, String numOfPaths, String Places, int oneTimeCost, int fixedCost, Boolean NewUpdate) {
-        this.city = city;
-        this.Description = Description;
-        this.numOfMaps = numOfMaps;
-        this.numOfPlaces =numOfPlaces;
-        this.numOfPaths = numOfPaths;
-        this.Places = Places;
-        this.oneTimeCost = oneTimeCost;
-        this.fixedCost = fixedCost;
-        this.NewUpdate = NewUpdate;
-    }
+	City(String city, String Description, String numOfMaps, String numOfPlaces, String numOfPaths, String Places,
+			int oneTimeCost, int fixedCost, int Version, int NewUpdate, Boolean VersionUpdate) {
+		this.city = city;
+		this.Description = Description;
+		this.numOfMaps = numOfMaps;
+		this.numOfPlaces = numOfPlaces;
+		this.numOfPaths = numOfPaths;
+		this.Places = Places;
+		this.oneTimeCost = oneTimeCost;
+		this.fixedCost = fixedCost;
+		this.NewUpdate = NewUpdate;
+		this.Version = Version;
+		this.VersionUpdate = VersionUpdate;
+	}
 
+	public int getVersion() {
+		return Version;
+	}
+
+	public void setVersion(int version) {
+		Version = version;
+	}
 
 	public String getCity() {
 		return city;
@@ -77,7 +89,6 @@ public class City implements Serializable {
 		Places = places;
 	}
 
-
 	public int getOneTimeCost() {
 		return oneTimeCost;
 	}
@@ -93,14 +104,20 @@ public class City implements Serializable {
 	public void setFixedCost(int fixedCost) {
 		this.fixedCost = fixedCost;
 	}
-    
 
-
-	public Boolean getNewUpdate() {
+	public int getNewUpdate() {
 		return NewUpdate;
 	}
 
-	public void setNewUpdate(Boolean newUpdate) {
+	public void setNewUpdate(int newUpdate) {
 		NewUpdate = newUpdate;
+	}
+
+	public Boolean getVersionUpdate() {
+		return VersionUpdate;
+	}
+
+	public void setVersionUpdate(Boolean versionUpdate) {
+		VersionUpdate = versionUpdate;
 	}
 }

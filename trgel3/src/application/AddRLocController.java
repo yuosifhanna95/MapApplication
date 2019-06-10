@@ -38,11 +38,12 @@ import javafx.scene.transform.Transform;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-public class AddLocController {
+public class AddRLocController {
 	private int Mode;
 	private Label[] labels = new Label[10];
 	private ImageView[] locations = new ImageView[10];
 	private Place[] Places = new Place[10];
+	private RoutePlace[] RPlaces = new RoutePlace[10];
 	private ImagePlace[] ImagePlaces = new ImagePlace[10];
 	private ImagePlace[] ImagePlacesOld = new ImagePlace[10];
 	private ImagePlace CurImagePlace;
@@ -51,15 +52,20 @@ public class AddLocController {
 	private double aspect = 0.75f;
 	private Place[] OPlacelist;
 	private UPlace[] UPlacelist;
+	private RoutePlace[] ORoutePlaceList;
+	private URoutePlace[] URoutePlaceList;
 
 	@FXML
-	private Button btn_UpdateMap;
+	private Button btn_UpdateVer;
+
+	@FXML
+	private Button btn_UpdateRoute;
 
 	@FXML
 	private AnchorPane mainPane;
 
 	@FXML
-	private ImageView MapImage;
+	private ImageView RouteImage;
 
 	@FXML
 	private Label label_message;
@@ -107,19 +113,10 @@ public class AddLocController {
 	private ComboBox<String> comboBox;
 
 	@FXML
-	private Button btn_UpdateVer;
+	private ComboBox<String> comboboxLoc;
 
 	@FXML
-	void UpdateVersion(ActionEvent event) throws Exception, IOException {
-
-		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
-		String[] array = new String[2];
-		ObjectOutputStream objectOutput;
-		array[0] = "VersionUpdate";
-		array[1] = "" + Globals.map.getCity();
-		objectOutput = new ObjectOutputStream(socket.getOutputStream());
-		objectOutput.writeObject(array);
+	void UpdateVersion(ActionEvent event) {
 
 	}
 
@@ -146,15 +143,15 @@ public class AddLocController {
 	}
 
 	@FXML
-	void UpdateMap(ActionEvent event) throws Exception {
+	void UpdateRoute(ActionEvent event) throws Exception {
 
 		@SuppressWarnings("resource")
 		Socket socket = new Socket("localhost", 5555);
 		String[] array = new String[2];
 		Object[] array2 = new Object[3];
-		array[0] = "getUPlaces";
+		array[0] = "getURoutePlaces";
 		// get[1] = "" + ImagePlaces[i].getPlace().getCityName();
-		array[1] = "" + Globals.map.getId();
+		array[1] = "" + Globals.route.getId();
 
 		ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 		objectOutput.writeObject(array);
@@ -162,111 +159,103 @@ public class AddLocController {
 		Object data;
 		ObjectInputStream objectInput = new ObjectInputStream(socket.getInputStream());
 		data = objectInput.readObject();
-		Boolean TherewasUpdate = false;
 		// System.out.println(((Object[]) data)[0]);
-		UPlace[] list = (UPlace[]) ((Object[]) data)[1];
+		URoutePlaceList = (URoutePlace[]) ((Object[]) data)[1];
+		// UPlacelist = GetUPListFromURoutePlace(URoutePlaceList);
+		UPlace[] list = GetUPListFromURoutePlace(URoutePlaceList);
 		for (int i = 0; i < ImagePlaces.length; i++) {
 			if (ImagePlaces[i] != null)
 				if (ImagePlaces[i].getChanged()) {
 					int flagnew = 1;
-					if (ImagePlaces[i].getPlace() instanceof UPlace) {
-						long serialid = ImagePlaces[i].getPlace().getSerialID();
-						String MapId = ImagePlaces[i].getPlace().getMapId();
-						int PlaceId = ((UPlace) (ImagePlaces[i].getPlace())).getPlaceId();
-						String CityName = ImagePlaces[i].getPlace().getCityName();
-						String PlaceName = ImagePlaces[i].getPlace().getPlaceName();
-						String description = ImagePlaces[i].getPlace().getDescription();
-						String classification = ImagePlaces[i].getPlace().getClassification();
-						int accessibility = ImagePlaces[i].getPlace().getAccessibility();
+					if (ImagePlaces[i].getRplace() instanceof URoutePlace) {
+						long serialid = ImagePlaces[i].getRplace().getSerialID();
+						int RouteId = ImagePlaces[i].getRplace().getRouteId();
+						int RPlaceId = ((URoutePlace) (ImagePlaces[i].getRplace())).getRPlaceId();
+						String CityName = Globals.route.getCity();// ImagePlaces[i].getRplace().getCity();
+						String PlaceName = ImagePlaces[i].getRplace().getPlace();
+						// String description = ImagePlaces[i].getRplace().getDescription();
+						// String classification = ImagePlaces[i].getRplace().getClassification();
+						// int accessibility = ImagePlaces[i].getRplace().getAccessibility();
 						int LocX = ImagePlaces[i].getX();
 						int LocY = ImagePlaces[i].getY();
-						int mapsNum = ImagePlaces[i].getPlace().getNumOfmaps();
-						String type = ImagePlaces[i].getPlace().getType();
-						array2[0] = "UpdatePlace";
-						array2[1] = new UPlace(MapId, CityName, PlaceName, description, classification, accessibility,
-								serialid, LocX, LocY, type, mapsNum, PlaceId);
+						int time = ImagePlaces[i].getRplace().getTime();
+						// int mapsNum = ImagePlaces[i].getRplace().getNumOfmaps();
+						String Type = ((URoutePlace) ImagePlaces[i].getRplace()).getType();
+						array2[0] = "UpdateRPlace";
+						array2[1] = new URoutePlace(RouteId, RPlaceId, PlaceName, time, LocX, LocY, serialid, Type);
 						// objectOutput = new ObjectOutputStream(socket.getOutputStream());
-						array2[2] = "" + serialid;
+						array2[2] = "" + Globals.route.getCity();
 						@SuppressWarnings("resource")
 						Socket socket2 = new Socket("localhost", 5555);
 						objectOutput = new ObjectOutputStream(socket2.getOutputStream());
 						objectOutput.writeObject(array2);
 						flagnew = 0;
-						TherewasUpdate = true;
 
 					} else {
 
-						for (Place pl : list) {
+						for (RoutePlace pl : URoutePlaceList) {
 
-							if (ImagePlaces[i].getPlace().getSerialID() == pl.getSerialID()) {
-								long serialid = ImagePlaces[i].getPlace().getSerialID();
-								String MapId = ImagePlaces[i].getPlace().getMapId();
-								String CityName = ImagePlaces[i].getPlace().getCityName();
-								String PlaceName = ImagePlaces[i].getPlace().getPlaceName();
-								String description = ImagePlaces[i].getPlace().getDescription();
-								String classification = ImagePlaces[i].getPlace().getClassification();
-								int accessibility = ImagePlaces[i].getPlace().getAccessibility();
+							if (ImagePlaces[i].getRplace().getSerialID() == pl.getSerialID()) {
+								long serialid = ImagePlaces[i].getRplace().getSerialID();
+								int RouteId = ImagePlaces[i].getRplace().getRouteId();
+								String CityName = Globals.route.getCity();// ImagePlaces[i].getRplace().getCity();
+								String PlaceName = ImagePlaces[i].getRplace().getPlace();
+								// String description = ImagePlaces[i].getRplace().getDescription();
+								// String classification = ImagePlaces[i].getRplace().getClassification();
+								// int accessibility = ImagePlaces[i].getRplace().getAccessibility();
 								int LocX = ImagePlaces[i].getX();
 								int LocY = ImagePlaces[i].getY();
-								int mapsNum = ImagePlaces[i].getPlace().getNumOfmaps();
+								int time = ImagePlaces[i].getRplace().getTime();
 								String type = "UPDATE";
-								array2[0] = "UpdatePlace";
-								array2[1] = new Place(MapId, CityName, PlaceName, description, classification,
-										accessibility, serialid, LocX, LocY, type, mapsNum);
+								array2[0] = "UpdateRPlace";
+								array2[1] = new RoutePlace(RouteId, PlaceName, time, LocX, LocY, serialid);
 								// objectOutput = new ObjectOutputStream(socket.getOutputStream());
-								array2[2] = "" + serialid;
+								array2[2] = "" + Globals.route.getCity();
 								@SuppressWarnings("resource")
 								Socket socket2 = new Socket("localhost", 5555);
 								objectOutput = new ObjectOutputStream(socket2.getOutputStream());
 								objectOutput.writeObject(array2);
 								flagnew = 0;
-								TherewasUpdate = true;
 								break;
 
 							}
 
 						}
 						if (flagnew == 1) {
-							long serialid = ImagePlaces[i].getPlace().getSerialID();
-							String MapId = ImagePlaces[i].getPlace().getMapId();
-							String CityName = ImagePlaces[i].getPlace().getCityName();
-							String PlaceName = ImagePlaces[i].getPlace().getPlaceName();
-							String description = ImagePlaces[i].getPlace().getDescription();
-							String classification = ImagePlaces[i].getPlace().getClassification();
-							int accessibility = ImagePlaces[i].getPlace().getAccessibility();
+							long serialid = ImagePlaces[i].getRplace().getSerialID();
+							int RouteId = ImagePlaces[i].getRplace().getRouteId();
+							String CityName = Globals.route.getCity();// ImagePlaces[i].getRplace().getCity();
+							String PlaceName = ImagePlaces[i].getRplace().getPlace();
+							// String description = ImagePlaces[i].getRplace().getDescription();
+							// String classification = ImagePlaces[i].getRplace().getClassification();
+							// int accessibility = ImagePlaces[i].getRplace().getAccessibility();
 							int LocX = ImagePlaces[i].getX();
 							int LocY = ImagePlaces[i].getY();
+							int time = ImagePlaces[i].getRplace().getTime();
 							String type;
-							if (ImagePlaces[i].getPlace() instanceof UPlace)
-								if (((UPlace) ImagePlaces[i].getPlace()).getPlaceId() == -1)
+							if (ImagePlaces[i].getRplace() instanceof URoutePlace)
+								if (((URoutePlace) ImagePlaces[i].getRplace()).getRPlaceId() == -1)
 									type = "NEW";
 								else
 									type = "UPDATE";
 							else
 								type = "UPDATE";
-							array2[0] = "UpdatePlace";
-							Place pp = new Place(MapId, CityName, PlaceName, description, classification, accessibility,
-									LocX, LocY, type);
+							array2[0] = "UpdateRPlace";
+							RoutePlace pp = new RoutePlace(RouteId, PlaceName, time, LocX, LocY, serialid, type);
 							array2[1] = pp;
-							array2[2] = "" + serialid;
+							array2[2] = "" + Globals.route.getCity();
 							@SuppressWarnings("resource")
 							Socket socket2 = new Socket("localhost", 5555);
 							objectOutput = new ObjectOutputStream(socket2.getOutputStream());
 							objectOutput.writeObject(array2);
-							TherewasUpdate = true;
 						}
 					}
 				}
 		}
-		if (TherewasUpdate)
-			Globals.ThereIsMapUpdate = true;
-		if (Globals.MODE >= 4 && Globals.ThereIsMapUpdate)
-			ConfirmUpdate.setVisible(true);
-		if (TherewasUpdate) {
-			BuildAllPlaces();
-			BuildOldMap();
+		ConfirmUpdate.setVisible(true);
+		BuildAllPlaces();
+		BuildOldMap();
 
-		}
 	}
 
 	@SuppressWarnings("deprecation")
@@ -301,9 +290,9 @@ public class AddLocController {
 		Socket socket = new Socket("localhost", 5555);
 		String[] array = new String[2];
 		String[] array2 = new String[2];
-		array[0] = "getPlaces";
+		array[0] = "getRoutePlaces";
 		// get[1] = "" + ImagePlaces[i].getPlace().getCityName();
-		array[1] = "" + Globals.map.getId();
+		array[1] = "" + Globals.route.getId();
 
 		ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 		objectOutput.writeObject(array);
@@ -312,11 +301,12 @@ public class AddLocController {
 		ObjectInputStream objectInput = new ObjectInputStream(socket.getInputStream());
 		data = objectInput.readObject();
 		// System.out.println(((Object[]) data)[0]);
-		OPlacelist = (Place[]) ((Object[]) data)[1];
+		ORoutePlaceList = (RoutePlace[]) ((Object[]) data)[1];
+		OPlacelist = GetPListFromRoutePlace(ORoutePlaceList);
 
-		array2[0] = "getUPlaces";
+		array2[0] = "getURoutePlaces";
 		// get[1] = "" + ImagePlaces[i].getPlace().getCityName();
-		array2[1] = "" + Globals.map.getId();
+		array2[1] = "" + Globals.route.getId();
 		Socket socket2 = new Socket("localhost", 5555);
 		objectOutput = new ObjectOutputStream(socket2.getOutputStream());
 		objectOutput.writeObject(array2);
@@ -325,28 +315,29 @@ public class AddLocController {
 		ObjectInputStream objectInput2 = new ObjectInputStream(socket2.getInputStream());
 		data2 = objectInput2.readObject();
 		// System.out.println(((Object[]) data2)[0]);
-		UPlacelist = (UPlace[]) ((Object[]) data2)[1];
+		URoutePlaceList = (URoutePlace[]) ((Object[]) data2)[1];
+		UPlacelist = GetUPListFromURoutePlace(URoutePlaceList);
 
 		int counter = 0, counter2 = 0;
 		int flag = 0;
-		for (int i = 0; i < OPlacelist.length; i++) {
-			for (int c = 0; c < UPlacelist.length; c++) {
+		for (int i = 0; i < ORoutePlaceList.length; i++) {
+			for (int c = 0; c < URoutePlaceList.length; c++) {
 				// if (Globals.map.getId() == list2[c].getSerialID()) {
-				if (OPlacelist[i].getSerialID() == UPlacelist[c].getPlaceId()) {
+				if (ORoutePlaceList[i].getSerialID() == URoutePlaceList[c].getRPlaceId()) {
 					Image im = new Image("File:editedloc.png");
 					ImageView newLoc = new ImageView(im);
 					// newLoc.relocate((double) list2[c].getLocX(), (double) list2[c].getLocY());
 					Label label = new Label();
 					// label.relocate((double) list2[c].getLocX(), (double) list2[c].getLocY());
 
-					newLoc.relocate(UPlacelist[c].getLocX() - (im.getWidth() / 2) * aspect,
-							UPlacelist[c].getLocY() - (im.getHeight() / 2) * aspect);
+					newLoc.relocate(URoutePlaceList[c].getLocX() - (im.getWidth() / 2) * aspect,
+							URoutePlaceList[c].getLocY() - (im.getHeight() / 2) * aspect);
 
 					label.setFont(new Font("Quicksand", 20));
-					UPlace p = new UPlace("" + Globals.map.getId(), UPlacelist[c].getCityName(),
+					UPlace p = new UPlace("" + Globals.route.getId(), UPlacelist[c].getCityName(),
 							UPlacelist[c].getPlaceName(), UPlacelist[c].getDescription(),
 							UPlacelist[c].getClassification(), UPlacelist[c].getAccessibility(),
-							UPlacelist[c].getSerialID(), UPlacelist[c].getLocX(), UPlacelist[c].getLocY(),
+							UPlacelist[c].getSerialID(), URoutePlaceList[c].getLocX(), URoutePlaceList[c].getLocY(),
 							UPlacelist[c].getType(), UPlacelist[c].getNumOfmaps(), UPlacelist[c].getPlaceId());
 					label.setText(p.getPlaceName());
 					Text t = new Text();
@@ -355,15 +346,20 @@ public class AddLocController {
 					double width = t.getBoundsInLocal().getWidth();
 					double height = t.getBoundsInLocal().getHeight();
 
-					label.relocate(UPlacelist[c].getLocX() - (width / 2),
-							UPlacelist[c].getLocY() - (height + (im.getHeight() / 2) * aspect));
+					label.relocate(URoutePlaceList[c].getLocX() - (width / 2),
+							URoutePlaceList[c].getLocY() - (height + (im.getHeight() / 2) * aspect));
 
 					newLoc.setFitHeight(im.getHeight() * aspect);
 					newLoc.setFitWidth(im.getWidth() * aspect);
 					newLoc.setId("imv" + Counter);
 
-					ImagePlaces[counter] = new ImagePlace(counter, newLoc, label, p, UPlacelist[c].getLocX(),
-							UPlacelist[c].getLocY(), false);
+					URoutePlace URp = new URoutePlace(URoutePlaceList[c].getRouteId(), URoutePlaceList[c].getRPlaceId(),
+							URoutePlaceList[c].getPlace(), URoutePlaceList[c].getTime(), URoutePlaceList[c].getLocX(),
+							URoutePlaceList[c].getLocY(), URoutePlaceList[c].getSerialID(),
+							URoutePlaceList[c].getType());
+
+					ImagePlaces[counter] = new ImagePlace(counter, newLoc, label, URp, URoutePlaceList[c].getLocX(),
+							URoutePlaceList[c].getLocY(), false);
 					counter++;
 					Counter++;
 					flag = 1;
@@ -375,19 +371,19 @@ public class AddLocController {
 			if (flag == 0) {
 				Image im = new Image("File:oldloc.png");
 				ImageView newLoc = new ImageView(im);
-				double X = OPlacelist[i].getLocX(), Y = OPlacelist[i].getLocY();
+				double X = ORoutePlaceList[i].getLocX(), Y = ORoutePlaceList[i].getLocY();
 				// newLoc1.relocate(X, Y);
 				Label label = new Label();
 				// label.relocate(X, Y);
 
-				newLoc.relocate(OPlacelist[i].getLocX() - (im.getWidth() / 2) * aspect,
-						OPlacelist[i].getLocY() - (im.getHeight() / 2) * aspect);
+				newLoc.relocate(ORoutePlaceList[i].getLocX() - (im.getWidth() / 2) * aspect,
+						ORoutePlaceList[i].getLocY() - (im.getHeight() / 2) * aspect);
 
 				label.setFont(new Font("Quicksand", 20));
-				Place p = new Place("" + Globals.map.getId(), OPlacelist[i].getCityName(), OPlacelist[i].getPlaceName(),
-						OPlacelist[i].getDescription(), OPlacelist[i].getClassification(),
-						OPlacelist[i].getAccessibility(), OPlacelist[i].getSerialID(), OPlacelist[i].getLocX(),
-						OPlacelist[i].getLocY(), OPlacelist[i].getType(), OPlacelist[i].getNumOfmaps());
+				Place p = new Place("" + Globals.route.getId(), OPlacelist[i].getCityName(),
+						OPlacelist[i].getPlaceName(), OPlacelist[i].getDescription(), OPlacelist[i].getClassification(),
+						OPlacelist[i].getAccessibility(), OPlacelist[i].getSerialID(), ORoutePlaceList[i].getLocX(),
+						ORoutePlaceList[i].getLocY(), OPlacelist[i].getType(), OPlacelist[i].getNumOfmaps());
 				label.setText(p.getPlaceName());
 
 				Text t = new Text();
@@ -396,15 +392,19 @@ public class AddLocController {
 				double width = t.getBoundsInLocal().getWidth();
 				double height = t.getBoundsInLocal().getHeight();
 
-				label.relocate(OPlacelist[i].getLocX() - (width / 2),
-						OPlacelist[i].getLocY() - (height + (im.getHeight() / 2) * aspect));
+				label.relocate(ORoutePlaceList[i].getLocX() - (width / 2),
+						ORoutePlaceList[i].getLocY() - (height + (im.getHeight() / 2) * aspect));
 
 				newLoc.setFitHeight(im.getHeight() * aspect);
 				newLoc.setFitWidth(im.getWidth() * aspect);
 				newLoc.setId("imv" + Counter);
 
-				ImagePlaces[counter] = new ImagePlace(counter, newLoc, label, p, OPlacelist[i].getLocX(),
-						OPlacelist[i].getLocY(), false);
+				RoutePlace rp = new RoutePlace(ORoutePlaceList[i].getRouteId(), ORoutePlaceList[i].getPlace(),
+						ORoutePlaceList[i].getTime(), ORoutePlaceList[i].getLocX(), ORoutePlaceList[i].getLocY(),
+						ORoutePlaceList[i].getSerialID());
+
+				ImagePlaces[counter] = new ImagePlace(counter, newLoc, label, rp, ORoutePlaceList[i].getLocX(),
+						ORoutePlaceList[i].getLocY(), false);
 				counter++;
 				counter2++;
 				Counter++;
@@ -412,7 +412,7 @@ public class AddLocController {
 			flag = 0;
 		}
 
-		for (int c = 0; c < UPlacelist.length; c++) {
+		for (int c = 0; c < URoutePlaceList.length; c++) {
 			if (UPlacelist[c].getType().equals("NEW") || UPlacelist[c].getType().equals("UNEW")) {
 				Image im = new Image("File:newloc.png");
 				ImageView newLoc = new ImageView(im);
@@ -424,7 +424,7 @@ public class AddLocController {
 						UPlacelist[c].getLocY() - (im.getHeight() / 2) * aspect);
 
 				label.setFont(new Font("Quicksand", 20));
-				UPlace p = new UPlace("" + Globals.map.getId(), UPlacelist[c].getCityName(),
+				UPlace p = new UPlace("" + Globals.route.getId(), UPlacelist[c].getCityName(),
 						UPlacelist[c].getPlaceName(), UPlacelist[c].getDescription(), UPlacelist[c].getClassification(),
 						UPlacelist[c].getAccessibility(), UPlacelist[c].getSerialID(), UPlacelist[c].getLocX(),
 						UPlacelist[c].getLocY(), UPlacelist[c].getType(), UPlacelist[c].getNumOfmaps(),
@@ -443,7 +443,11 @@ public class AddLocController {
 				newLoc.setFitHeight(im.getHeight() * aspect);
 				newLoc.setFitWidth(im.getWidth() * aspect);
 				newLoc.setId("imv" + Counter);
-				ImagePlaces[counter] = new ImagePlace(counter, newLoc, label, p, UPlacelist[c].getLocX(),
+
+				URoutePlace URp = new URoutePlace(URoutePlaceList[c].getRouteId(), URoutePlaceList[c].getRPlaceId(),
+						URoutePlaceList[c].getPlace(), URoutePlaceList[c].getTime(), URoutePlaceList[c].getLocX(),
+						URoutePlaceList[c].getLocY(), URoutePlaceList[c].getSerialID(), URoutePlaceList[c].getType());
+				ImagePlaces[counter] = new ImagePlace(counter, newLoc, label, URp, UPlacelist[c].getLocX(),
 						UPlacelist[c].getLocY(), false);
 				counter++;
 				Counter++;
@@ -535,8 +539,8 @@ public class AddLocController {
 						OPlacelist[i].getLocY() - (im.getHeight() / 2) * aspect);
 
 				label.setFont(new Font("Quicksand", 20));
-				Place p = new Place("" + Globals.map.getId(), OPlacelist[i].getCityName(), OPlacelist[i].getPlaceName(),
-						OPlacelist[i].getDescription(), OPlacelist[i].getClassification(),
+				Place p = new Place("" + Globals.route.getId(), OPlacelist[i].getCityName(),
+						OPlacelist[i].getPlaceName(), OPlacelist[i].getDescription(), OPlacelist[i].getClassification(),
 						OPlacelist[i].getAccessibility(), OPlacelist[i].getSerialID(), OPlacelist[i].getLocX(),
 						OPlacelist[i].getLocY(), OPlacelist[i].getType(), OPlacelist[i].getNumOfmaps());
 				label.setText(p.getPlaceName());
@@ -610,10 +614,11 @@ public class AddLocController {
 							ImagePlaces[Integer.parseInt(ID)].setY((int) event.getSceneY());
 							ImagePlaces[Integer.parseInt(ID)].setChanged(true);
 
-							TF_Accessibility
-									.setText("" + ImagePlaces[Integer.parseInt(ID)].getPlace().getAccessibility());
-							TF_Description.setText(ImagePlaces[Integer.parseInt(ID)].getPlace().getDescription());
-							TF_Classification.setText(ImagePlaces[Integer.parseInt(ID)].getPlace().getClassification());
+							// TF_Accessibility
+							// .setText("" +
+							// ImagePlaces[Integer.parseInt(ID)].getPlace().getAccessibility());
+							// TF_Description.setText(ImagePlaces[Integer.parseInt(ID)].getPlace().getDescription());
+							// TF_Classification.setText(ImagePlaces[Integer.parseInt(ID)].getPlace().getClassification());
 
 						}
 					} else if (event.getEventType() == MouseEvent.MOUSE_CLICKED) {
@@ -625,9 +630,10 @@ public class AddLocController {
 						CurImagePlace.setLabel(ImagePlaces[Integer.parseInt(ID)].getLabel());
 						CurImagePlace.setPlace(ImagePlaces[Integer.parseInt(ID)].getPlace());
 
-						TF_Accessibility.setText("" + ImagePlaces[Integer.parseInt(ID)].getPlace().getAccessibility());
-						TF_Description.setText(ImagePlaces[Integer.parseInt(ID)].getPlace().getDescription());
-						TF_Classification.setText(ImagePlaces[Integer.parseInt(ID)].getPlace().getClassification());
+						// TF_Accessibility.setText("" +
+						// ImagePlaces[Integer.parseInt(ID)].getPlace().getAccessibility());
+						// TF_Description.setText(ImagePlaces[Integer.parseInt(ID)].getPlace().getDescription());
+						// TF_Classification.setText(ImagePlaces[Integer.parseInt(ID)].getPlace().getClassification());
 
 					}
 					// TODO Auto-generated method stub
@@ -646,7 +652,8 @@ public class AddLocController {
 	@FXML
 	void AddLocation(ActionEvent event) {
 		Mode = 0;
-		if (!NewLocation.getText().equals("") && Counter < 10) {
+		// if (!NewLocation.getText().equals("") && Counter < 10) {
+		if (ThereIsNoLocation(comboboxLoc.getValue()) && Counter < 10) {
 			EventHandler<MouseEvent> OkEventHandler = new EventHandler<MouseEvent>() {
 
 				@Override
@@ -664,23 +671,26 @@ public class AddLocController {
 			OK = new Button();
 			OK.setText("set");
 			OK.addEventHandler(MouseEvent.MOUSE_CLICKED, OkEventHandler);
-			label.setText(NewLocation.getText());
+			// label.setText(NewLocation.getText());
+			label.setText(comboboxLoc.getValue());
 			label.setFont(new Font("Quicksand", 20));
 			Image im = new Image("File:newloc.png");
 			ImageView newLoc = new ImageView(im);
-			newLoc.relocate(MapImage.getLayoutX(), MapImage.getLayoutY());
-			label.relocate(MapImage.getLayoutX(), MapImage.getLayoutY());
+			newLoc.relocate(RouteImage.getLayoutX(), RouteImage.getLayoutY());
+			label.relocate(RouteImage.getLayoutX(), RouteImage.getLayoutY());
 
 			newLoc.setFitHeight(im.getHeight() * aspect);
 			newLoc.setFitWidth(im.getWidth() * aspect);
 			newLoc.setId("imv" + Counter);
 			labels[Counter] = label;
 			locations[Counter] = newLoc;
-			Places[Counter] = new UPlace("" + Globals.map.getId(), Globals.map.getCity(), label.getText(), "", "", 1,
-					(int) newLoc.getX(), (int) newLoc.getY(), "NEW", -1);
+			Places[Counter] = new UPlace("" + Globals.route.getId(), Globals.route.getCity(), label.getText(), "", "",
+					1, (int) newLoc.getX(), (int) newLoc.getY(), "NEW", -1);
+			RPlaces[Counter] = new URoutePlace(Globals.route.getId(), -1, label.getText(), 10, (int) newLoc.getX(),
+					(int) newLoc.getY(), -1, "NEW");
 
-			ImagePlaces[Counter] = new ImagePlace(Counter, locations[Counter], labels[Counter], Places[Counter],
-					(int) MapImage.getLayoutX(), (int) MapImage.getLayoutY(), true);
+			ImagePlaces[Counter] = new ImagePlace(Counter, locations[Counter], labels[Counter], RPlaces[Counter],
+					(int) RouteImage.getLayoutX(), (int) RouteImage.getLayoutY(), true);
 
 			mainPane.getChildren().addAll(locations[Counter]);
 			mainPane.getChildren().addAll(labels[Counter]);
@@ -700,6 +710,7 @@ public class AddLocController {
 							CurImagePlace.setId(Integer.parseInt(ID));
 							CurImagePlace.setLabel(labels[CurImagePlace.getId()]);
 							CurImagePlace.setPlace(Places[CurImagePlace.getId()]);
+							CurImagePlace.setRplace(RPlaces[CurImagePlace.getId()]);
 
 							if (event.getSource() instanceof ImageView) {
 								ImageView imView = (ImageView) event.getSource();
@@ -726,6 +737,7 @@ public class AddLocController {
 							CurImagePlace.setId(Integer.parseInt(ID));
 							CurImagePlace.setLabel(labels[CurImagePlace.getId()]);
 							CurImagePlace.setPlace(Places[CurImagePlace.getId()]);
+							CurImagePlace.setRplace(RPlaces[CurImagePlace.getId()]);
 							TF_Accessibility
 									.setText("" + ImagePlaces[Integer.parseInt(ID)].getPlace().getAccessibility());
 							TF_Description.setText(ImagePlaces[Integer.parseInt(ID)].getPlace().getDescription());
@@ -775,11 +787,12 @@ public class AddLocController {
 
 		@SuppressWarnings("resource")
 		Socket socket = new Socket("localhost", 5555);
-		String[] array = new String[2];
+		String[] array = new String[3];
 		ObjectOutputStream objectOutput;
 
-		array[0] = "ConfirmUpdate";
-		array[1] = "" + Globals.map.getId();
+		array[0] = "ConfirmRUpdate";
+		array[1] = "" + Globals.route.getId();
+		array[2] = "" + Globals.route.getCity();
 		objectOutput = new ObjectOutputStream(socket.getOutputStream());
 		objectOutput.writeObject(array);
 		ConfirmUpdate.setVisible(false);
@@ -807,9 +820,33 @@ public class AddLocController {
 		}
 	}
 
+	void InitializeComboBoxLocations() throws Exception, IOException {
+
+		@SuppressWarnings("resource")
+		Socket socket = new Socket("localhost", 5555);
+		String[] array = new String[2];
+		Object[] array2 = new Object[3];
+		array[0] = "getPlacesForRoutes";
+		// get[1] = "" + ImagePlaces[i].getPlace().getCityName();
+		array[1] = "" + Globals.route.getCity();
+
+		ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
+		objectOutput.writeObject(array);
+
+		Object data;
+		ObjectInputStream objectInput = new ObjectInputStream(socket.getInputStream());
+		data = objectInput.readObject();
+		Place[] list = (Place[]) (((Object[]) data)[1]);
+		for (int i = 0; i < list.length; i++) {
+			comboboxLoc.getItems().addAll(list[i].getPlaceName());
+		}
+
+	}
+
 	@FXML
 	void initialize() throws IOException, Exception {
 
+		InitializeComboBoxLocations();
 		comboBox.getItems().addAll("Original", "Updated");
 
 		comboBox.valueProperty().addListener(new ChangeListener<String>() {
@@ -837,10 +874,10 @@ public class AddLocController {
 		if (Globals.MODE < 4) {
 			ConfirmUpdate.setVisible(false);
 		}
-		if (!Globals.ThereIsMapUpdate)
+		if (!Globals.ThereIsRouteUpdate)
 			ConfirmUpdate.setVisible(false);
 
-		Image LinkedImage = new Image(Globals.map.getLinkCustomer());
+		Image LinkedImage = new Image(Globals.route.getLink());
 		raninImage = new ImageView(LinkedImage);
 		raninImage.relocate(291, 50);
 		raninImage.setFitWidth(LinkedImage.getWidth());
@@ -970,10 +1007,40 @@ public class AddLocController {
 	}
 
 	public WritableImage pixelScaleAwareCanvasSnapshot(AnchorPane node, SnapshotParameters params, double pixelScale) {
-		WritableImage writableImage = new WritableImage((int) MapImage.getFitWidth(), (int) MapImage.getFitHeight());
+		WritableImage writableImage = new WritableImage((int) RouteImage.getFitWidth(),
+				(int) RouteImage.getFitHeight());
 		SnapshotParameters spa = params;
 		spa.setTransform(Transform.scale(pixelScale, pixelScale));
 		return node.snapshot(spa, writableImage);
+	}
+
+	public Place[] GetPListFromRoutePlace(RoutePlace[] list) {
+
+		Place[] list2 = new Place[list.length];
+		for (int i = 0; i < list.length; i++) {
+			list2[i] = new Place("0", Globals.city.getCity(), list[i].getPlace(), "", "", 0, 0, list[i].getLocX(),
+					list[i].getLocY(), "UPDATE", 0);
+		}
+		return list2;
+	}
+
+	public UPlace[] GetUPListFromURoutePlace(URoutePlace[] list) {
+
+		UPlace[] list2 = new UPlace[list.length];
+		for (int i = 0; i < list.length; i++) {
+			list2[i] = new UPlace("0", Globals.city.getCity(), list[i].getPlace(), "", "", 0, 0, list[i].getLocX(),
+					list[i].getLocY(), list[i].getType(), 0, 0);
+		}
+		return list2;
+	}
+
+	public Boolean ThereIsNoLocation(String Loc) {
+		for (int i = 0; i < ImagePlaces.length; i++)
+			if (ImagePlaces[i] != null)
+				if (ImagePlaces[i].getRplace().getPlace().toLowerCase().equals(Loc.toLowerCase()))
+					return false;
+
+		return true;
 	}
 	
 	private Object logOut() throws UnknownHostException, IOException {

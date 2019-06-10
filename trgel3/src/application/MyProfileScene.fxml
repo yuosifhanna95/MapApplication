@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MyProfileController">
+   <children>
+      <VBox layoutX="490.0" layoutY="150.0" prefHeight="200.0" prefWidth="309.0">
+         <children>
+            <HBox prefHeight="20.0" prefWidth="403.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="First Name:" translateX="10.0" translateY="5.0" wrappingWidth="120.7294921875" HBox.hgrow="NEVER" />
+                  <TextField fx:id="firstName" HBox.hgrow="NEVER" />
+               </children>
+            </HBox>
+            <HBox prefHeight="20.0" prefWidth="403.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Last Name:" translateX="10.0" translateY="5.0" wrappingWidth="120.7294921875" />
+                  <TextField fx:id="lastName" />
+               </children>
+               <VBox.margin>
+                  <Insets top="5.0" />
+               </VBox.margin>
+            </HBox>
+            <HBox prefHeight="20.0" prefWidth="403.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Phone Number:" translateX="10.0" translateY="5.0" wrappingWidth="120.7294921875" />
+                  <TextField fx:id="phone" />
+               </children>
+               <VBox.margin>
+                  <Insets top="5.0" />
+               </VBox.margin>
+            </HBox>
+            <HBox prefHeight="20.0" prefWidth="403.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Email address:" translateX="10.0" translateY="5.0" wrappingWidth="120.7294921875" />
+                  <TextField fx:id="email">
+                     <HBox.margin>
+                        <Insets top="5.0" />
+                     </HBox.margin>
+                  </TextField>
+               </children>
+            </HBox>
+            <HBox prefHeight="20.0" prefWidth="403.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Payment:" translateX="10.0" translateY="5.0" wrappingWidth="120.7294921875" />
+                  <TextField fx:id="payment">
+                     <HBox.margin>
+                        <Insets top="5.0" />
+                     </HBox.margin>
+                  </TextField>
+               </children>
+            </HBox>
+            <HBox prefHeight="20.0" prefWidth="400.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="User Name:" translateX="10.0" translateY="5.0" wrappingWidth="120.7294921875" />
+                  <TextField fx:id="user">
+                     <HBox.margin>
+                        <Insets top="5.0" />
+                     </HBox.margin>
+                  </TextField>
+               </children>
+            </HBox>
+            <HBox prefHeight="20.0" prefWidth="403.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="New password:" translateX="10.0" translateY="5.0" wrappingWidth="120.7294921875" />
+                  <PasswordField fx:id="password">
+                     <HBox.margin>
+                        <Insets top="5.0" />
+                     </HBox.margin>
+                  </PasswordField>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+      <Button fx:id="saveBtn" layoutX="662.0" layoutY="383.0" mnemonicParsing="false" onAction="#save" prefHeight="26.0" prefWidth="70.0" text="Save" />
+      <Button fx:id="back" layoutX="202.0" layoutY="66.0" mnemonicParsing="false" onAction="#onBack" text="Back" />
+      <Button fx:id="resetBtn" layoutX="546.0" layoutY="383.0" mnemonicParsing="false" onAction="#reset" prefHeight="26.0" prefWidth="70.0" text="Reset" />
+      <TableView fx:id="historyTable" layoutX="430.0" layoutY="490.0" prefHeight="200.0" prefWidth="420.0">
+        <columns>
+          <TableColumn fx:id="cityCol" prefWidth="140.0" text="City" />
+          <TableColumn fx:id="typeCol" prefWidth="150.0" text="Type" />
+            <TableColumn fx:id="dateCol" prefWidth="129.0" text="Date" />
+        </columns>
+      </TableView>
+      <Text layoutX="616.0" layoutY="464.0" strokeType="OUTSIDE" strokeWidth="0.0" text="HISTORY" />
+   </children>
+</AnchorPane>

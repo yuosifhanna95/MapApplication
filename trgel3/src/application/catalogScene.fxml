@@ -15,7 +15,7 @@
    </opaqueInsets>
    <children>
       <Button fx:id="back" layoutX="390.0" layoutY="129.0" mnemonicParsing="false" onAction="#backFunc" prefHeight="26.0" prefWidth="56.0" text="Back" />
-      <HBox layoutX="490.0" layoutY="129.0" prefHeight="30.0" prefWidth="320.0">
+      <HBox fx:id="hbox" layoutX="490.0" layoutY="129.0" prefHeight="30.0" prefWidth="320.0">
          <children>
             <ComboBox fx:id="comboBox" prefWidth="130.0" promptText="Search by" />
             <TextField fx:id="searchText" prefWidth="200.0" />

@@ -8,9 +8,9 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 
-<AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.DefPageController">
+<AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.EditRoutesController">
    <children>
-      <Button fx:id="btn_message" layoutX="218.0" layoutY="234.0" mnemonicParsing="false" onAction="#messageFunc" text="Messages" />
+      <Button fx:id="btn_message" layoutX="455.0" layoutY="599.0" mnemonicParsing="false" onAction="#messageFunc" text="Messages" />
       <Button fx:id="Back" layoutX="413.0" layoutY="131.0" mnemonicParsing="false" onAction="#backFunc" text="Back" />
       <HBox fx:id="hbox" layoutX="490.0" layoutY="129.0" prefHeight="30.0" prefWidth="320.0">
          <children>
@@ -37,10 +37,8 @@
             <TableColumn fx:id="mapCol1" prefWidth="100.0" text="#Maps" />
          </columns>
       </TableView>
-      <Button fx:id="myMaps" layoutX="218.0" layoutY="283.0" mnemonicParsing="false" onAction="#showMymaps" text="My maps" />
-      <Button fx:id="OneTimePurchase" layoutX="463.0" layoutY="602.0" mnemonicParsing="false" onAction="#OnePurchase" prefHeight="26.0" prefWidth="151.0" text="One time purchase" />
-      <Button fx:id="FixedTimePurchase" layoutX="672.0" layoutY="602.0" mnemonicParsing="false" onAction="#FixedPurchase" text="Fixed time purchase" />
-      <Button fx:id="editProfile" layoutX="1085.0" layoutY="71.0" mnemonicParsing="false" onAction="#editProfileButt" text="Edit Profile" />
+      <Button fx:id="myMaps" layoutX="625.0" layoutY="599.0" mnemonicParsing="false" onAction="#showMymaps" text="My maps" />
+      <Button fx:id="edit" layoutX="779.0" layoutY="599.0" mnemonicParsing="false" onAction="#editRoutes" text="Edit" />
  
    </children>
 </AnchorPane>
