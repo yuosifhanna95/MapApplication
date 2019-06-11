@@ -120,8 +120,10 @@ public class AddLocController {
 			ImagePlaces[CurImagePlace.getId()].getPlace().setType("DELETE");
 			mainPane.getChildren().removeAll(ImagePlaces[CurImagePlace.getId()].getImageview());
 			mainPane.getChildren().removeAll(ImagePlaces[CurImagePlace.getId()].getLabel());
-			mainPane.getChildren().removeAll(ImagePlacesOld[CurImagePlace.getId()].getImageview());
-			mainPane.getChildren().removeAll(ImagePlacesOld[CurImagePlace.getId()].getLabel());
+			if (CheckOActivePlaces() > CurImagePlace.getId()) {
+				mainPane.getChildren().removeAll(ImagePlacesOld[CurImagePlace.getId()].getImageview());
+				mainPane.getChildren().removeAll(ImagePlacesOld[CurImagePlace.getId()].getLabel());
+			}
 			ImagePlaces[CurImagePlace.getId()].setChanged(true);
 			ImagePlaces[CurImagePlace.getId()].setPlace(new UPlace(p.getMapId(), p.getCityName(), p.getPlaceName(),
 					p.getDescription(), p.getClassification(), p.getAccessibility(), p.getLocX(), p.getLocY(),
@@ -1064,4 +1066,13 @@ public class AddLocController {
 		return true;
 	}
 
+	public int CheckOActivePlaces() {
+		int count = 0;
+		for (int i = 0; i < ImagePlacesOld.length; i++) {
+			if (ImagePlacesOld[i] != null)
+				count++;
+
+		}
+		return count;
+	}
 }
