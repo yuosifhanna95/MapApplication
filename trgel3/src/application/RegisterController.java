@@ -155,7 +155,7 @@ public class RegisterController {
 		User Client = new User(0,fname1, lname1, email, user, password, phone, pay, type, "");
 
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 
 		Object[] get = new Object[2];
 		get[0] = "Register";

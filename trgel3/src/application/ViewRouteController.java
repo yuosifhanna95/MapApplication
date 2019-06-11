@@ -94,7 +94,7 @@ public class ViewRouteController {
 
 	public void buildData() throws UnknownHostException, IOException {
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 		data = FXCollections.observableArrayList();
 
 		String[] get = new String[2];
@@ -132,7 +132,7 @@ public class ViewRouteController {
 		array[2] = Globals.user.getPassword();
 		
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 		try {
 			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			objectOutput.writeObject(array);

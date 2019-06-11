@@ -42,7 +42,6 @@ public class ViewController {
 		mapImage.relocate(162, 50);
 		mainPane.getChildren().add(mapImage);
 		DrawPlaces();
-
 	}
 
 	@FXML
@@ -69,12 +68,13 @@ public class ViewController {
 	void DrawPlaces() throws IOException, ClassNotFoundException {
 
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
-		String[] array = new String[2];
+		Socket socket = new Socket(Globals.IpAddress, 5555);
+		String[] array = new String[3];
 		String[] array2 = new String[2];
 		array[0] = "getPlaces";
 		// get[1] = "" + ImagePlaces[i].getPlace().getCityName();
 		array[1] = "" + Globals.map.getId();
+		array[2] = Globals.user.getType();
 
 		ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 		objectOutput.writeObject(array);
@@ -151,7 +151,7 @@ public class ViewController {
 		array[2] = Globals.user.getPassword();
 		
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 		try {
 			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			objectOutput.writeObject(array);

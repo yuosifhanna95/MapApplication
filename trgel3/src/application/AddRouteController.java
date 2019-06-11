@@ -113,7 +113,7 @@ public class AddRouteController {
 		if (!(TF_CityName.getText().equals("") || TF_RouteDes.getText().equals("")
 				|| TF_ImageLink.getText().equals(""))) {
 
-			Socket socket = new Socket("localhost", 5555);
+			Socket socket = new Socket(Globals.IpAddress, 5555);
 			Object[] array = new Object[3];
 			// Object[] array2 = new Object[3];
 			array[0] = "AddRoute";
@@ -132,7 +132,7 @@ public class AddRouteController {
 	void UpdateRoute(ActionEvent event) throws Exception {
 
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 		String[] array = new String[2];
 		Object[] array2 = new Object[3];
 		array[0] = "getURoutePlaces";
@@ -172,7 +172,7 @@ public class AddRouteController {
 						// objectOutput = new ObjectOutputStream(socket.getOutputStream());
 						array2[2] = "" + Globals.route.getCity();
 						@SuppressWarnings("resource")
-						Socket socket2 = new Socket("localhost", 5555);
+						Socket socket2 = new Socket(Globals.IpAddress, 5555);
 						objectOutput = new ObjectOutputStream(socket2.getOutputStream());
 						objectOutput.writeObject(array2);
 						flagnew = 0;
@@ -198,7 +198,7 @@ public class AddRouteController {
 								// objectOutput = new ObjectOutputStream(socket.getOutputStream());
 								array2[2] = "" + Globals.route.getCity();
 								@SuppressWarnings("resource")
-								Socket socket2 = new Socket("localhost", 5555);
+								Socket socket2 = new Socket(Globals.IpAddress, 5555);
 								objectOutput = new ObjectOutputStream(socket2.getOutputStream());
 								objectOutput.writeObject(array2);
 								flagnew = 0;
@@ -231,7 +231,7 @@ public class AddRouteController {
 							array2[1] = pp;
 							array2[2] = "" + Globals.route.getCity();
 							@SuppressWarnings("resource")
-							Socket socket2 = new Socket("localhost", 5555);
+							Socket socket2 = new Socket(Globals.IpAddress, 5555);
 							objectOutput = new ObjectOutputStream(socket2.getOutputStream());
 							objectOutput.writeObject(array2);
 						}
@@ -262,7 +262,7 @@ public class AddRouteController {
 		ImagePlaces = new ImagePlace[10];
 
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 		String[] array = new String[2];
 		String[] array2 = new String[2];
 		array[0] = "getPlaces";
@@ -281,7 +281,7 @@ public class AddRouteController {
 		array2[0] = "getUPlaces";
 		// get[1] = "" + ImagePlaces[i].getPlace().getCityName();
 		array2[1] = "" + Globals.map.getId();
-		Socket socket2 = new Socket("localhost", 5555);
+		Socket socket2 = new Socket(Globals.IpAddress, 5555);
 		objectOutput = new ObjectOutputStream(socket2.getOutputStream());
 		objectOutput.writeObject(array2);
 
@@ -629,7 +629,7 @@ public class AddRouteController {
 	void ConfirmUpdate(ActionEvent event) throws IOException, ClassNotFoundException {
 
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 		String[] array = new String[2];
 		ObjectOutputStream objectOutput;
 
@@ -850,7 +850,7 @@ public class AddRouteController {
 		ImagePlaces = new ImagePlace[10];
 
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 		String[] array = new String[2];
 		String[] array2 = new String[2];
 		array[0] = "getRoutePlaces";
@@ -870,7 +870,7 @@ public class AddRouteController {
 		array2[0] = "getURoutePlaces";
 		// get[1] = "" + ImagePlaces[i].getPlace().getCityName();
 		array2[1] = "" + Globals.route.getId();
-		Socket socket2 = new Socket("localhost", 5555);
+		Socket socket2 = new Socket(Globals.IpAddress, 5555);
 		objectOutput = new ObjectOutputStream(socket2.getOutputStream());
 		objectOutput.writeObject(array2);
 
@@ -1156,7 +1156,7 @@ public class AddRouteController {
 	void InitializeComboBoxLocations() throws Exception, IOException {
 
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 		String[] array = new String[2];
 		Object[] array2 = new Object[3];
 		array[0] = "getPlacesForRoutes";
@@ -1192,7 +1192,7 @@ public class AddRouteController {
 		array[2] = Globals.user.getPassword();
 		
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 		try {
 			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			objectOutput.writeObject(array);

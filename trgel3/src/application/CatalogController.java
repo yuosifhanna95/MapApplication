@@ -336,7 +336,7 @@ public class CatalogController {
 
 	public void buildData(String type) throws UnknownHostException, IOException {
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 
 		String[] get = new String[2];
 		get[0] = "getCatalog";

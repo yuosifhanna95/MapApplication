@@ -430,7 +430,7 @@ public class ConfirmRoutesController {
 							btn2.setOnAction(event -> {
 								try {
 									@SuppressWarnings("resource")
-									Socket socket = new Socket("localhost", 5555);
+									Socket socket = new Socket(Globals.IpAddress, 5555);
 									String[] array = new String[2];
 									ObjectOutputStream objectOutput;
 									array[0] = "AgreeVUpdate";
@@ -448,7 +448,7 @@ public class ConfirmRoutesController {
 							btn3.setOnAction(event -> {
 								try {
 									@SuppressWarnings("resource")
-									Socket socket = new Socket("localhost", 5555);
+									Socket socket = new Socket(Globals.IpAddress, 5555);
 									String[] array = new String[2];
 									ObjectOutputStream objectOutput;
 									array[0] = "DisagreeVUpdate";
@@ -532,7 +532,7 @@ public class ConfirmRoutesController {
 
 	public void addDataBasetoMember() throws UnknownHostException, IOException {
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 		dataCity = FXCollections.observableArrayList();
 
 		String[] set = new String[3];
@@ -549,7 +549,7 @@ public class ConfirmRoutesController {
 
 	public void buildData(String type) throws UnknownHostException, IOException {
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 
 		String[] get = new String[2];
 		get[0] = "getCatalog";
@@ -660,7 +660,7 @@ public class ConfirmRoutesController {
 		array[2] = Globals.user.getPassword();
 		
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 		try {
 			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			objectOutput.writeObject(array);

@@ -15,7 +15,7 @@ public class Main extends Application {
 			Globals.MODE = 0;
 			URL url = getClass().getResource("MainPage.fxml");
 			AnchorPane pane = FXMLLoader.load(url);
-
+			
 			Scene scene = new Scene(pane);
 			scene.getStylesheets().add(getClass().getResource("styleMain.css").toExternalForm());
 			primaryStage.setScene(scene);
@@ -26,6 +26,7 @@ public class Main extends Application {
 	}
 
 	public static void main(String[] args) {
+		Globals.IpAddress = "127.0.0.1";
 		launch(args);
 	}
 }

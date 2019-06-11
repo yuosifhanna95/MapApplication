@@ -15,21 +15,11 @@ import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-
 import java.util.Calendar;
 import java.util.Date;
-
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.text.SimpleDateFormat;
-
-
-import java.util.Calendar;
-import java.util.Date;
-
 import javax.swing.JOptionPane;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -109,6 +99,7 @@ public class Server {
 
 							Date sdate = Calendar.getInstance().getTime();
 							String date = df.format(sdate);
+							statics("fixedpurchase",fp.getCity(),java.sql.Date.valueOf(endDateAsString));
 							AddPurchaseToHistory(fp.getCity(), 1, fp.getUser(), "FT", date, conn);
 
 						}
@@ -304,8 +295,8 @@ public class Server {
 						String date = (String) ((Object[]) (data))[4];
 						Class.forName(JDBC_DRIVER);
 						conn = DriverManager.getConnection(DB_URL, USER, PASS);
+						statics("onepurchase", city, null);
 						AddPurchaseToHistory(city, version, user.getUserName(), "OT", date, conn);
-
 					}
 
 					else if (((String) ((Object[]) (data))[0]).equals("addNewDate")) {
@@ -347,7 +338,8 @@ public class Server {
 								pr.setString(5, cityname);
 								pr.executeUpdate();
 							}
-
+							statics("fixedpurchase", cityname, java.sql.Date.valueOf(NewEndDateAsString));
+							statics("renewpurchase", cityname, java.sql.Date.valueOf(NewEndDateAsString));
 							stmt.close();
 							conn.close();
 
@@ -1503,7 +1495,6 @@ public class Server {
 					}
 
 					else if (((String[]) (data))[0].equals("getPlaces")) {
-
 						Place[] list, list2, list3;
 						int k = ((String[]) (data)).length;
 
@@ -1517,6 +1508,7 @@ public class Server {
 							stmt = conn.createStatement();
 							String mapid = ((String[]) (data))[1];
 							String City = ((String[]) (data))[2];
+							String type = ((String[]) (data))[3];
 							String sql = "SELECT * FROM places where Name='" + City + "'";
 							ResultSet rs = stmt.executeQuery(sql);
 
@@ -1586,7 +1578,6 @@ public class Server {
 										id, LocX, LocY);
 								list2[index] = (place);
 								index++;
-
 							}
 							list3 = new Place[list2.length];
 							for (int i = 0; i < list2.length; i++) {
@@ -1605,6 +1596,10 @@ public class Server {
 
 							result[0] = Connected;
 							result[1] = list3;
+							
+							if(type.equals("member")){
+								statics("view", City, null );
+							}
 
 							stmt.close();
 							conn.close();
@@ -3284,4 +3279,63 @@ public class Server {
 
 		return 0;
 	}
+	
+	static void statics(String type,String city,java.sql.Date fixedenddate) {
+		Connection conn = null;
+		Statement stmt = null;
+		PreparedStatement pr;
+
+		try {
+			Class.forName(JDBC_DRIVER);
+
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			stmt = conn.createStatement();
+			
+			String sql1 = "INSERT INTO staticinformation(`date`, `city`, `type`, `enddate`) VALUES (?,?,?,?)";
+			if (conn != null) {
+				pr = conn.prepareStatement(sql1);
+				 LocalDate sd= LocalDate.now();
+				 Calendar c = Calendar.getInstance();
+				 DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+				 String stringdate=sd.format(dateFormatter);
+				 SimpleDateFormat sdf1 = new SimpleDateFormat("dd-MM-yyyy");
+				 
+				 java.util.Date date1 = sdf1.parse(stringdate);
+				 c.setTime(date1);
+				 c.add(Calendar.DATE,1);
+				 String output = sdf1.format(c.getTime());
+				 date1=sdf1.parse(output);
+				 java.sql.Date datenow1=new java.sql.Date(date1.getTime()); ;
+				 
+				pr.setDate(1, datenow1 );
+				pr.setString(2, city);
+				pr.setString(3, type);
+				if(type.equals("fixedpurchase")) {
+				pr.setDate(4, fixedenddate);	
+				}
+				pr.executeUpdate();
+			
+		}
+	
+	} catch (SQLException se) {
+		se.printStackTrace();
+		System.out.println("SQLException: " + se.getMessage());
+		System.out.println("SQLState: " + se.getSQLState());
+		System.out.println("VendorError: " + se.getErrorCode());
+	} catch (Exception e) {
+		e.printStackTrace();
+	} finally {
+		try {
+			if (stmt != null)
+				stmt.close();
+			if (conn != null)
+				conn.close();
+		} catch (SQLException se) {
+			se.printStackTrace();
+		}
+		
+	}
+
+	
+}
 }

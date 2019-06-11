@@ -11,4 +11,5 @@ public class Globals {
 	static Boolean ThereIsCityUpdate = false;
 	static Boolean ThereIsMapUpdate = false;
 	static Boolean ThereIsRouteUpdate = false;
+	static String IpAddress;
 }

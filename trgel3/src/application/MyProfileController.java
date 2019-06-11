@@ -119,7 +119,7 @@ public class MyProfileController {
     	User newInfo = new User(userInfo.getId(), First, Last, emailN, userN, pass, phoneN, paymentN, "", "");
     	
 	    @SuppressWarnings("resource")
-    	Socket	 socket = new Socket("localhost",5555);
+    	Socket	 socket = new Socket(Globals.IpAddress,5555);
         Object[] set = new Object[2];
         set[0] = "updateUserInfo";
         set[1]= newInfo;
@@ -195,7 +195,7 @@ public class MyProfileController {
 		array[2] = Globals.user.getPassword();
 		
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 		try {
 			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			objectOutput.writeObject(array);

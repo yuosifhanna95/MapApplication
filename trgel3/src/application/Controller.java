@@ -80,7 +80,7 @@ public class Controller {
 		array[1] = Username.getText();
 		array[2] = Password.getText();
 
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 		ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
 		out.writeObject(array);
 
@@ -138,7 +138,7 @@ public class Controller {
 		array[2] = Password.getText();
 		
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 		try {
 			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			objectOutput.writeObject(array);
@@ -170,7 +170,7 @@ public class Controller {
 		array[1] = Username.getText();
 		array[2] = Password.getText();
 
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 		ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
 		out.writeObject(array);
 

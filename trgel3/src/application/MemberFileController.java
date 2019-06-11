@@ -395,7 +395,7 @@ public class MemberFileController {
 
 	public void addDataBasetoMember() throws UnknownHostException, IOException {
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 		dataUser = FXCollections.observableArrayList();
 
 		String[] set = new String[3];
@@ -412,7 +412,7 @@ public class MemberFileController {
 
 	public void buildData(String type) throws UnknownHostException, IOException {
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 
 		String[] get = new String[1];
 		get[0] = "getUsers";
@@ -517,7 +517,7 @@ public class MemberFileController {
 		array[2] = Globals.user.getPassword();
 		
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 		try {
 			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			objectOutput.writeObject(array);

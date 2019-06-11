@@ -148,7 +148,7 @@ public class AddLocController {
 	void UpdateVersion(ActionEvent event) throws Exception, IOException {
 
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 		String[] array = new String[2];
 		ObjectOutputStream objectOutput;
 		array[0] = "VersionUpdate";
@@ -184,7 +184,7 @@ public class AddLocController {
 	void UpdateMap(ActionEvent event) throws Exception {
 
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 		String[] array = new String[2];
 		Object[] array2 = new Object[3];
 		array[0] = "getUPlaces";
@@ -223,7 +223,7 @@ public class AddLocController {
 						// objectOutput = new ObjectOutputStream(socket.getOutputStream());
 						array2[2] = "" + serialid;
 						@SuppressWarnings("resource")
-						Socket socket2 = new Socket("localhost", 5555);
+						Socket socket2 = new Socket(Globals.IpAddress, 5555);
 						objectOutput = new ObjectOutputStream(socket2.getOutputStream());
 						objectOutput.writeObject(array2);
 						flagnew = 0;
@@ -251,7 +251,7 @@ public class AddLocController {
 								// objectOutput = new ObjectOutputStream(socket.getOutputStream());
 								array2[2] = "" + serialid;
 								@SuppressWarnings("resource")
-								Socket socket2 = new Socket("localhost", 5555);
+								Socket socket2 = new Socket(Globals.IpAddress, 5555);
 								objectOutput = new ObjectOutputStream(socket2.getOutputStream());
 								objectOutput.writeObject(array2);
 								flagnew = 0;
@@ -288,7 +288,7 @@ public class AddLocController {
 							array2[1] = pp;
 							array2[2] = "" + serialid;
 							@SuppressWarnings("resource")
-							Socket socket2 = new Socket("localhost", 5555);
+							Socket socket2 = new Socket(Globals.IpAddress, 5555);
 							objectOutput = new ObjectOutputStream(socket2.getOutputStream());
 							objectOutput.writeObject(array2);
 							TherewasUpdate = true;
@@ -336,7 +336,7 @@ public class AddLocController {
 		ImagePlaces = new ImagePlace[10];
 
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 		String[] array = new String[3];
 		String[] array2 = new String[2];
 		array[0] = "getPlaces";
@@ -356,7 +356,7 @@ public class AddLocController {
 		array2[0] = "getUPlaces";
 		// get[1] = "" + ImagePlaces[i].getPlace().getCityName();
 		array2[1] = "" + Globals.map.getId();
-		Socket socket2 = new Socket("localhost", 5555);
+		Socket socket2 = new Socket(Globals.IpAddress, 5555);
 		objectOutput = new ObjectOutputStream(socket2.getOutputStream());
 		objectOutput.writeObject(array2);
 
@@ -838,7 +838,7 @@ public class AddLocController {
 	void ConfirmUpdate(ActionEvent event) throws Exception {
 
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 		String[] array = new String[2];
 		ObjectOutputStream objectOutput;
 
@@ -1047,7 +1047,7 @@ public class AddLocController {
 		array[2] = Globals.user.getPassword();
 
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 		try {
 			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			objectOutput.writeObject(array);

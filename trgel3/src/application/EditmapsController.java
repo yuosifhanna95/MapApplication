@@ -420,7 +420,7 @@ public class EditmapsController {
 
 	public void buildData(String type) throws UnknownHostException, IOException {
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 
 		String[] get = new String[2];
 		get[0] = "getCatalog";
@@ -530,7 +530,7 @@ public class EditmapsController {
 		array[2] = Globals.user.getPassword();
 		
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 		try {
 			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			objectOutput.writeObject(array);

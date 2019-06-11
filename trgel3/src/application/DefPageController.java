@@ -412,7 +412,7 @@ public class DefPageController {
 						try {
 							saveAllMaps();
 							@SuppressWarnings("resource")
-							Socket socket = new Socket("localhost", 5555);
+							Socket socket = new Socket(Globals.IpAddress, 5555);
 							Object[] array = new Object[5];
 							array[0] = "OneTimePurchase";
 							array[1] = Globals.user;
@@ -760,7 +760,7 @@ public class DefPageController {
 
 	public String checkIfCityExist() throws UnknownHostException, IOException {
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 		dataCity = FXCollections.observableArrayList();
 
 		String[] set = new String[3];
@@ -790,7 +790,7 @@ public class DefPageController {
 
 	public void buildData(String type) throws UnknownHostException, IOException {
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 
 		String[] get = new String[2];
 		get[0] = "getCatalog";
@@ -894,7 +894,7 @@ public class DefPageController {
 
 	public static void getFromCity(String str) throws UnknownHostException, IOException {
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 
 		String[] get = new String[2];
 		get[0] = "getMyRoutes";
@@ -996,7 +996,7 @@ public class DefPageController {
 	public void saveAllMaps() throws ClassNotFoundException, IOException {
 
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 		String[] array = new String[3];
 		array[0] = "getMaps";
 		array[1] = Globals.city.getCity();
@@ -1104,7 +1104,7 @@ public class DefPageController {
 		ImagePlaces = new ImagePlace[10];
 
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 		String[] array = new String[2];
 		String[] array2 = new String[2];
 		array[0] = "getPlaces";
@@ -1123,7 +1123,7 @@ public class DefPageController {
 		array2[0] = "getUPlaces";
 		// get[1] = "" + ImagePlaces[i].getPlace().getCityName();
 		array2[1] = "" + Globals.map.getId();
-		Socket socket2 = new Socket("localhost", 5555);
+		Socket socket2 = new Socket(Globals.IpAddress, 5555);
 		objectOutput = new ObjectOutputStream(socket2.getOutputStream());
 		objectOutput.writeObject(array2);
 
@@ -1299,7 +1299,7 @@ public class DefPageController {
 			FixedPurchase fp = new FixedPurchase(user, period, city, sdate, enddate, price);
 
 			@SuppressWarnings("resource")
-			Socket socket = new Socket("localhost", 5555);
+			Socket socket = new Socket(Globals.IpAddress, 5555);
 			Object[] set = new Object[4];
 			set[0] = "dofixedpurchase";
 			set[1] = fp;
@@ -1321,7 +1321,7 @@ public class DefPageController {
 		array[2] = Globals.user.getPassword();
 		
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
+		Socket socket = new Socket(Globals.IpAddress, 5555);
 		try {
 			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			objectOutput.writeObject(array);
