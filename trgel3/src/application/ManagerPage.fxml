@@ -12,6 +12,7 @@
       <Button fx:id="btn_confirmMaps" layoutX="765.0" layoutY="208.0" mnemonicParsing="false" onAction="#confirmMapsFunc" text="Confirm Maps" />
       <Button fx:id="memberfile" layoutX="606.0" layoutY="246.0" mnemonicParsing="false" onAction="#MembersFileFunc" text="Members File" />
       <Button fx:id="btn_AddRoute" layoutX="774.0" layoutY="246.0" mnemonicParsing="false" onAction="#AddRouteFunc" text="Add Route" />
+      <Button fx:id="btn_AddRoute" layoutX="774.0" layoutY="246.0" mnemonicParsing="false" onAction="#AddRouteFunc" text="Add Route" />
       <Button fx:id="btn_ConfirmRoutes" layoutX="871.0" layoutY="208.0" mnemonicParsing="false" onAction="#confirmRoutesFunc" text="Confirm Routes" />
       
    </children>
