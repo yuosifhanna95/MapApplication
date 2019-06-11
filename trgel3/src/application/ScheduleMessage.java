@@ -72,6 +72,7 @@ public class ScheduleMessage implements Runnable  {
 					c1.setTime(date2);
 					String output = sdf.format(c.getTime());
 					String output1 = sdf.format(c1.getTime());
+					System.out.println(output1);
 					if(output.equals(output1)) {
 						String city=rs.getString("city");
 						String mess="Three days left to purchase"+city+"City,you can renew the purchase to the same period and you will get discount 10%";  

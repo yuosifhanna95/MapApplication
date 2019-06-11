@@ -11,6 +11,7 @@
       <Button fx:id="btn_editMaps" layoutX="684.0" layoutY="208.0" mnemonicParsing="false" onAction="#editmaps" text="Edit Maps" />
       <Button fx:id="btn_confirmMaps" layoutX="765.0" layoutY="208.0" mnemonicParsing="false" onAction="#confirmMapsFunc" text="Confirm Maps" />
       <Button fx:id="memberfile" layoutX="606.0" layoutY="246.0" mnemonicParsing="false" onAction="#MembersFileFunc" text="Members File" />
-      
+      <Button fx:id="Prices" layoutX="782.0" layoutY="246.0" mnemonicParsing="false" onAction="#changeprice" text="change prices" />
+      <Button fx:id="Reports" layoutX="684.0" layoutY="280.0" mnemonicParsing="false" onAction="#showreportbtn" text="Show Reports" />
    </children>
 </AnchorPane>
