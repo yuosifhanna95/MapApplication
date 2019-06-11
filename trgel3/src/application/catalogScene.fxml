@@ -18,7 +18,7 @@
       <HBox fx:id="hbox" layoutX="490.0" layoutY="129.0" prefHeight="30.0" prefWidth="320.0">
          <children>
             <ComboBox fx:id="comboBox" prefWidth="130.0" promptText="Search by" />
-            <TextField fx:id="searchText" prefWidth="200.0" />
+            <TextField fx:id="searchText" prefWidth="200.0"  />
          </children>
       </HBox>
       <TableView fx:id="searchTable" layoutX="390.0" layoutY="192.0" prefHeight="400.0" prefWidth="500.0">

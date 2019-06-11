@@ -34,6 +34,37 @@ public class ManagerPageController {
 
 	@FXML
 	private Button memberfile;
+	 @FXML
+	    private Button Prices;
+	 @FXML
+	    private Button Reports;
+	 
+	 
+	 @FXML
+	    void showreportbtn(ActionEvent event) throws IOException{
+		 
+		 Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+			URL url = getClass().getResource("ShowReports.fxml");
+			AnchorPane pane = FXMLLoader.load(url);
+
+			Scene scene = new Scene(pane);
+			scene.getStylesheets().add(getClass().getResource("styleMain.css").toExternalForm());
+			primaryStage.setScene(scene);
+			primaryStage.show();
+		 
+	 }
+	 
+	 @FXML
+	    void changeprice(ActionEvent event) throws IOException{
+		 Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+			URL url = getClass().getResource("Changeprices.fxml");
+			AnchorPane pane = FXMLLoader.load(url);
+
+			Scene scene = new Scene(pane);
+			scene.getStylesheets().add(getClass().getResource("styleMain.css").toExternalForm());
+			primaryStage.setScene(scene);
+			primaryStage.show();
+	    }
 
 	@FXML
 	private Button btn_AddRoute;
