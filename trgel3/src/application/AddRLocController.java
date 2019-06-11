@@ -56,6 +56,9 @@ public class AddRLocController {
 	private URoutePlace[] URoutePlaceList;
 
 	@FXML
+	private Button btn_DeletePlace;
+
+	@FXML
 	private Button btn_UpdateVer;
 
 	@FXML
@@ -86,9 +89,6 @@ public class AddRLocController {
 	private Button btn_AddLoc;
 
 	@FXML
-	private TextField NewLocation;
-
-	@FXML
 	private Button OK;
 
 	@FXML
@@ -116,7 +116,44 @@ public class AddRLocController {
 	private ComboBox<String> comboboxLoc;
 
 	@FXML
-	void UpdateVersion(ActionEvent event) {
+	void DeletePlace(ActionEvent event) throws Exception, IOException {
+		if (CurImagePlace != null) {
+			RoutePlace p = ImagePlaces[CurImagePlace.getId()].getRplace();
+			CurImagePlace.getRplace().setType("DELETE");
+			ImagePlaces[CurImagePlace.getId()].getRplace().setType("DELETE");
+			mainPane.getChildren().removeAll(ImagePlaces[CurImagePlace.getId()].getImageview());
+			mainPane.getChildren().removeAll(ImagePlaces[CurImagePlace.getId()].getLabel());
+			mainPane.getChildren().removeAll(ImagePlacesOld[CurImagePlace.getId()].getImageview());
+			mainPane.getChildren().removeAll(ImagePlacesOld[CurImagePlace.getId()].getLabel());
+			ImagePlaces[CurImagePlace.getId()].setChanged(true);
+			ImagePlaces[CurImagePlace.getId()].setRplace(new URoutePlace(p.getRouteId(), (int) p.getSerialID(),
+					p.getPlace(), p.getTime(), p.getLocX(), p.getLocY(), -1, p.getType()));
+			// new UPlace(p.getMapId(), p.getCityName(), p.getPlaceName(),
+			// p.getDescription(), p.getClassification(), p.getAccessibility(),
+			// p.getSerialID(), p.getLocX(),
+			// p.getLocY(), p.getType(), p.getNumOfmaps(),p.getSerialID()));
+
+			// ImagePlaces[CurImagePlace.getId()] =
+			// null;
+		}
+		// BuildAllPlaces();
+		// BuildOldMap();
+		// DrawUpdatedPlaces();
+		// BuildAllPlaces();
+		// BuildOldMap();
+	}
+
+	@FXML
+	void UpdateVersion(ActionEvent event) throws Exception, IOException {
+
+		@SuppressWarnings("resource")
+		Socket socket = new Socket("localhost", 5555);
+		String[] array = new String[2];
+		ObjectOutputStream objectOutput;
+		array[0] = "VersionUpdate";
+		array[1] = "" + Globals.map.getCity();
+		objectOutput = new ObjectOutputStream(socket.getOutputStream());
+		objectOutput.writeObject(array);
 
 	}
 
@@ -163,6 +200,7 @@ public class AddRLocController {
 		URoutePlaceList = (URoutePlace[]) ((Object[]) data)[1];
 		// UPlacelist = GetUPListFromURoutePlace(URoutePlaceList);
 		UPlace[] list = GetUPListFromURoutePlace(URoutePlaceList);
+		Boolean TherewasUpdate = false;
 		for (int i = 0; i < ImagePlaces.length; i++) {
 			if (ImagePlaces[i] != null)
 				if (ImagePlaces[i].getChanged()) {
@@ -190,6 +228,7 @@ public class AddRLocController {
 						objectOutput = new ObjectOutputStream(socket2.getOutputStream());
 						objectOutput.writeObject(array2);
 						flagnew = 0;
+						TherewasUpdate = true;
 
 					} else {
 
@@ -216,6 +255,7 @@ public class AddRLocController {
 								objectOutput = new ObjectOutputStream(socket2.getOutputStream());
 								objectOutput.writeObject(array2);
 								flagnew = 0;
+								TherewasUpdate = true;
 								break;
 
 							}
@@ -236,6 +276,8 @@ public class AddRLocController {
 							if (ImagePlaces[i].getRplace() instanceof URoutePlace)
 								if (((URoutePlace) ImagePlaces[i].getRplace()).getRPlaceId() == -1)
 									type = "NEW";
+								else if ((ImagePlaces[i].getPlace()).getType().equals("DELETE"))
+									type = "DELETE";
 								else
 									type = "UPDATE";
 							else
@@ -248,13 +290,20 @@ public class AddRLocController {
 							Socket socket2 = new Socket("localhost", 5555);
 							objectOutput = new ObjectOutputStream(socket2.getOutputStream());
 							objectOutput.writeObject(array2);
+							TherewasUpdate = true;
 						}
 					}
 				}
 		}
-		ConfirmUpdate.setVisible(true);
-		BuildAllPlaces();
-		BuildOldMap();
+		if (TherewasUpdate)
+			Globals.ThereIsMapUpdate = true;
+		if (Globals.MODE >= 4 && Globals.ThereIsMapUpdate)
+			ConfirmUpdate.setVisible(true);
+		if (TherewasUpdate) {
+			BuildAllPlaces();
+			BuildOldMap();
+
+		}
 
 	}
 
@@ -413,7 +462,7 @@ public class AddRLocController {
 		}
 
 		for (int c = 0; c < URoutePlaceList.length; c++) {
-			if (UPlacelist[c].getType().equals("NEW") || UPlacelist[c].getType().equals("UNEW")) {
+			if (URoutePlaceList[c].getType().equals("NEW") || URoutePlaceList[c].getType().equals("UNEW")) {
 				Image im = new Image("File:newloc.png");
 				ImageView newLoc = new ImageView(im);
 				// newLoc.relocate((double) list2[c].getLocX(), (double) list2[c].getLocY());
@@ -472,26 +521,36 @@ public class AddRLocController {
 
 	@SuppressWarnings("deprecation")
 	void DrawOldPlaces() throws IOException, ClassNotFoundException {
-
 		for (int i = 0; i < ImagePlaces.length; i++) {
 
 			if (ImagePlaces[i] != null) {
+				if (ImagePlaces[i].getRplace() instanceof URoutePlace) {
+					if (!ImagePlaces[i].getRplace().getType().equals("DELETE")) {
 
-				mainPane.getChildren().removeAll(ImagePlaces[i].getImageview());
-				mainPane.getChildren().removeAll(ImagePlaces[i].getLabel());
-
+						mainPane.getChildren().removeAll(ImagePlaces[i].getImageview());
+						mainPane.getChildren().removeAll(ImagePlaces[i].getLabel());
+					}
+				} else {
+					mainPane.getChildren().removeAll(ImagePlaces[i].getImageview());
+					mainPane.getChildren().removeAll(ImagePlaces[i].getLabel());
+				}
 			}
 		}
 		for (int i = 0; i < ImagePlacesOld.length; i++) {
 
 			if (ImagePlacesOld[i] != null) {
-
-				mainPane.getChildren().addAll(ImagePlacesOld[i].getImageview());
-				mainPane.getChildren().addAll(ImagePlacesOld[i].getLabel());
+				if (ImagePlacesOld[i].getRplace() instanceof URoutePlace) {
+					if (!ImagePlacesOld[i].getRplace().getType().equals("DELETE")) {
+						mainPane.getChildren().addAll(ImagePlacesOld[i].getImageview());
+						mainPane.getChildren().addAll(ImagePlacesOld[i].getLabel());
+					}
+				} else {
+					mainPane.getChildren().addAll(ImagePlacesOld[i].getImageview());
+					mainPane.getChildren().addAll(ImagePlacesOld[i].getLabel());
+				}
 
 			}
 		}
-
 		// AddMethodsForIP();
 
 	}
@@ -500,21 +559,34 @@ public class AddRLocController {
 
 		for (int i = 0; i < ImagePlaces.length; i++) {
 
-			if (ImagePlaces[i] != null) {
+			if (ImagePlaces[i] != null)
+				if (ImagePlaces[i].getRplace() instanceof URoutePlace) {
+					if (!ImagePlaces[i].getPlace().getType().equals("DELETE")) {
 
-				mainPane.getChildren().addAll(ImagePlaces[i].getImageview());
-				mainPane.getChildren().addAll(ImagePlaces[i].getLabel());
+						mainPane.getChildren().addAll(ImagePlaces[i].getImageview());
+						mainPane.getChildren().addAll(ImagePlaces[i].getLabel());
 
-			}
+					}
+				} else if (ImagePlaces[i].getRplace() instanceof RoutePlace) {
+					mainPane.getChildren().addAll(ImagePlaces[i].getImageview());
+					mainPane.getChildren().addAll(ImagePlaces[i].getLabel());
+				}
 		}
 		for (int i = 0; i < ImagePlacesOld.length; i++) {
 
-			if (ImagePlacesOld[i] != null) {
+			if (ImagePlacesOld[i] != null)
+				if (ImagePlacesOld[i].getRplace() instanceof URoutePlace) {
+					if (!ImagePlacesOld[i].getRplace().getType().equals("DELETE")) {
 
-				mainPane.getChildren().removeAll(ImagePlacesOld[i].getImageview());
-				mainPane.getChildren().removeAll(ImagePlacesOld[i].getLabel());
+						mainPane.getChildren().removeAll(ImagePlacesOld[i].getImageview());
+						mainPane.getChildren().removeAll(ImagePlacesOld[i].getLabel());
 
-			}
+					}
+				} else {
+					mainPane.getChildren().removeAll(ImagePlacesOld[i].getImageview());
+					mainPane.getChildren().removeAll(ImagePlacesOld[i].getLabel());
+				}
+
 		}
 
 		// AddMethodsForIP();
@@ -629,7 +701,7 @@ public class AddRLocController {
 						CurImagePlace.setId(Integer.parseInt(ID));
 						CurImagePlace.setLabel(ImagePlaces[Integer.parseInt(ID)].getLabel());
 						CurImagePlace.setPlace(ImagePlaces[Integer.parseInt(ID)].getPlace());
-
+						CurImagePlace.setRplace(ImagePlaces[Integer.parseInt(ID)].getRplace());
 						// TF_Accessibility.setText("" +
 						// ImagePlaces[Integer.parseInt(ID)].getPlace().getAccessibility());
 						// TF_Description.setText(ImagePlaces[Integer.parseInt(ID)].getPlace().getDescription());
@@ -925,7 +997,7 @@ public class AddRLocController {
 		}
 		BuildAllPlaces();
 		BuildOldMap();
-
+		// DrawOldPlaces();
 		// updateLocations();
 
 	}
@@ -940,7 +1012,7 @@ public class AddRLocController {
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
-		primaryStage.setOnCloseRequest(e-> {
+		primaryStage.setOnCloseRequest(e -> {
 			try {
 				logOut();
 			} catch (IOException e1) {
@@ -961,7 +1033,7 @@ public class AddRLocController {
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
-		primaryStage.setOnCloseRequest(e-> {
+		primaryStage.setOnCloseRequest(e -> {
 			try {
 				logOut();
 			} catch (IOException e1) {
@@ -1042,13 +1114,13 @@ public class AddRLocController {
 
 		return true;
 	}
-	
+
 	private Object logOut() throws UnknownHostException, IOException {
 		String[] array = new String[3];
 		array[0] = "LogOut";
 		array[1] = Globals.user.getUserName();
 		array[2] = Globals.user.getPassword();
-		
+
 		@SuppressWarnings("resource")
 		Socket socket = new Socket("localhost", 5555);
 		try {
@@ -1057,7 +1129,7 @@ public class AddRLocController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
 
