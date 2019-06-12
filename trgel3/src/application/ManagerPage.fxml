@@ -10,8 +10,9 @@
       <Button fx:id="Back" layoutX="614.0" layoutY="174.0" mnemonicParsing="false" onAction="#backFunc" text="Back" />
       <Button fx:id="btn_editMaps" layoutX="684.0" layoutY="208.0" mnemonicParsing="false" onAction="#editmaps" text="Edit Maps" />
       <Button fx:id="btn_confirmMaps" layoutX="765.0" layoutY="208.0" mnemonicParsing="false" onAction="#confirmMapsFunc" text="Confirm Maps" />
+      <Button fx:id="btn_ConfirmRoutes" layoutX="874.0" layoutY="208.0" mnemonicParsing="false" onAction="#confirmRoutesFunc" text="Confirm Routes" />      
       <Button fx:id="memberfile" layoutX="606.0" layoutY="246.0" mnemonicParsing="false" onAction="#MembersFileFunc" text="Members File" />
-      <Button fx:id="Prices" layoutX="874.0" layoutY="246.0" mnemonicParsing="false" onAction="#changeprice" text="change prices" />
+      <Button fx:id="Prices" layoutX="874.0" layoutY="246.0" mnemonicParsing="false" onAction="#changeprice" text="Change prices" />
       <Button fx:id="Reports" layoutX="684.0" layoutY="280.0" mnemonicParsing="false" onAction="#showreportbtn" text="Show Reports" />
       <Button fx:id="btn_AddRoute" layoutX="782.0" layoutY="246.0" mnemonicParsing="false" onAction="#AddRouteFunc" text="Add Route" />
       

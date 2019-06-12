@@ -75,6 +75,7 @@ public class MessagesController {
 			gridPane.setHgap(10);
 			gridPane.setVgap(10);
 			TableView<NewPrices> NewPricesTable = new TableView<NewPrices>();
+			NewPricesTable.prefHeight(100);
 			NewPricesTable.getColumns().clear();
 			NewPricesTable.setEditable(true);
 			TableColumn<NewPrices, String> CityName = new TableColumn<NewPrices, String>();
@@ -192,7 +193,7 @@ public class MessagesController {
 			layoutV.getChildren().add(gridPane1);
 			layoutV.getChildren().add(gridPane3);
 			layoutV.setAlignment(Pos.CENTER);
-			Scene dialogScene = new Scene(layoutV, 500, 400);
+			Scene dialogScene = new Scene(layoutV, 500, 500);
 			buttonClose.setOnAction(e -> {
 				Confirmation.close();
 			});

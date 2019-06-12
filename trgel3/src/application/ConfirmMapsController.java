@@ -46,12 +46,6 @@ public class ConfirmMapsController {
 	private Button Back;
 
 	@FXML
-	private Button OneTimePurchase;
-
-	@FXML
-	private Button FixedTimePurchase;
-
-	@FXML
 	private ComboBox<String> comboBox;
 
 	@FXML
@@ -247,7 +241,7 @@ public class ConfirmMapsController {
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
-		primaryStage.setOnCloseRequest(e-> {
+		primaryStage.setOnCloseRequest(e -> {
 			try {
 				logOut();
 			} catch (IOException e1) {
@@ -278,7 +272,7 @@ public class ConfirmMapsController {
 			Scene scene = new Scene(pane);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
-			primaryStage.setOnCloseRequest(e-> {
+			primaryStage.setOnCloseRequest(e -> {
 				try {
 					logOut();
 				} catch (IOException e1) {
@@ -472,7 +466,7 @@ public class ConfirmMapsController {
 									scene.getStylesheets()
 											.add(getClass().getResource("application.css").toExternalForm());
 									primaryStage.setScene(scene);
-									primaryStage.setOnCloseRequest(e-> {
+									primaryStage.setOnCloseRequest(e -> {
 										try {
 											logOut();
 										} catch (IOException e1) {
@@ -597,7 +591,7 @@ public class ConfirmMapsController {
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
-		primaryStage.setOnCloseRequest(e-> {
+		primaryStage.setOnCloseRequest(e -> {
 			try {
 				logOut();
 			} catch (IOException e1) {
@@ -618,7 +612,7 @@ public class ConfirmMapsController {
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
-		primaryStage.setOnCloseRequest(e-> {
+		primaryStage.setOnCloseRequest(e -> {
 			try {
 				logOut();
 			} catch (IOException e1) {
@@ -639,7 +633,7 @@ public class ConfirmMapsController {
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
-		primaryStage.setOnCloseRequest(e-> {
+		primaryStage.setOnCloseRequest(e -> {
 			try {
 				logOut();
 			} catch (IOException e1) {
@@ -650,13 +644,13 @@ public class ConfirmMapsController {
 		primaryStage.show();
 
 	}
-	
+
 	private Object logOut() throws UnknownHostException, IOException {
 		String[] array = new String[3];
 		array[0] = "LogOut";
 		array[1] = Globals.user.getUserName();
 		array[2] = Globals.user.getPassword();
-		
+
 		@SuppressWarnings("resource")
 		Socket socket = new Socket(Globals.IpAddress, 5555);
 		try {
@@ -665,7 +659,7 @@ public class ConfirmMapsController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
 

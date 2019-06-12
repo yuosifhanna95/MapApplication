@@ -26,7 +26,7 @@
              <TableColumn fx:id="usernameCol" prefWidth="75.0" text="Username" />
               <TableColumn fx:id="passwordCol" prefWidth="75.0" text="Password" />
                <TableColumn fx:id="typeCol" prefWidth="75.0" text="Type" />
-             	 <TableColumn fx:id="EditCol" prefWidth="100.0" text="Status" />
+             	 <TableColumn fx:id="HistoryCol" prefWidth="100.0" text="History" />
         </columns>
       </TableView>
    </children>

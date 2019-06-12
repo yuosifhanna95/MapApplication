@@ -3,6 +3,7 @@ package application;
 public class Globals {
 	static int MODE;
 	static User user;
+	static User userView;
 	static City city;
 	static FixedPurchase FixedPurchase;
 	static Map map;

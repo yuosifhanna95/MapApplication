@@ -379,8 +379,9 @@ public class AddRLocController {
 					Label label = new Label();
 					// label.relocate((double) list2[c].getLocX(), (double) list2[c].getLocY());
 
-					newLoc.relocate(URoutePlaceList[c].getLocX() - (im.getWidth() / 2) * aspect,
-							URoutePlaceList[c].getLocY() - (im.getHeight() / 2) * aspect);
+					newLoc.relocate(
+							URoutePlaceList[c].getLocX() + raninImage.getLayoutX() - (im.getWidth() / 2) * aspect,
+							URoutePlaceList[c].getLocY() + raninImage.getLayoutY() - (im.getHeight() / 2) * aspect);
 
 					label.setFont(new Font("Quicksand", 20));
 					UPlace p = new UPlace("" + Globals.route.getId(), UPlacelist[c].getCityName(),
@@ -395,8 +396,9 @@ public class AddRLocController {
 					double width = t.getBoundsInLocal().getWidth();
 					double height = t.getBoundsInLocal().getHeight();
 
-					label.relocate(URoutePlaceList[c].getLocX() - (width / 2),
-							URoutePlaceList[c].getLocY() - (height + (im.getHeight() / 2) * aspect));
+					label.relocate(URoutePlaceList[c].getLocX() + raninImage.getLayoutX() - (width / 2),
+							URoutePlaceList[c].getLocY() + raninImage.getLayoutY()
+									- (height + (im.getHeight() / 2) * aspect));
 
 					newLoc.setFitHeight(im.getHeight() * aspect);
 					newLoc.setFitWidth(im.getWidth() * aspect);
@@ -425,8 +427,8 @@ public class AddRLocController {
 				Label label = new Label();
 				// label.relocate(X, Y);
 
-				newLoc.relocate(ORoutePlaceList[i].getLocX() - (im.getWidth() / 2) * aspect,
-						ORoutePlaceList[i].getLocY() - (im.getHeight() / 2) * aspect);
+				newLoc.relocate(ORoutePlaceList[i].getLocX() + raninImage.getLayoutX() - (im.getWidth() / 2) * aspect,
+						ORoutePlaceList[i].getLocY() + raninImage.getLayoutY() - (im.getHeight() / 2) * aspect);
 
 				label.setFont(new Font("Quicksand", 20));
 				Place p = new Place("" + Globals.route.getId(), OPlacelist[i].getCityName(),
@@ -441,8 +443,9 @@ public class AddRLocController {
 				double width = t.getBoundsInLocal().getWidth();
 				double height = t.getBoundsInLocal().getHeight();
 
-				label.relocate(ORoutePlaceList[i].getLocX() - (width / 2),
-						ORoutePlaceList[i].getLocY() - (height + (im.getHeight() / 2) * aspect));
+				label.relocate(ORoutePlaceList[i].getLocX() + raninImage.getLayoutX() - (width / 2),
+						ORoutePlaceList[i].getLocY() + raninImage.getLayoutY()
+								- (height + (im.getHeight() / 2) * aspect));
 
 				newLoc.setFitHeight(im.getHeight() * aspect);
 				newLoc.setFitWidth(im.getWidth() * aspect);
@@ -469,8 +472,8 @@ public class AddRLocController {
 				Label label = new Label();
 				// label.relocate((double) list2[c].getLocX(), (double) list2[c].getLocY());
 
-				newLoc.relocate(UPlacelist[c].getLocX() - (im.getWidth() / 2) * aspect,
-						UPlacelist[c].getLocY() - (im.getHeight() / 2) * aspect);
+				newLoc.relocate(UPlacelist[c].getLocX() + raninImage.getLayoutX() - (im.getWidth() / 2) * aspect,
+						UPlacelist[c].getLocY() + raninImage.getLayoutY() - (im.getHeight() / 2) * aspect);
 
 				label.setFont(new Font("Quicksand", 20));
 				UPlace p = new UPlace("" + Globals.route.getId(), UPlacelist[c].getCityName(),
@@ -486,8 +489,8 @@ public class AddRLocController {
 				double width = t.getBoundsInLocal().getWidth();
 				double height = t.getBoundsInLocal().getHeight();
 
-				label.relocate(UPlacelist[c].getLocX() - (width / 2),
-						UPlacelist[c].getLocY() - (height + (im.getHeight() / 2) * aspect));
+				label.relocate(UPlacelist[c].getLocX() + raninImage.getLayoutX() - (width / 2),
+						UPlacelist[c].getLocY() + raninImage.getLayoutY() - (height + (im.getHeight() / 2) * aspect));
 
 				newLoc.setFitHeight(im.getHeight() * aspect);
 				newLoc.setFitWidth(im.getWidth() * aspect);
@@ -561,7 +564,7 @@ public class AddRLocController {
 
 			if (ImagePlaces[i] != null)
 				if (ImagePlaces[i].getRplace() instanceof URoutePlace) {
-					if (!ImagePlaces[i].getPlace().getType().equals("DELETE")) {
+					if (!ImagePlaces[i].getRplace().getType().equals("DELETE")) {
 
 						mainPane.getChildren().addAll(ImagePlaces[i].getImageview());
 						mainPane.getChildren().addAll(ImagePlaces[i].getLabel());
@@ -607,8 +610,8 @@ public class AddRLocController {
 				Label label = new Label();
 				// label.relocate(X, Y);
 
-				newLoc.relocate(OPlacelist[i].getLocX() - (im.getWidth() / 2) * aspect,
-						OPlacelist[i].getLocY() - (im.getHeight() / 2) * aspect);
+				newLoc.relocate(OPlacelist[i].getLocX() + raninImage.getLayoutX() - (im.getWidth() / 2) * aspect,
+						OPlacelist[i].getLocY() + raninImage.getLayoutY() - (im.getHeight() / 2) * aspect);
 
 				label.setFont(new Font("Quicksand", 20));
 				Place p = new Place("" + Globals.route.getId(), OPlacelist[i].getCityName(),
@@ -623,8 +626,8 @@ public class AddRLocController {
 				double width = t.getBoundsInLocal().getWidth();
 				double height = t.getBoundsInLocal().getHeight();
 
-				label.relocate(OPlacelist[i].getLocX() - (width / 2),
-						OPlacelist[i].getLocY() - (height + (im.getHeight() / 2) * aspect));
+				label.relocate(OPlacelist[i].getLocX() + raninImage.getLayoutX() - (width / 2),
+						OPlacelist[i].getLocY() + raninImage.getLayoutY() - (height + (im.getHeight() / 2) * aspect));
 
 				newLoc.setFitHeight(im.getHeight() * aspect);
 				newLoc.setFitWidth(im.getWidth() * aspect);
@@ -682,8 +685,8 @@ public class AddRLocController {
 
 							// CurImagePlace.setX((int) event.getSceneX());
 							// CurImagePlace.setY((int) event.getSceneY());
-							ImagePlaces[Integer.parseInt(ID)].setX((int) event.getSceneX());
-							ImagePlaces[Integer.parseInt(ID)].setY((int) event.getSceneY());
+							ImagePlaces[Integer.parseInt(ID)].setX((int) (event.getSceneX() - raninImage.getLayoutX()));
+							ImagePlaces[Integer.parseInt(ID)].setY((int) (event.getSceneY() - raninImage.getLayoutY()));
 							ImagePlaces[Integer.parseInt(ID)].setChanged(true);
 
 							// TF_Accessibility
@@ -792,8 +795,8 @@ public class AddRLocController {
 										event.getSceneX() - (labels[CurImagePlace.getId()].getWidth() / 2),
 										event.getSceneY() - (labels[CurImagePlace.getId()].getHeight()
 												+ (im.getHeight() / 2) * aspect));
-								CurImagePlace.setX((int) event.getSceneX());
-								CurImagePlace.setY((int) event.getSceneY());
+								CurImagePlace.setX((int) (event.getSceneX() - raninImage.getLayoutX()));
+								CurImagePlace.setY((int) (event.getSceneY() - raninImage.getLayoutY()));
 								TF_Accessibility
 										.setText("" + ImagePlaces[Integer.parseInt(ID)].getPlace().getAccessibility());
 								TF_Description.setText(ImagePlaces[Integer.parseInt(ID)].getPlace().getDescription());
@@ -836,8 +839,8 @@ public class AddRLocController {
 							OK.relocate(event.getSceneX() - (OK.getWidth() / 2), event.getSceneY() + (OK.getHeight()));
 							locations[current].addEventFilter(MouseEvent.MOUSE_CLICKED, EditTouchEvent);
 							locations[current].addEventFilter(MouseEvent.MOUSE_DRAGGED, EditTouchEvent);
-							ImagePlaces[current].setX((int) event.getSceneX());
-							ImagePlaces[current].setY((int) event.getSceneY());
+							ImagePlaces[current].setX((int) (event.getSceneX() - raninImage.getLayoutX()));
+							ImagePlaces[current].setY((int) (event.getSceneY() - raninImage.getLayoutY()));
 						}
 						// TODO Auto-generated method stub
 

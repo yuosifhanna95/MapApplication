@@ -6,5 +6,6 @@
 <AnchorPane fx:id="mainPane" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.ViewController">
    <children>
       <Button fx:id="back" layoutX="71.0" layoutY="73.0" mnemonicParsing="false" onAction="#backFunc" text="Back" />
+      <Button fx:id="btn_save" layoutX="651.0" layoutY="14.0" mnemonicParsing="false" onAction="#saveImage" text="Download Map" />
    </children>
 </AnchorPane>

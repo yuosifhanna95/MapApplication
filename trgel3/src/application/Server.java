@@ -630,6 +630,7 @@ public class Server {
 								// ObjectOutputStream(skt.getOutputStream());
 								// String message = "thanks for adding map";
 								// objectOutput.writeObject(message);
+								AddCityNumberOfMaps(map.getCity(), conn);
 								System.out.println("thanks for adding map");
 							}
 
@@ -659,6 +660,7 @@ public class Server {
 								// ObjectOutputStream(skt.getOutputStream());
 								// String message = "thanks for adding map";
 								// objectOutput.writeObject(message);
+								AddCityNumberOfRoutes(Route.getCity(), conn);
 								System.out.println("thanks for adding route");
 							}
 
@@ -830,6 +832,7 @@ public class Server {
 												if (pr2.executeUpdate() > 0) {
 													// JOptionPane.showMessageDialog(null, "thanks for Update");
 													System.out.println("thanks for confirmation");
+													AddCityNumberOfPlaces(CityName, conn);
 													flag = true;
 												}
 											}
@@ -861,6 +864,7 @@ public class Server {
 											if (!rs.next())
 												if (stmt2.executeUpdate(sql) > 0) {
 													// JOptionPane.showMessageDialog(null, "thanks for Update");
+													RemoveCityNumberOfPlaces(CityName, conn);
 													System.out.println("thanks for confirmation");
 													flag = true;
 												}
@@ -938,8 +942,7 @@ public class Server {
 
 								if (place.getType().equals("NEW")) {
 									sql = "INSERT INTO RoutePlaces (RouteId, `Place`, time, LocX, LocY) VALUES (?,?,?,?,?)";
-								}
-								if (place.getType().equals("DELETE")) {
+								} else if (place.getType().equals("DELETE")) {
 									// sql = "DELETE FROM RoutePlaces WHERE id =" + place.getPlaceId();
 									sql = "DELETE FROM RoutePlaces WHERE place='" + place.getPlace() + "' AND RouteID="
 											+ place.getRouteId();
@@ -1519,7 +1522,7 @@ public class Server {
 								String classification = rs.getString("classification");
 								int accessibility = rs.getInt("accessibility");
 
-								Point p = GetLocationFromDB(Integer.parseInt(MapId), Place);
+								Point p = new Point(0, 0);// GetLocationFromDB(Integer.parseInt(MapId), Place);
 								int LocX = (int) p.getX();
 								int LocY = (int) p.getY();
 								// rs.getString("pathNum");
@@ -3103,6 +3106,106 @@ public class Server {
 
 	}
 
+	public static void AddCityNumberOfRoutes(String City, Connection conn) {
+		Statement stmt;
+
+		// Connection conn=connecttion();
+		if (conn != null) {
+			try {
+
+				conn = DriverManager.getConnection(DB_URL, USER, PASS);
+				stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+				String sql = "SELECT * FROM CityCatalog where name='" + City + "'";
+				ResultSet rs = stmt.executeQuery(sql);
+				if (rs.next()) {
+					rs.updateInt("pathNum", rs.getInt("pathNum") + 1);// 1
+					rs.updateRow();
+
+				}
+
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+	}
+
+	public static void AddCityNumberOfPlaces(String City, Connection conn) {
+		Statement stmt;
+
+		// Connection conn=connecttion();
+		if (conn != null) {
+			try {
+
+				conn = DriverManager.getConnection(DB_URL, USER, PASS);
+				stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+				String sql = "SELECT * FROM CityCatalog where name='" + City + "'";
+				ResultSet rs = stmt.executeQuery(sql);
+				if (rs.next()) {
+					rs.updateInt("placesNum", rs.getInt("placesNum") + 1);// 1
+					rs.updateRow();
+
+				}
+
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+	}
+
+	public static void RemoveCityNumberOfPlaces(String City, Connection conn) {
+		Statement stmt;
+
+		// Connection conn=connecttion();
+		if (conn != null) {
+			try {
+
+				conn = DriverManager.getConnection(DB_URL, USER, PASS);
+				stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+				String sql = "SELECT * FROM CityCatalog where name='" + City + "'";
+				ResultSet rs = stmt.executeQuery(sql);
+				if (rs.next()) {
+					rs.updateInt("placesNum", rs.getInt("placesNum") - 1);// 1
+					rs.updateRow();
+
+				}
+
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+	}
+
+	public static void AddCityNumberOfMaps(String City, Connection conn) {
+		Statement stmt;
+
+		// Connection conn=connecttion();
+		if (conn != null) {
+			try {
+
+				conn = DriverManager.getConnection(DB_URL, USER, PASS);
+				stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+				String sql = "SELECT * FROM CityCatalog where name='" + City + "'";
+				ResultSet rs = stmt.executeQuery(sql);
+				if (rs.next()) {
+					rs.updateInt("mapsNum", rs.getInt("mapsNum") + 1);// 1
+					rs.updateRow();
+
+				}
+
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+	}
+
 	static void AddPurchaseToHistory(String city, int version, String user, String Type, String date, Connection conn) {
 
 		Statement pr;
@@ -3278,7 +3381,6 @@ public class Server {
 				String output = sdf1.format(c.getTime());
 				date1 = sdf1.parse(output);
 				java.sql.Date datenow1 = new java.sql.Date(date1.getTime());
-				;
 
 				pr.setDate(1, datenow1);
 				pr.setString(2, city);

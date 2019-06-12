@@ -71,15 +71,15 @@ public class MemberFileController {
 
 	@FXML
 	private TableColumn<User, String> usernameCol;
-	
+
 	@FXML
 	private TableColumn<User, String> passwordCol;
-	
+
 	@FXML
 	private TableColumn<User, String> typeCol;
-	
+
 	@FXML
-	private TableColumn<User, String> EditCol;
+	private TableColumn<User, String> HistoryCol;
 
 	private TableColumn buttonCol;
 	@FXML
@@ -162,15 +162,15 @@ public class MemberFileController {
 		searchText.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent ke) {
 				switch (comboBox.getValue()) {
-				case "City":
+				case "Username":
 					flPlace.setPredicate(
 							p -> p.getCityName().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
 					break;
-				case "Place":
+				case "Email":
 					flPlace.setPredicate(
 							p -> p.getPlaceName().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
 					break;
-				case "Description":
+				case "Phone number":
 					flPlace.setPredicate(
 							p -> p.getDescription().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
 					break;
@@ -190,7 +190,7 @@ public class MemberFileController {
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
-		primaryStage.setOnCloseRequest(e-> {
+		primaryStage.setOnCloseRequest(e -> {
 			try {
 				logOut();
 			} catch (IOException e1) {
@@ -221,7 +221,7 @@ public class MemberFileController {
 			Scene scene = new Scene(pane);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
-			primaryStage.setOnCloseRequest(e-> {
+			primaryStage.setOnCloseRequest(e -> {
 				try {
 					logOut();
 				} catch (IOException e1) {
@@ -241,12 +241,12 @@ public class MemberFileController {
 	void initialize() throws IOException, Exception {
 		Globals.backLink = "MainPage.fxml";
 
-		//searchCity.getStyleClass().removeAll("addBobOk, focus");
-		//searchCity.getStyleClass().add("addBobOk");
+		// searchCity.getStyleClass().removeAll("addBobOk, focus");
+		// searchCity.getStyleClass().add("addBobOk");
 
 		buildData("user");
-		
-		comboBox.getItems().addAll("City", "Place", "Description");
+
+		comboBox.getItems().addAll("Username", "Email", "Phone number");
 		searchText.setPromptText("Write here");
 
 		flPlace = new FilteredList<Place>(dataPlace, p -> true);// Pass the dataCity to a filtered list
@@ -259,7 +259,7 @@ public class MemberFileController {
 			row.setOnMouseClicked(event -> {
 				if (event.getClickCount() == 1 && (!row.isEmpty())) {
 					User userRow = searchTable.getSelectionModel().getSelectedItem();
-					//Globals.user = (User) userRow;
+					// Globals.user = (User) userRow;
 
 				}
 			});
@@ -294,18 +294,18 @@ public class MemberFileController {
 		emailCol.setStyle("-fx-alignment: CENTER;");
 		emailCol.setMinWidth(50);
 		emailCol.setCellValueFactory(new PropertyValueFactory<User, String>("email"));
-		
+
 		passwordCol.setStyle("-fx-alignment: CENTER;");
 		passwordCol.setMinWidth(50);
 		passwordCol.setCellValueFactory(new PropertyValueFactory<User, String>("password"));
-		
+
 		typeCol.setStyle("-fx-alignment: CENTER;");
 		typeCol.setMinWidth(50);
 		typeCol.setCellValueFactory(new PropertyValueFactory<User, String>("type"));
-		
-		EditCol.setStyle("-fx-alignment: CENTER;");
-		EditCol.setMinWidth(50);
-		EditCol.setCellValueFactory(new PropertyValueFactory<>("type"));
+
+		HistoryCol.setStyle("-fx-alignment: CENTER;");
+		HistoryCol.setMinWidth(50);
+		HistoryCol.setCellValueFactory(new PropertyValueFactory<>("type"));
 
 		Callback<TableColumn<User, String>, TableCell<User, String>> cellFactory = new Callback<TableColumn<User, String>, TableCell<User, String>>() {
 
@@ -314,7 +314,7 @@ public class MemberFileController {
 				// TODO Auto-generated method stub
 				final TableCell<User, String> cell = new TableCell<User, String>() {
 
-					final Button btn = new Button("Edit");
+					final Button btn = new Button("View history");
 
 					@Override
 					public void updateItem(String item, boolean empty) {
@@ -324,16 +324,19 @@ public class MemberFileController {
 							setText(null);
 						} else {
 							User user1 = getTableView().getItems().get(getIndex());
-							//if (!city1.getNewUpdate()) {
-							//	btn.setText("Edit");
-								//Globals.ThereIsCityUpdate = false;
-							//} else
-								//Globals.ThereIsCityUpdate = true;
+							// if (!city1.getNewUpdate()) {
+							// btn.setText("Edit");
+							// Globals.ThereIsCityUpdate = false;
+							// } else
+							// Globals.ThereIsCityUpdate = true;
 
 							btn.setOnAction(event -> {
-								//Globals.city = city1;
+								User us = (User) user1;
+								Globals.userView = us;
+								// Globals.city = city1;
+								Globals.backLink = "MemberFile.fxml";
 								Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-								URL url = getClass().getResource("ConfirmMap.fxml");
+								URL url = getClass().getResource("MemberHistory.fxml");
 								AnchorPane pane;
 								try {
 									pane = FXMLLoader.load(url);
@@ -341,7 +344,7 @@ public class MemberFileController {
 									scene.getStylesheets()
 											.add(getClass().getResource("application.css").toExternalForm());
 									primaryStage.setScene(scene);
-									primaryStage.setOnCloseRequest(e-> {
+									primaryStage.setOnCloseRequest(e -> {
 										try {
 											logOut();
 										} catch (IOException e1) {
@@ -364,24 +367,25 @@ public class MemberFileController {
 				return cell;
 			}
 		};
-		EditCol.setCellFactory(cellFactory);
+		HistoryCol.setCellFactory(cellFactory);
 
 		flUser = new FilteredList<User>(dataUser, p -> true);// Pass the data to a filtered list
 		searchTable.setItems(flUser);// Set the table's items using the filtered list
-		searchTable.getColumns().addAll(fnameCol, lnameCol, pnumberCol, emailCol, usernameCol, passwordCol,typeCol,EditCol);
+		searchTable.getColumns().addAll(fnameCol, lnameCol, pnumberCol, emailCol, usernameCol, passwordCol, typeCol,
+				HistoryCol);
 
 		searchText.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent ke) {
 				switch (comboBox.getValue()) {
-				case "City":
+				case "Username":
 					flUser.setPredicate(
 							p -> p.getUserName().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
 					break;
-				case "Place":
+				case "Email":
 					flUser.setPredicate(
 							p -> p.getEmail().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
 					break;
-				case "Description":
+				case "Phone number":
 					flUser.setPredicate(
 							p -> p.getPhoneNumber().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
 					break;
@@ -431,7 +435,7 @@ public class MemberFileController {
 						for (int i = 1; i <= (int) object[0]; i++) {
 							dataUser.add((User) object[i]);
 						}
-					} 
+					}
 
 				} catch (ClassNotFoundException e) {
 					System.out.println("The title list has not come from the server");
@@ -456,7 +460,7 @@ public class MemberFileController {
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
-		primaryStage.setOnCloseRequest(e-> {
+		primaryStage.setOnCloseRequest(e -> {
 			try {
 				logOut();
 			} catch (IOException e1) {
@@ -477,7 +481,7 @@ public class MemberFileController {
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
-		primaryStage.setOnCloseRequest(e-> {
+		primaryStage.setOnCloseRequest(e -> {
 			try {
 				logOut();
 			} catch (IOException e1) {
@@ -498,7 +502,7 @@ public class MemberFileController {
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
-		primaryStage.setOnCloseRequest(e-> {
+		primaryStage.setOnCloseRequest(e -> {
 			try {
 				logOut();
 			} catch (IOException e1) {
@@ -515,7 +519,7 @@ public class MemberFileController {
 		array[0] = "LogOut";
 		array[1] = Globals.user.getUserName();
 		array[2] = Globals.user.getPassword();
-		
+
 		@SuppressWarnings("resource")
 		Socket socket = new Socket(Globals.IpAddress, 5555);
 		try {
@@ -524,7 +528,7 @@ public class MemberFileController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
 }

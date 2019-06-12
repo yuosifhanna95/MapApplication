@@ -705,7 +705,7 @@ public class AddMapController {
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
-		primaryStage.setOnCloseRequest(e-> {
+		primaryStage.setOnCloseRequest(e -> {
 			try {
 				logOut();
 			} catch (IOException e1) {
@@ -769,13 +769,13 @@ public class AddMapController {
 		spa.setTransform(Transform.scale(pixelScale, pixelScale));
 		return node.snapshot(spa, writableImage);
 	}
-	
+
 	private Object logOut() throws UnknownHostException, IOException {
 		String[] array = new String[3];
 		array[0] = "LogOut";
 		array[1] = Globals.user.getUserName();
 		array[2] = Globals.user.getPassword();
-		
+
 		@SuppressWarnings("resource")
 		Socket socket = new Socket(Globals.IpAddress, 5555);
 		try {
@@ -784,7 +784,7 @@ public class AddMapController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
 
