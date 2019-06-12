@@ -15,11 +15,13 @@ import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.Date;
+
 import javax.swing.JOptionPane;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -41,17 +43,14 @@ public class Server {
 			ServerSocket myServerSocket = new ServerSocket(5555);
 			while (true) {
 
+				Date date2 = new Date();
 
-				   
-			    Date date2 = new Date();
-			   
-			   
-			    if((date2.getHours()==12||date2.getHours()==1)&&(checked==0)){
-			    	if(checkthesystem()==1) {
-			    	new Thread(new ScheduleMessage()).start();}
-			    	checked=1;
-			    }
-			    
+				if ((date2.getHours() == 12 || date2.getHours() == 1) && (checked == 0)) {
+					if (checkthesystem() == 1) {
+						new Thread(new ScheduleMessage()).start();
+					}
+					checked = 1;
+				}
 
 				Socket skt = myServerSocket.accept();
 				ObjectInputStream objectInput = new ObjectInputStream(skt.getInputStream());
@@ -99,46 +98,44 @@ public class Server {
 
 							Date sdate = Calendar.getInstance().getTime();
 							String date = df.format(sdate);
-							statics("fixedpurchase",fp.getCity(),java.sql.Date.valueOf(endDateAsString));
+							statics("fixedpurchase", fp.getCity(), java.sql.Date.valueOf(endDateAsString));
 							AddPurchaseToHistory(fp.getCity(), 1, fp.getUser(), "FT", date, conn);
 
 						}
 
-
-					} 
-					else if(((String)((Object[])(data))[0]).equals("getreport")) {
+					} else if (((String) ((Object[]) (data))[0]).equals("getreport")) {
 						ObservableList<Reports> data1 = FXCollections.observableArrayList();
-						
-					String type=((String)((Object[])(data))[1]);
-					if(type.equals("One city")) {
-						Reports r=((Reports)((Object[])(data))[2]);
-						Reports report = getReportFromDB(r);
-						data1.add(report);
-						Object[] data = new Object[data1.size() + 1];
-						data[0] = data1.size();
-						int counter = 1;
-						for (Reports tu : data1) {
-							data[counter] = tu;
-							counter++;
-						}
-						try {
-							ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
-							objectOutput.writeObject(data);
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-						
-					}
-					else {
-						ObservableList<City> cityList = getCityFromDB(-1);
-						Object[] data2 = new Object[cityList.size() + 1];
-						data2[0] = cityList.size();
-						
-						for (City ms : cityList) {
-							Reports r1=((Reports)((Object[])(data))[2]);
-							r1.setCity(ms.getCity());
-							Reports report = getReportFromDB(r1);
-							data1.add(report);}
+
+						String type = ((String) ((Object[]) (data))[1]);
+						if (type.equals("One city")) {
+							Reports r = ((Reports) ((Object[]) (data))[2]);
+							Reports report = getReportFromDB(r);
+							data1.add(report);
+							Object[] data = new Object[data1.size() + 1];
+							data[0] = data1.size();
+							int counter = 1;
+							for (Reports tu : data1) {
+								data[counter] = tu;
+								counter++;
+							}
+							try {
+								ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
+								objectOutput.writeObject(data);
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+
+						} else {
+							ObservableList<City> cityList = getCityFromDB(-1);
+							Object[] data2 = new Object[cityList.size() + 1];
+							data2[0] = cityList.size();
+
+							for (City ms : cityList) {
+								Reports r1 = ((Reports) ((Object[]) (data))[2]);
+								r1.setCity(ms.getCity());
+								Reports report = getReportFromDB(r1);
+								data1.add(report);
+							}
 							Object[] data = new Object[data1.size() + 1];
 							data[0] = data1.size();
 							int counter1 = 1;
@@ -146,69 +143,69 @@ public class Server {
 								data[counter1] = tu;
 								counter1++;
 							}
-						
-						try {
-							ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
-							objectOutput.writeObject(data);
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-						
-					
-						
-						
-					}
-						
-						
-						
-					}
-					else if(((String)((Object[])(data))[0]).equals("confirm the prices and save it")) {
-						Connection  conn = null;
-						Connection conn1=null;
-                        NewPrices n=((NewPrices)((Object[])(data))[1]);
-        			
-					Class.forName(JDBC_DRIVER);
 
-					conn = DriverManager.getConnection(DB_URL, USER, PASS);
-					conn1 = DriverManager.getConnection(DB_URL, USER, PASS);
-					PreparedStatement pr=null;
-					PreparedStatement pr1=null;
-					String sql="INSERT INTO NewPrices( `city`, `fixedcost`, `onetimecost`) VALUES (?,?,?)";
-					String sql1="INSERT INTO messages(`userName`, `message`, `Datesend`, `read`, `typemessage`) VALUES (?,?,?,?,?)";
-					if ((conn != null)&&(conn1 != null)) {
-						pr = conn.prepareStatement(sql);
-						pr1 = conn1.prepareStatement(sql1);
-						Date date5=new Date();
-						java.sql.Date date3=new java.sql.Date(date5.getTime());
-						String type="Confirmation of change of prices of city "+ n.getCity();
-						String us="yuosif";
-						String mess="Dear sir,i updated the prices of purchase the maps of "+ n.getCity()+" city, i see that we will profit more money without losing any clint,so please confirm the price to update prices and publish it.";
-						pr1.setString(1,us );
-						pr1.setString(2, mess);
-						pr1.setDate(3, date3);
-						pr1.setInt(4, 0);
-						pr1.setString(5, type);
-            			
-            			 
-                  
-						pr.setString(1,n.getCity() );
-						pr.setInt(2,n.getFixedCost());
-						pr.setInt(3,n.getOneTimeCost());
-						
-						if ((pr1.executeUpdate() > 0)) {
-							if(pr.executeUpdate() > 0){
-							ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
-  		    				String message="we save the update price,we will listen for the confirmation,and we will send to you the answer of the directory maneger";
-	     	                objectOutput.writeObject(message);
+							try {
+								ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
+								objectOutput.writeObject(data);
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+
+						}
+
+					} else if (((String) ((Object[]) (data))[0]).equals("confirm the prices and save it")) {
+						Connection conn = null;
+						NewPrices n = ((NewPrices) ((Object[]) (data))[1]);
+
+						Class.forName(JDBC_DRIVER);
+
+						conn = DriverManager.getConnection(DB_URL, USER, PASS);
+						// conn1 = DriverManager.getConnection(DB_URL, USER, PASS);
+						PreparedStatement pr = null;
+						PreparedStatement pr1 = null;
+						Statement stmt = null;
+						String sql = "INSERT INTO newprices( `city`, `fixedcost`, `onetimecost`) VALUES (?,?,?)";
+						String sql1 = "INSERT INTO messages(`userName`, `message`, `Datesend`, `read`, `typemessage`) VALUES (?,?,?,?,?)";
+						String sqlfind = "SELECT * FROM newprices WHERE city='" + n.getCity() + "'";
+						if ((conn != null)) {
+							stmt = conn.createStatement();
+							ResultSet rs = stmt.executeQuery(sqlfind);
+							if (rs.next()) {
+								System.out.println("city prices have been already updated");
+								ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
+								String message = "city prices have been already updated";
+								objectOutput.writeObject(message);
+
+							} else {
+								pr = conn.prepareStatement(sql);
+								pr1 = conn.prepareStatement(sql1);
+								Date date5 = new Date();
+								java.sql.Date date3 = new java.sql.Date(date5.getTime());
+								String type = "Confirmation of change of prices of city " + n.getCity();
+								String us = "yuosif";
+								String mess = "Dear sir,i updated the prices of purchase the maps of " + n.getCity()
+										+ " city, i see that we will profit more money without losing any clint,so please confirm the price to update prices and publish it.";
+								pr1.setString(1, us);
+								pr1.setString(2, mess);
+								pr1.setDate(3, date3);
+								pr1.setInt(4, 0);
+								pr1.setString(5, type);
+
+								pr.setString(1, n.getCity());
+								pr.setInt(2, n.getFixedCost());
+								pr.setInt(3, n.getOneTimeCost());
+
+								if ((pr1.executeUpdate() > 0)) {
+									if (pr.executeUpdate() > 0) {
+										ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
+										String message = "we save the update price,we will listen for the confirmation,and we will send to you the answer of the directory maneger";
+										objectOutput.writeObject(message);
+									}
+								}
 							}
 						}
-				}
-    			
 
-					
-					
-					
-					}else if(((String)((Object[])(data))[0]).equals("updateUserInfo")) {
+					} else if (((String) ((Object[]) (data))[0]).equals("updateUserInfo")) {
 
 						Connection conn = null;
 
@@ -1018,8 +1015,7 @@ public class Server {
 						}
 						DeleteRUpdates(routeId);
 						DeleteRNewUpdates(routeId);
-					}
-					else if (((String[]) (data))[0].equals("getNewPrices")) {
+					} else if (((String[]) (data))[0].equals("getNewPrices")) {
 						ObservableList<NewPrices> NewPricesList = getMyNewPricesFromDB(((String[]) (data))[1]);
 						Object[] data = new Object[NewPricesList.size() + 1];
 						data[0] = NewPricesList.size();
@@ -1034,84 +1030,74 @@ public class Server {
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
-					}
-					else if (((String[]) (data))[0].equals("send message to contentmaneger")) {
+					} else if (((String[]) (data))[0].equals("send message to contentmaneger")) {
 						Connection conn = null;
 						Connection conn1 = null;
 						Statement stmt = null;
-						String ncity1=((String[]) (data))[4];
+						String ncity1 = ((String[]) (data))[4];
 						PreparedStatement pr;
-						String sql1="DELETE FROM NewPrices WHERE city = ?";
-						String sql = "SELECT * FROM NewPrices where city='" + ncity1 + "'";
-						String sql2="update CityCatalog set fixedCost = ?,oneTimeCost=? where name = ?";
-						int fc1=-1;
-						int otcost1=-1;	
-	
+						String sql1 = "DELETE FROM newprices WHERE city = ?";
+						String sql = "SELECT * FROM newprices where city='" + ncity1 + "'";
+						String sql2 = "update CityCatalog set fixedCost = ?,oneTimeCost=? where name = ?";
+						int fc1 = -1;
+						int otcost1 = -1;
+
 						try {
 							Class.forName(JDBC_DRIVER);
 
 							conn = DriverManager.getConnection(DB_URL, USER, PASS);
 							conn1 = DriverManager.getConnection(DB_URL, USER, PASS);
-							if (conn != null&&conn1 != null) {
+							if (conn != null && conn1 != null) {
 								stmt = conn.createStatement();
 								ResultSet rs = stmt.executeQuery(sql);
 								pr = conn1.prepareStatement(sql1);
 								pr.setString(1, ncity1);
 								while (rs.next()) {
-									 fc1=rs.getInt("fixedcost");
-									otcost1=rs.getInt("onetimecost");
+									fc1 = rs.getInt("fixedcost");
+									otcost1 = rs.getInt("onetimecost");
 								}
 								pr.executeUpdate();
 							}
-							
-							
-							
-							
-							
-									
-							
-							
-							
-						if (((String[]) (data))[2].equals("yes")) {
-							if(conn!=null) {
-								pr = conn.prepareStatement(sql2);
-								pr.setInt(1,fc1);
-								pr.setInt(2,otcost1);
-								pr.setString(3, ncity1);
-								pr.executeUpdate();
+
+							if (((String[]) (data))[2].equals("yes")) {
+								if (conn != null) {
+									pr = conn.prepareStatement(sql2);
+									pr.setInt(1, fc1);
+									pr.setInt(2, otcost1);
+									pr.setString(3, ncity1);
+									pr.executeUpdate();
+								}
 							}
-						}
-						
-						PreparedStatement pr1=null;
-						
-						
-						String sql3="INSERT INTO messages(`userName`, `message`, `Datesend`, `read`, `typemessage`) VALUES (?,?,?,?,?)";
-						if ((conn != null)) {
-							
-							pr1 = conn1.prepareStatement(sql3);
-							String type2="the answer of the directorymaneger about the NewPrices for city "+ncity1;
-							java.sql.Date date3=new java.sql.Date(new Date().getTime());
-							String us=((String[]) (data))[1];
-							String mess=((String[]) (data))[3];
-							pr1.setString(1,us );
-							pr1.setString(2, mess);
-							pr1.setDate(3, date3);
-							pr1.setInt(4, 0);
-							pr1.setString(5, type2);
-							if(pr1.executeUpdate()>0) {
-								ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
-								String message = "done";
-								objectOutput.writeObject(message);
+
+							PreparedStatement pr1 = null;
+
+							String sql3 = "INSERT INTO messages(`userName`, `message`, `Datesend`, `read`, `typemessage`) VALUES (?,?,?,?,?)";
+							if ((conn != null)) {
+
+								pr1 = conn1.prepareStatement(sql3);
+								String type2 = "the answer of the directorymaneger about the NewPrices for city "
+										+ ncity1;
+								java.sql.Date date3 = new java.sql.Date(new Date().getTime());
+								String us = ((String[]) (data))[1];
+								String mess = ((String[]) (data))[3];
+								pr1.setString(1, us);
+								pr1.setString(2, mess);
+								pr1.setDate(3, date3);
+								pr1.setInt(4, 0);
+								pr1.setString(5, type2);
+								if (pr1.executeUpdate() > 0) {
+									ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
+									String message = "done";
+									objectOutput.writeObject(message);
+								}
 							}
-						}
 						} catch (SQLException se) {
 							se.printStackTrace();
 							System.out.println("SQLException: " + se.getMessage());
 							System.out.println("SQLState: " + se.getSQLState());
 							System.out.println("VendorError: " + se.getErrorCode());
 						}
-					}
-					else if (((String[]) (data))[0].equals("getMessages")) {
+					} else if (((String[]) (data))[0].equals("getMessages")) {
 
 						ObservableList<Message> messageList = getMyMessagesFromDB(((String[]) (data))[1]);
 						Object[] data = new Object[messageList.size() + 1];
@@ -1596,9 +1582,9 @@ public class Server {
 
 							result[0] = Connected;
 							result[1] = list3;
-							
-							if(type.equals("member")){
-								statics("view", City, null );
+
+							if (type.equals("member")) {
+								statics("view", City, null);
 							}
 
 							stmt.close();
@@ -2879,7 +2865,6 @@ public class Server {
 
 	}
 
-
 	static void AddCityIfNotExist(Route route, Connection conn, String CityDes) {
 
 		Statement pr;
@@ -2920,14 +2905,13 @@ public class Server {
 
 	}
 
-
-	static ObservableList<NewPrices> getMyNewPricesFromDB(String ncity){
+	static ObservableList<NewPrices> getMyNewPricesFromDB(String ncity) {
 		ObservableList<NewPrices> data = FXCollections.observableArrayList();
 		Connection conn = null;
 		Statement stmt = null;
 		try {
 			Class.forName(JDBC_DRIVER);
-			
+
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -2944,15 +2928,15 @@ public class Server {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		String sql = "SELECT * FROM NewPrices where city='" + ncity + "'";
+
+		String sql = "SELECT * FROM newprices where city='" + ncity + "'";
 		try {
 			ResultSet rs = stmt.executeQuery(sql);
-			while(rs.next()) {
-				String city=rs.getString("city");
-				int fcost=rs.getInt("fixedcost");
-				int otcost=rs.getInt("onetimecost");
-				data.add(new NewPrices(city,fcost,otcost));
+			while (rs.next()) {
+				String city = rs.getString("city");
+				int fcost = rs.getInt("fixedcost");
+				int otcost = rs.getInt("onetimecost");
+				data.add(new NewPrices(city, fcost, otcost));
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -2972,22 +2956,20 @@ public class Server {
 		}
 
 		return data;
-			
+
 	}
-	
-		
-	
-	static Reports getReportFromDB(Reports rep){
-		Reports rep1=null;
+
+	static Reports getReportFromDB(Reports rep) {
+		Reports rep1 = null;
 		Connection conn = null;
 		Statement stmt = null;
 		Statement stmt1 = null;
-		String cname=rep.getCity();
-		java.sql.Date sdate=rep.getStartDate();
-		java.sql.Date edate=rep.getEndDate();
+		String cname = rep.getCity();
+		java.sql.Date sdate = rep.getStartDate();
+		java.sql.Date edate = rep.getEndDate();
 		try {
 			Class.forName(JDBC_DRIVER);
-			
+
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -3005,49 +2987,46 @@ public class Server {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		String f="fixedpurchase";
-		String sql = "SELECT * FROM staticinformation where city ='" + cname + "' and date >='" + sdate + "' and date <='" + edate + "' ";
-		String sql1 = "SELECT * FROM staticinformation where city ='" + cname + "' and type ='" + f + "' ";										
+		String f = "fixedpurchase";
+		String sql = "SELECT * FROM staticinformation where city ='" + cname + "' and date >='" + sdate
+				+ "' and date <='" + edate + "' ";
+		String sql1 = "SELECT * FROM staticinformation where city ='" + cname + "' and type ='" + f + "' ";
 		try {
 			ResultSet rs = stmt.executeQuery(sql);
 			ResultSet rs1 = stmt1.executeQuery(sql1);
-			int nmap=0;
-			int nfixed=0;
-			int numotpurchase=0;
-			int numrenews=0;
-			int numviews=0;
-			int numdownloads=0;
-			while(rs1.next()) {
-				if(rs1.getDate("date").compareTo(sdate)>=0&&rs1.getDate("date").compareTo(edate)<=0) {
+			int nmap = 0;
+			int nfixed = 0;
+			int numotpurchase = 0;
+			int numrenews = 0;
+			int numviews = 0;
+			int numdownloads = 0;
+			while (rs1.next()) {
+				if (rs1.getDate("date").compareTo(sdate) >= 0 && rs1.getDate("date").compareTo(edate) <= 0) {
 					nfixed++;
-				}
-				else if(rs1.getDate("enddate").compareTo(sdate)>=0&&rs1.getDate("enddate").compareTo(edate)<=0) {
+				} else if (rs1.getDate("enddate").compareTo(sdate) >= 0
+						&& rs1.getDate("enddate").compareTo(edate) <= 0) {
 					nfixed++;
-				}
-				else if(rs1.getDate("enddate").compareTo(edate)>=0&&rs1.getDate("date").compareTo(sdate)<=0) {
+				} else if (rs1.getDate("enddate").compareTo(edate) >= 0 && rs1.getDate("date").compareTo(sdate) <= 0) {
 					nfixed++;
 				}
 			}
-			while(rs.next()) {
-				if(rs.getString("type").equals("map")) {
+			while (rs.next()) {
+				if (rs.getString("type").equals("map")) {
 					nmap++;
 				}
-				
-				else if(rs.getString("type").equals("onetimepurchase")) {
+
+				else if (rs.getString("type").equals("onetimepurchase")) {
 					numotpurchase++;
-				}
-				else if(rs.getString("type").equals("renew")) {
+				} else if (rs.getString("type").equals("renew")) {
 					numrenews++;
-				}
-				else if(rs.getString("type").equals("view")) {
+				} else if (rs.getString("type").equals("view")) {
 					numviews++;
-				}
-				else if(rs.getString("type").equals("download")) {
+				} else if (rs.getString("type").equals("download")) {
 					numdownloads++;
 				}
-				
+
 			}
-			 rep1=new Reports(cname,nmap,numotpurchase,nfixed,numrenews,numviews,numdownloads,sdate,edate);
+			rep1 = new Reports(cname, nmap, numotpurchase, nfixed, numrenews, numviews, numdownloads, sdate, edate);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -3067,11 +3046,10 @@ public class Server {
 		}
 
 		return rep1;
-			
-	
+
 	}
-	
-	static ObservableList<Message> getMyMessagesFromDB(String user){
+
+	static ObservableList<Message> getMyMessagesFromDB(String user) {
 
 		ObservableList<Message> data = FXCollections.observableArrayList();
 		Connection conn = null;
@@ -3210,54 +3188,49 @@ public class Server {
 
 		return data;
 	}
+
 	static int checkthesystem() {
 		Connection conn = null;
 		Statement stmt = null;
-		
 
 		try {
 			Class.forName(JDBC_DRIVER);
 
 			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			stmt = conn.createStatement();
-			
 
 			String sql = "SELECT * FROM checksystem";
 			ResultSet rs = stmt.executeQuery(sql);
-			 LocalDate sd= LocalDate.now();
-			 Calendar c = Calendar.getInstance();
-			 DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-			 String stringdate=sd.format(dateFormatter);
-			 SimpleDateFormat sdf1 = new SimpleDateFormat("dd-MM-yyyy");
-			 java.util.Date date = sdf1.parse(stringdate);
-			 java.util.Date date1 = sdf1.parse(stringdate);
-			 c.setTime(date1);
-			 c.add(Calendar.DATE,1);
-			 String output = sdf1.format(c.getTime());
-			 date1=sdf1.parse(output);
-			 java.sql.Date datenow=new java.sql.Date(date.getTime()); 
+			LocalDate sd = LocalDate.now();
+			Calendar c = Calendar.getInstance();
+			DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+			String stringdate = sd.format(dateFormatter);
+			SimpleDateFormat sdf1 = new SimpleDateFormat("dd-MM-yyyy");
+			java.util.Date date = sdf1.parse(stringdate);
+			java.util.Date date1 = sdf1.parse(stringdate);
+			c.setTime(date1);
+			c.add(Calendar.DATE, 1);
+			String output = sdf1.format(c.getTime());
+			date1 = sdf1.parse(output);
+			java.sql.Date datenow = new java.sql.Date(date.getTime());
 			while (rs.next()) {
-				if(rs.getDate("date").compareTo(datenow)<0) {
+				if (rs.getDate("date").compareTo(datenow) < 0) {
 					PreparedStatement pr;
 					String sql1 = "UPDATE checksystem SET date = ?";
 					if (conn != null) {
 						pr = conn.prepareStatement(sql1);
-						 java.sql.Date datenow1=new java.sql.Date(date1.getTime()); ;
-						 
-						pr.setDate(1, datenow1 );
-						
-						
-						pr.executeUpdate();
-					
-				}
-					return 1;
-			}
-			}
-			
-			
-			
+						java.sql.Date datenow1 = new java.sql.Date(date1.getTime());
+						;
 
-			
+						pr.setDate(1, datenow1);
+
+						pr.executeUpdate();
+
+					}
+					return 1;
+				}
+			}
+
 		} catch (SQLException se) {
 			se.printStackTrace();
 			System.out.println("SQLException: " + se.getMessage());
@@ -3274,13 +3247,13 @@ public class Server {
 			} catch (SQLException se) {
 				se.printStackTrace();
 			}
-			
+
 		}
 
 		return 0;
 	}
-	
-	static void statics(String type,String city,java.sql.Date fixedenddate) {
+
+	static void statics(String type, String city, java.sql.Date fixedenddate) {
 		Connection conn = null;
 		Statement stmt = null;
 		PreparedStatement pr;
@@ -3290,52 +3263,52 @@ public class Server {
 
 			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			stmt = conn.createStatement();
-			
+
 			String sql1 = "INSERT INTO staticinformation(`date`, `city`, `type`, `enddate`) VALUES (?,?,?,?)";
 			if (conn != null) {
 				pr = conn.prepareStatement(sql1);
-				 LocalDate sd= LocalDate.now();
-				 Calendar c = Calendar.getInstance();
-				 DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-				 String stringdate=sd.format(dateFormatter);
-				 SimpleDateFormat sdf1 = new SimpleDateFormat("dd-MM-yyyy");
-				 
-				 java.util.Date date1 = sdf1.parse(stringdate);
-				 c.setTime(date1);
-				 c.add(Calendar.DATE,1);
-				 String output = sdf1.format(c.getTime());
-				 date1=sdf1.parse(output);
-				 java.sql.Date datenow1=new java.sql.Date(date1.getTime()); ;
-				 
-				pr.setDate(1, datenow1 );
+				LocalDate sd = LocalDate.now();
+				Calendar c = Calendar.getInstance();
+				DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+				String stringdate = sd.format(dateFormatter);
+				SimpleDateFormat sdf1 = new SimpleDateFormat("dd-MM-yyyy");
+
+				java.util.Date date1 = sdf1.parse(stringdate);
+				c.setTime(date1);
+				c.add(Calendar.DATE, 1);
+				String output = sdf1.format(c.getTime());
+				date1 = sdf1.parse(output);
+				java.sql.Date datenow1 = new java.sql.Date(date1.getTime());
+				;
+
+				pr.setDate(1, datenow1);
 				pr.setString(2, city);
 				pr.setString(3, type);
-				if(type.equals("fixedpurchase")) {
-				pr.setDate(4, fixedenddate);	
+				if (type.equals("fixedpurchase")) {
+					pr.setDate(4, fixedenddate);
 				}
 				pr.executeUpdate();
-			
-		}
-	
-	} catch (SQLException se) {
-		se.printStackTrace();
-		System.out.println("SQLException: " + se.getMessage());
-		System.out.println("SQLState: " + se.getSQLState());
-		System.out.println("VendorError: " + se.getErrorCode());
-	} catch (Exception e) {
-		e.printStackTrace();
-	} finally {
-		try {
-			if (stmt != null)
-				stmt.close();
-			if (conn != null)
-				conn.close();
+
+			}
+
 		} catch (SQLException se) {
 			se.printStackTrace();
-		}
-		
-	}
+			System.out.println("SQLException: " + se.getMessage());
+			System.out.println("SQLState: " + se.getSQLState());
+			System.out.println("VendorError: " + se.getErrorCode());
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			}
 
-	
-}
+		}
+
+	}
 }

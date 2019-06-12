@@ -337,13 +337,13 @@ public class AddLocController {
 
 		@SuppressWarnings("resource")
 		Socket socket = new Socket(Globals.IpAddress, 5555);
-		String[] array = new String[3];
+		String[] array = new String[4];
 		String[] array2 = new String[2];
 		array[0] = "getPlaces";
 		// get[1] = "" + ImagePlaces[i].getPlace().getCityName();
 		array[1] = "" + Globals.map.getId();
 		array[2] = "" + Globals.map.getCity();
-
+		array[3] = "manager";
 		ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 		objectOutput.writeObject(array);
 

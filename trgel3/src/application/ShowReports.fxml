@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="720" prefWidth="1280" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.ShowReportsController">
+   <opaqueInsets>
+      <Insets />
+   </opaqueInsets>
+   <children>
+      <Button fx:id="back" layoutX="390.0" layoutY="60.0" mnemonicParsing="false" onAction="#backFunc" prefHeight="26.0" prefWidth="80.0" text="Back" />
+       <Text layoutX="235.0" layoutY="140.0" scaleX="1.7227810128815952" scaleY="1.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Write startdate here" />
+      <DatePicker fx:id="startdate" layoutX="390.0" layoutY="120" prefHeight="26.0" prefWidth="150.0" />
+      <DatePicker fx:id="enddate" layoutX="590.0" layoutY="120" prefHeight="26.0" prefWidth="150.0" />
+      <Text layoutX="790.0" layoutY="140.0" scaleX="1.7227810128815952" scaleY="1.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Write enddate here" />
+      
+      <HBox layoutX="490.0" layoutY="60.0" prefHeight="30.0" prefWidth="320.0">
+         <children>
+            <ComboBox fx:id="comboBox" prefWidth="130.0" promptText="Show" />
+            <TextField fx:id="cityname" prefWidth="200.0" promptText="Write here" />
+           
+         </children>
+      </HBox>
+ 
+      <TableView fx:id="reportTable" layoutX="192.0" layoutY="202.0" prefHeight="400.0" prefWidth="934.0">
+        <columns>
+          <TableColumn fx:id="CityName" prefWidth="75.0" text="City" />
+          <TableColumn fx:id="numOfMaps" prefWidth="101.0" text="numOfMaps" />
+            <TableColumn fx:id="numofonetimepurchase" prefWidth="150.0" text="numofOneTimePurchase" />
+             <TableColumn fx:id="numOfSubscribers" minWidth="0.0" prefWidth="141.0" text="numOfSubscribers" />
+             <TableColumn fx:id="numofRenews" minWidth="0.0" prefWidth="113.0" text="numofRenews" />
+             <TableColumn fx:id="numOfViews" minWidth="0.0" prefWidth="93.0" text="numOfViews" />
+             <TableColumn fx:id="numOfDownloads" minWidth="0.0" prefWidth="181.0" text="numOfDownloads" />
+        </columns>
+      </TableView>
+      <Button fx:id="Show" layoutX="500.0" layoutY="166.0" mnemonicParsing="false" onAction="#ShowBtn" prefHeight="26.0" prefWidth="250.0" text="Show" />
+      
+      
+   </children>
+</AnchorPane>
