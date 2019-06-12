@@ -3024,7 +3024,6 @@ public class Server {
 				} else if (rs.getString("type").equals("download")) {
 					numdownloads++;
 				}
-
 			}
 			rep1 = new Reports(cname, nmap, numotpurchase, nfixed, numrenews, numviews, numdownloads, sdate, edate);
 		} catch (SQLException e) {
