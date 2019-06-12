@@ -25,6 +25,9 @@ import javafx.stage.Stage;
 
 public class Controller {
 
+	@FXML
+	private AnchorPane pane;
+
 	@FXML // fx:id="Password"
 	private TextField Password; // Value injected by FXMLLoader
 
@@ -89,11 +92,10 @@ public class Controller {
 		System.out.println(((Object[]) data)[0]);
 
 		if (((Object[]) (data))[0] instanceof Boolean) {
-			if((int) ((Object[]) (data))[2] == 1) {
+			if ((int) ((Object[]) (data))[2] == 1) {
 				Messege.setText("The user is already logged in");
 				Globals.user = null;
-			}
-			else if ((Boolean) ((Object[]) (data))[0]) {
+			} else if ((Boolean) ((Object[]) (data))[0]) {
 
 				Globals.user = (User) ((Object[]) (data))[1];
 				URL url = getClass().getResource("DefaultPage.fxml");
@@ -115,7 +117,7 @@ public class Controller {
 				scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 				primaryStage.setScene(scene);
 				primaryStage.show();
-				primaryStage.setOnCloseRequest(e-> {
+				primaryStage.setOnCloseRequest(e -> {
 					try {
 						logOut();
 					} catch (IOException e1) {
@@ -136,7 +138,7 @@ public class Controller {
 		array[0] = "LogOut";
 		array[1] = Username.getText();
 		array[2] = Password.getText();
-		
+
 		@SuppressWarnings("resource")
 		Socket socket = new Socket(Globals.IpAddress, 5555);
 		try {
@@ -145,7 +147,7 @@ public class Controller {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
 

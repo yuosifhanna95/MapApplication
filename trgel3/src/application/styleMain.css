@@ -1,4 +1,8 @@
 /* JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
+#pane {
+	
+	-fx-background-image: url("mainpage.png");
+}
 .text-input {
     -fx-text-fill: white;
     -fx-font-family: Quicksand;
@@ -9,7 +13,7 @@
 	-fx-font-size: 20;
 }
 .button {
-	-fx-background-color: #3ebdb3;
+	-fx-background-color: #00d0ed;
 	-fx-background-radius: 100;
 	-fx-text-fill: white;
 }
@@ -20,7 +24,7 @@
 	-fx-background-color: #297c75;
 }
 #Catalog {	
-	-fx-background-color: #3e86bd;
+	-fx-background-color: #0086de;
 	-fx-background-radius: 100;
 	-fx-text-fill: white;
 }
