@@ -6,22 +6,26 @@
 .text-input {
     -fx-text-fill: white;
     -fx-font-family: Quicksand;
-    -fx-font-size: 20;
+    -fx-font-size: 20pt;
 }
 .text {
 	-fx-font-family: Quicksand;
-	-fx-font-size: 20;
+	-fx-font-size: 20pt;
+	 -fx-font-smoothing-type: gray;
 }
 .button {
-	-fx-background-color: #00d0ed;
+	-fx-background-color: transparent;
 	-fx-background-radius: 100;
 	-fx-text-fill: white;
+	-fx-border-color: white;
+	-fx-border-radius: 100;
+	-fx-border-width: 2 2 2 2;
 }
 .button:hover {
-	-fx-background-color: #5de8de;
+	-fx-background-color: #00d0ed;
 }
 .button:pressed {
-	-fx-background-color: #297c75;
+	-fx-background-color: #237685;
 }
 #Catalog {	
 	-fx-background-color: #0086de;
@@ -40,7 +44,10 @@
 	-fx-border-width:  0px 0px 2px 0px;
 	-fx-text-fill: white;
 	-fx-font-size: 20;
+	-fx-prompt-text-fill: white;
+	-fx-font-size: 18pt;
 }
 .label{
-	-fx-text-alignment: right; 
+	-fx-text-alignment: right;
+	-fx-font-size: 18pt; 
 }

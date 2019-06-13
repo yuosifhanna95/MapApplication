@@ -7,7 +7,8 @@ import java.net.Socket;
 import java.net.URL;
 import java.net.UnknownHostException;
 
-
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -22,6 +23,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -30,8 +32,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 
 public class CatalogController {
 
@@ -80,12 +80,14 @@ public class CatalogController {
 
 	@FXML
 	private Button searchCity;
-	
+
 	@FXML
 	private HBox hbox;
-	
-	TextField placeField= new TextField();
 
+	TextField placeField = new TextField();
+
+	@FXML
+	private Button view;
 
 	@FXML
 	private Button searchPlace;
@@ -95,21 +97,43 @@ public class CatalogController {
 	FilteredList<Place> flPlace = null;
 
 	@FXML
+	void viewMaps(ActionEvent event) throws IOException {
+		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+		URL url = getClass().getResource("ShowMapsCatalogScene.fxml");
+		Globals.backLink = "MyMapsScene.fxml";
+		AnchorPane pane;
+		pane = FXMLLoader.load(url);
+
+		Scene scene = new Scene(pane);
+		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		primaryStage.setScene(scene);
+//		primaryStage.setOnCloseRequest(e -> {
+//			try {
+//				logOut();
+//			} catch (IOException e1) {
+//				// TODO Auto-generated catch block
+//				e1.printStackTrace();
+//			}
+//		});
+		primaryStage.show();
+
+	}
+
+	@FXML
 	void searchCityBtn(ActionEvent event) {
 		searchPlace.getStyleClass().remove("addBobOk");
 		searchCity.getStyleClass().removeAll("addBobOk, focus");
 		searchCity.getStyleClass().add("addBobOk");
-		
-	    searchText.setPrefWidth(200);
-  	    hbox.getChildren().remove(placeField);
+
+		searchText.setPrefWidth(200);
+		hbox.getChildren().remove(placeField);
 
 		searchTable1.setVisible(false);
 		searchTable1.setDisable(true);
 
 		searchTable.setVisible(true);
 		searchTable.setDisable(false);
-		
-	
+
 		comboBox.getItems().remove("City & place");
 
 		searchText.setOnKeyReleased(new EventHandler<KeyEvent>() {
@@ -138,7 +162,7 @@ public class CatalogController {
 		searchCity.getStyleClass().remove("addBobOk");
 		searchPlace.getStyleClass().removeAll("addBobOk, focus");
 		searchPlace.getStyleClass().add("addBobOk");
-		
+
 		comboBox.getItems().add("City & place");
 
 		searchTable.setVisible(false);
@@ -146,39 +170,40 @@ public class CatalogController {
 
 		searchTable1.setVisible(true);
 		searchTable1.setDisable(false);
-		
+
 		comboBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-		      @Override public void changed(ObservableValue<? extends String> selected, String old, String newVal) {
-		          if (newVal != null) {
-		            switch(newVal) {
-		            case "City & place": 
-		            	  hbox.getChildren().remove(placeField);
-		            	  searchText.setPrefWidth(100);
-		            	  placeField.setPrefWidth(100);
-		            	  searchText.setPromptText("City");
-		            	  placeField.setPromptText("Place");
-		            	  hbox.getChildren().addAll(placeField);
-		            	  break;
-		            case "City": 
-		            	  searchText.setPrefWidth(200);
-		            	  searchText.setPromptText("City");
-		            	  hbox.getChildren().remove(placeField);
-		            	  break;
-		            case "Description": 
-		            	  searchText.setPrefWidth(200);
-		            	  searchText.setPromptText("Description");
-		            	  hbox.getChildren().remove(placeField);
-		            	  break;
-		            case "Place": 
-		            	  searchText.setPrefWidth(200);
-		            	  searchText.setPromptText("Place");
-		            	  hbox.getChildren().remove(placeField);
-		            	  break;
-		            }
-		          }
-		        }
+			@Override
+			public void changed(ObservableValue<? extends String> selected, String old, String newVal) {
+				if (newVal != null) {
+					switch (newVal) {
+					case "City & place":
+						hbox.getChildren().remove(placeField);
+						searchText.setPrefWidth(100);
+						placeField.setPrefWidth(100);
+						searchText.setPromptText("City");
+						placeField.setPromptText("Place");
+						hbox.getChildren().addAll(placeField);
+						break;
+					case "City":
+						searchText.setPrefWidth(200);
+						searchText.setPromptText("City");
+						hbox.getChildren().remove(placeField);
+						break;
+					case "Description":
+						searchText.setPrefWidth(200);
+						searchText.setPromptText("Description");
+						hbox.getChildren().remove(placeField);
+						break;
+					case "Place":
+						searchText.setPrefWidth(200);
+						searchText.setPromptText("Place");
+						hbox.getChildren().remove(placeField);
+						break;
+					}
+				}
+			}
 		});
-		
+
 		placeField.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent ke) {
 				switch (comboBox.getValue()) {
@@ -189,7 +214,7 @@ public class CatalogController {
 				}
 			}
 		});
-	
+
 		searchText.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent ke) {
 				switch (comboBox.getValue()) {
@@ -235,6 +260,17 @@ public class CatalogController {
 
 		buildData("city");
 		buildData("place");
+
+		searchTable.setRowFactory(ctv -> {
+			TableRow<City> row = new TableRow<>();
+			row.setOnMouseClicked(event -> {
+				if (event.getClickCount() == 1 && (!row.isEmpty())) {
+					City cityRow = searchTable.getSelectionModel().getSelectedItem();
+					Globals.city = (City) cityRow;
+				}
+			});
+			return row;
+		});
 
 		comboBox.getItems().addAll("City", "Place", "Description");
 		searchText.setPromptText("City");

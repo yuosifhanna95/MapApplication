@@ -177,29 +177,67 @@ public class ShowReportsController {
 
 	public void buildData(String type) throws UnknownHostException, IOException {
 		@SuppressWarnings("resource")
-		Socket socket = new Socket("localhost", 5555);
-
+		Socket socket = new Socket(Globals.IpAddress, 5555);
+		dataReport = FXCollections.observableArrayList();
 		Object[] get = new Object[4];
 		get[0] = "getreport";
 		get[1] = "One city";
 		get[3] = cityname.getText();
 		if (type.equals("All cities")) {
+			get[0] = "getreportcities";
 			get[1] = "All cities";
 			get[3] = "All cities";
 		}
 		Reports rep = new Reports(((String) ((Object[]) (get))[3]), 0, 0, 0, 0, 0, 0, sdate1, edate);
 		get[2] = rep;
+		Reports r = null;
 		try {
 			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			objectOutput.writeObject(get);
 			try {
 				ObjectInputStream objectInput = new ObjectInputStream(socket.getInputStream());
 				try {
-					dataReport = FXCollections.observableArrayList();
 					Object[] object = (Object[]) objectInput.readObject();
 
 					for (int i = 1; i <= (int) object[0]; i++) {
-						dataReport.add((Reports) object[i]);
+						if (object[i] != null) {
+							r = (Reports) object[i];
+							int count = 0;
+							int nmap = 0;
+							int nfixed = 0;
+							int numotpurchase = 0;
+							int numrenews = 0;
+							int numviews = 0;
+							int numdownloads = 0;
+							String c = r.getCity();
+							for (int j = 1; j <= (int) object[0]; j++) {
+								Reports r1 = null;
+								if (object[j] != null) {
+									r1 = (Reports) object[j];
+									if (c.equals(r1.getCity())) {
+
+										nmap = nmap + r1.getNumMaps();
+										nfixed = nfixed + r1.getNumSubscribers();
+										numotpurchase = numotpurchase + r1.getNumOtPurchase();
+										numrenews = numrenews + r1.getNumRenews();
+										numviews = numviews + r1.getNumViews();
+										numdownloads = numdownloads + r1.getNumDownloads();
+										if (count > 0) {
+											object[j] = null;
+										}
+										count++;
+									}
+
+								}
+
+							}
+
+							count = 0;
+							Reports r2 = new Reports(c, nmap, numotpurchase, nfixed, numrenews, numviews, numdownloads,
+									sdate1, edate);
+							dataReport.add(r2);
+						}
+
 					}
 
 				} catch (ClassNotFoundException e) {

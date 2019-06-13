@@ -103,6 +103,24 @@ public class Server {
 
 						}
 
+					} else if (((String) ((Object[]) (data))[0]).equals("getreportcities")) {
+						ObservableList<Reports> data1 = FXCollections.observableArrayList();
+						Reports r = ((Reports) ((Object[]) (data))[2]);
+						data1 = getReportFromDB1(r);
+						Object[] data = new Object[data1.size() + 1];
+						data[0] = data1.size();
+						int counter = 1;
+						for (Reports tu : data1) {
+							data[counter] = tu;
+							counter++;
+						}
+						try {
+							ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
+							objectOutput.writeObject(data);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+
 					} else if (((String) ((Object[]) (data))[0]).equals("getreport")) {
 						ObservableList<Reports> data1 = FXCollections.observableArrayList();
 
@@ -712,6 +730,7 @@ public class Server {
 							pr = conn.prepareStatement(sql);
 							if (pr.executeUpdate() > 0) {
 								System.out.println("thanks for Confirming new version");
+								SendVerMessage(City, conn, Version);
 							}
 						}
 
@@ -1238,7 +1257,8 @@ public class Server {
 							}
 						}
 					} else if (((String[]) (data))[0].equals("getUsers")) {
-						ObservableList<User> userList = getUserFromDB();
+
+						ObservableList<User> userList = getUserFromDB(((String[]) (data))[1]);
 
 						Object[] data = new Object[userList.size() + 1];
 						data[0] = userList.size();
@@ -2771,7 +2791,7 @@ public class Server {
 		return -1;
 	}
 
-	static ObservableList<User> getUserFromDB() {
+	static ObservableList<User> getUserFromDB(String Type) {
 		ObservableList<User> data = FXCollections.observableArrayList();
 
 		Connection conn = null;
@@ -2785,7 +2805,7 @@ public class Server {
 			stmt = conn.createStatement();
 			stmt2 = conn.createStatement();
 
-			String sql = "SELECT * FROM user";
+			String sql = "SELECT * FROM user WHERE type='" + Type + "'";
 			ResultSet rs = stmt.executeQuery(sql);
 
 			while (rs.next()) {
@@ -3048,6 +3068,96 @@ public class Server {
 		}
 
 		return rep1;
+
+	}
+
+	static ObservableList<Reports> getReportFromDB1(Reports rep) {
+
+		ObservableList<Reports> data = FXCollections.observableArrayList();
+		Connection conn = null;
+		Statement stmt = null;
+
+		java.sql.Date sdate = rep.getStartDate();
+		java.sql.Date edate = rep.getEndDate();
+		try {
+			Class.forName(JDBC_DRIVER);
+
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			stmt = conn.createStatement();
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		String sql = "SELECT * FROM staticinformation  where  date >='" + sdate + "' and date <='" + edate + "' ";
+
+		try {
+			ResultSet rs = stmt.executeQuery(sql);
+
+			while (rs.next()) {
+
+				int nmap = 0;
+				int nfixed = 0;
+				int numotpurchase = 0;
+				int numrenews = 0;
+				int numviews = 0;
+				int numdownloads = 0;
+				String cname = rs.getString("city");
+				if (rs.getString("type").equals("map")) {
+					nmap++;
+				} else if (rs.getString("type").equals("fixedpurchase")) {
+					if (rs.getDate("date").compareTo(sdate) >= 0 && rs.getDate("date").compareTo(edate) <= 0) {
+						nfixed++;
+					} else if (rs.getDate("enddate").compareTo(sdate) >= 0
+							&& rs.getDate("enddate").compareTo(edate) <= 0) {
+						nfixed++;
+					} else if (rs.getDate("enddate").compareTo(edate) >= 0
+							&& rs.getDate("date").compareTo(sdate) <= 0) {
+						nfixed++;
+					}
+				} else if (rs.getString("type").equals("onetimepurchase")) {
+					numotpurchase++;
+				} else if (rs.getString("type").equals("renew")) {
+					numrenews++;
+				} else if (rs.getString("type").equals("view")) {
+					numviews++;
+				} else if (rs.getString("type").equals("download")) {
+					numdownloads++;
+				}
+				data.add(new Reports(cname, nmap, numotpurchase, nfixed, numrenews, numviews, numdownloads, sdate,
+						edate));
+			}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			stmt.close();
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			conn.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return data;
 
 	}
 
@@ -3407,6 +3517,45 @@ public class Server {
 					conn.close();
 			} catch (SQLException se) {
 				se.printStackTrace();
+			}
+
+		}
+
+	}
+
+	static void SendVerMessage(String City, Connection conn, int Ver) {
+
+		Statement pr;
+		PreparedStatement pr2;
+
+		ResultSet rs = null;
+
+		String sqlfind = "";
+		String sql = "INSERT INTO messages(`userName`, `message`, DateSend, read, `typemessage`) VALUES (?,?,?,?,?)";
+
+		if (conn != null) {
+			try {
+				pr = conn.createStatement();
+				rs = pr.executeQuery(sqlfind);
+				if (!rs.next()) {
+					pr2 = conn.prepareStatement(sql);
+					Date date5 = new Date();
+					java.sql.Date date3 = new java.sql.Date(date5.getTime());
+					String type = "NewV," + City;
+					String us = "#";
+					String mess = "Dear member,a new version of the city" + City + "is out!";
+					pr2.setString(1, us);
+					pr2.setString(2, mess);
+					pr2.setDate(3, date3);
+					pr2.setInt(4, 0);
+					pr2.setString(5, type);
+
+					int k = pr2.executeUpdate();
+				}
+
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 
 		}

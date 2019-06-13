@@ -165,12 +165,11 @@ public class DefPageController {
 
 	@FXML
 	private AnchorPane mainPane;
-	
 
-    @FXML
-    private HBox hbox;
-    
-    TextField placeField= new TextField();
+	@FXML
+	private HBox hbox;
+
+	TextField placeField = new TextField();
 
 	@FXML
 	private Label Lab;
@@ -179,6 +178,7 @@ public class DefPageController {
 	private ImageView[] locations = new ImageView[10];
 	private Place[] Places = new Place[10];
 	private ImagePlace[] ImagePlaces = new ImagePlace[10];
+	private RoutePlace[] ORoutePlaceList;
 	private int Counter = 0;
 	private double aspect = 0.75f;
 
@@ -187,17 +187,16 @@ public class DefPageController {
 		searchPlace.getStyleClass().remove("addBobOk");
 		searchCity.getStyleClass().removeAll("addBobOk, focus");
 		searchCity.getStyleClass().add("addBobOk");
-		
-	    searchText.setPrefWidth(200);
-  	    hbox.getChildren().remove(placeField);
+
+		searchText.setPrefWidth(200);
+		hbox.getChildren().remove(placeField);
 
 		searchTable1.setVisible(false);
 		searchTable1.setDisable(true);
 
 		searchTable.setVisible(true);
 		searchTable.setDisable(false);
-		
-	
+
 		comboBox.getItems().remove("City & place");
 
 		searchText.setOnKeyReleased(new EventHandler<KeyEvent>() {
@@ -226,7 +225,7 @@ public class DefPageController {
 		searchCity.getStyleClass().remove("addBobOk");
 		searchPlace.getStyleClass().removeAll("addBobOk, focus");
 		searchPlace.getStyleClass().add("addBobOk");
-		
+
 		comboBox.getItems().add("City & place");
 
 		searchTable.setVisible(false);
@@ -234,39 +233,40 @@ public class DefPageController {
 
 		searchTable1.setVisible(true);
 		searchTable1.setDisable(false);
-		
+
 		comboBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-		      @Override public void changed(ObservableValue<? extends String> selected, String old, String newVal) {
-		          if (newVal != null) {
-		            switch(newVal) {
-		            case "City & place": 
-		            	  hbox.getChildren().remove(placeField);
-		            	  searchText.setPrefWidth(100);
-		            	  placeField.setPrefWidth(100);
-		            	  searchText.setPromptText("City");
-		            	  placeField.setPromptText("Place");
-		            	  hbox.getChildren().addAll(placeField);
-		            	  break;
-		            case "City": 
-		            	  searchText.setPrefWidth(200);
-		            	  searchText.setPromptText("City");
-		            	  hbox.getChildren().remove(placeField);
-		            	  break;
-		            case "Description": 
-		            	  searchText.setPrefWidth(200);
-		            	  searchText.setPromptText("Description");
-		            	  hbox.getChildren().remove(placeField);
-		            	  break;
-		            case "Place": 
-		            	  searchText.setPrefWidth(200);
-		            	  searchText.setPromptText("Place");
-		            	  hbox.getChildren().remove(placeField);
-		            	  break;
-		            }
-		          }
-		        }
+			@Override
+			public void changed(ObservableValue<? extends String> selected, String old, String newVal) {
+				if (newVal != null) {
+					switch (newVal) {
+					case "City & place":
+						hbox.getChildren().remove(placeField);
+						searchText.setPrefWidth(100);
+						placeField.setPrefWidth(100);
+						searchText.setPromptText("City");
+						placeField.setPromptText("Place");
+						hbox.getChildren().addAll(placeField);
+						break;
+					case "City":
+						searchText.setPrefWidth(200);
+						searchText.setPromptText("City");
+						hbox.getChildren().remove(placeField);
+						break;
+					case "Description":
+						searchText.setPrefWidth(200);
+						searchText.setPromptText("Description");
+						hbox.getChildren().remove(placeField);
+						break;
+					case "Place":
+						searchText.setPrefWidth(200);
+						searchText.setPromptText("Place");
+						hbox.getChildren().remove(placeField);
+						break;
+					}
+				}
+			}
 		});
-		
+
 		placeField.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent ke) {
 				switch (comboBox.getValue()) {
@@ -277,7 +277,7 @@ public class DefPageController {
 				}
 			}
 		});
-	
+
 		searchText.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent ke) {
 				switch (comboBox.getValue()) {
@@ -311,7 +311,7 @@ public class DefPageController {
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
-		primaryStage.setOnCloseRequest(e-> {
+		primaryStage.setOnCloseRequest(e -> {
 			try {
 				logOut();
 			} catch (IOException e1) {
@@ -332,7 +332,7 @@ public class DefPageController {
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
-		primaryStage.setOnCloseRequest(e-> {
+		primaryStage.setOnCloseRequest(e -> {
 			try {
 				logOut();
 			} catch (IOException e1) {
@@ -401,7 +401,6 @@ public class DefPageController {
 					newPayment.setVisible(true);
 					rb2.setVisible(true);
 				});
-				
 
 				buttonSave.setOnAction(e -> {
 					if (rb2.isSelected() && newPayment.getText().contentEquals("")) {
@@ -411,6 +410,7 @@ public class DefPageController {
 					} else {
 						try {
 							saveAllMaps();
+							saveAllRoutes();
 							@SuppressWarnings("resource")
 							Socket socket = new Socket(Globals.IpAddress, 5555);
 							Object[] array = new Object[5];
@@ -418,19 +418,19 @@ public class DefPageController {
 							array[1] = Globals.user;
 							array[2] = Globals.city.getCity();
 							array[3] = Globals.city.getVersion();
-							
+
 							Date sdate = Calendar.getInstance().getTime();
 							DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 							String date = df.format(sdate);
 							array[4] = date;
-							
+
 							String history = Globals.user.getHistory();
 							if (history.equals("")) {
 								history = array[2] + "," + ",OT," + "," + array[3] + "," + array[4];
 							} else {
-							  history += "#" + array[2] + ",OT," + array[3] +"," + array[4];
+								history += "#" + array[2] + ",OT," + array[3] + "," + array[4];
 							}
-							
+
 							Globals.user.setHistory(history);
 							ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 							objectOutput.writeObject(array);
@@ -838,7 +838,7 @@ public class DefPageController {
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("styleMain.css").toExternalForm());
 		primaryStage.setScene(scene);
-		primaryStage.setOnCloseRequest(e-> {
+		primaryStage.setOnCloseRequest(e -> {
 			try {
 				logOut();
 			} catch (IOException e1) {
@@ -858,7 +858,7 @@ public class DefPageController {
 		Globals.backLink = "DefaultPage.fxml";
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-		primaryStage.setOnCloseRequest(e-> {
+		primaryStage.setOnCloseRequest(e -> {
 			try {
 				logOut();
 			} catch (IOException e1) {
@@ -880,7 +880,7 @@ public class DefPageController {
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
-		primaryStage.setOnCloseRequest(e-> {
+		primaryStage.setOnCloseRequest(e -> {
 			try {
 				logOut();
 			} catch (IOException e1) {
@@ -1086,10 +1086,102 @@ public class DefPageController {
 
 	}
 
-	@SuppressWarnings("deprecation")
-	void DrawPlaces() throws IOException, ClassNotFoundException {
+	public void saveAllRoutes() throws ClassNotFoundException, IOException {
 
-		// ImagePlaces = null;
+		@SuppressWarnings("resource")
+		Socket socket = new Socket(Globals.IpAddress, 5555);
+		String[] array = new String[3];
+		array[0] = "getRoutes";
+		array[1] = Globals.city.getCity();
+		array[2] = "0";
+
+		ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
+		objectOutput.writeObject(array);
+
+		ObjectInputStream objectInput = new ObjectInputStream(socket.getInputStream());
+		Object data = objectInput.readObject();
+		// selectFolder();
+		for (int i = 1; i < ((Object[]) data).length; i++) {
+
+			Route route = (Route) (((Object[]) data)[i]);
+			Globals.route = route;
+			mainPane = new AnchorPane();
+			final Stage DownloadPage = new Stage();
+			DownloadPage.initModality(Modality.APPLICATION_MODAL);
+
+			Text text = new Text(Globals.city.getCity() + "'s package is " + Globals.city.getOneTimeCost() + "$");
+
+			area = new TextField("No file selected");
+			area.setDisable(true);
+
+			HBox layout = new HBox(20);
+
+			layout.setAlignment(Pos.CENTER);
+			layout.getChildren().add(mainPane);
+
+			HBox hbox = new HBox(area, mainPane);
+			hbox.setAlignment(Pos.CENTER);
+
+			VBox layoutV = new VBox(20);
+			layoutV.getChildren().add(text);
+			layoutV.getChildren().add(hbox);
+			layoutV.getChildren().add(layout);
+			layoutV.setAlignment(Pos.CENTER);
+			Scene DownlaodDialog = new Scene(layoutV, 1, 1);
+			DownloadPage.setScene(DownlaodDialog);
+			DownloadPage.show();
+
+			Image LinkedImage = new Image(route.getLink());
+			MainImage = new ImageView(LinkedImage);
+			MainImage.relocate(162, 50);
+			MainImage.setFitWidth(LinkedImage.getWidth());
+			MainImage.setFitHeight(LinkedImage.getHeight());
+
+			mainPane.getChildren().add(MainImage);
+			// Globals.map = map;
+
+			DrawRPlaces();
+
+			FileChooser fileChooser = new FileChooser();
+
+			// Set extension filter
+			fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("png files (*.png)", "*.png"));
+
+			// Prompt user to select a file
+			// File file = fileChooser.showSaveDialog(null);
+
+			// dir=directoryChooser.showDialog(null);
+			File file = new File(dir + "/" + route.getCity() + "Route" + route.getId() + ".png");
+			if (file != null) {
+				try {
+					// Pad the capture area
+					WritableImage writableImage = new WritableImage((int) MainImage.getFitWidth(),
+							(int) MainImage.getFitHeight());
+					// WritableImage writableImage = new WritableImage((int)2000 , (int)2000);
+					SnapshotParameters params = new SnapshotParameters();
+
+					params.setViewport(new Rectangle2D(MainImage.getLayoutX(), MainImage.getLayoutY(),
+							MainImage.getFitWidth(), MainImage.getFitHeight()));
+					((Node) mainPane).snapshot(params, writableImage);
+					// writableImage= pixelScaleAwareCanvasSnapshot(mainPane,params,2);
+					// ((Node)mainPane).snapshot()
+					// ((Node)event.getSource()).snapshot(null, writableImage);
+					RenderedImage renderedImage = SwingFXUtils.fromFXImage(writableImage, null);
+					// Write the snapshot to the chosen file
+					ImageIO.write(renderedImage, "png", file);
+					DownloadPage.close();
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
+			}
+
+		}
+
+	}
+
+	@SuppressWarnings("deprecation")
+	void DrawRPlaces() throws IOException, ClassNotFoundException {
+
 		Counter = 0;
 		for (int i = 0; i < ImagePlaces.length; i++) {
 
@@ -1107,9 +1199,9 @@ public class DefPageController {
 		Socket socket = new Socket(Globals.IpAddress, 5555);
 		String[] array = new String[2];
 		String[] array2 = new String[2];
-		array[0] = "getPlaces";
+		array[0] = "getRoutePlaces";
 		// get[1] = "" + ImagePlaces[i].getPlace().getCityName();
-		array[1] = "" + Globals.map.getId();
+		array[1] = "" + Globals.route.getId();
 
 		ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 		objectOutput.writeObject(array);
@@ -1118,75 +1210,112 @@ public class DefPageController {
 		ObjectInputStream objectInput = new ObjectInputStream(socket.getInputStream());
 		data = objectInput.readObject();
 		// System.out.println(((Object[]) data)[0]);
-		Place[] list = (Place[]) ((Object[]) data)[1];
+		ORoutePlaceList = (RoutePlace[]) ((Object[]) data)[1];
 
-		array2[0] = "getUPlaces";
+		int counter = 0, counter2 = 0;
+		int flag = 0;
+		for (int i = 0; i < ORoutePlaceList.length; i++) {
+			if (flag == 0) {
+				Image im = new Image("File:oldloc.png");
+				ImageView newLoc = new ImageView(im);
+				double X = ORoutePlaceList[i].getLocX(), Y = ORoutePlaceList[i].getLocY();
+				// newLoc1.relocate(X, Y);
+				Label label = new Label();
+				// label.relocate(X, Y);
+				RoutePlace rp = new RoutePlace(ORoutePlaceList[i].getRouteId(), ORoutePlaceList[i].getPlace(),
+						ORoutePlaceList[i].getTime(), ORoutePlaceList[i].getLocX(), ORoutePlaceList[i].getLocY(),
+						ORoutePlaceList[i].getSerialID());
+				newLoc.relocate(ORoutePlaceList[i].getLocX() + MainImage.getLayoutX() - (im.getWidth() / 2) * aspect,
+						ORoutePlaceList[i].getLocY() + MainImage.getLayoutY() - (im.getHeight() / 2) * aspect);
+
+				label.setFont(new Font("Quicksand", 20));
+				label.setText(rp.getPlace());
+
+				Text t = new Text();
+				t.setText(label.getText());
+				t.setFont(label.getFont());
+				double width = t.getBoundsInLocal().getWidth();
+				double height = t.getBoundsInLocal().getHeight();
+
+				label.relocate(ORoutePlaceList[i].getLocX() + MainImage.getLayoutX() - (width / 2),
+						ORoutePlaceList[i].getLocY() + MainImage.getLayoutY()
+								- (height + (im.getHeight() / 2) * aspect));
+
+				newLoc.setFitHeight(im.getHeight() * aspect);
+				newLoc.setFitWidth(im.getWidth() * aspect);
+				newLoc.setId("imv" + Counter);
+
+				ImagePlaces[counter] = new ImagePlace(counter, newLoc, label, rp, ORoutePlaceList[i].getLocX(),
+						ORoutePlaceList[i].getLocY(), false);
+				counter++;
+				counter2++;
+				Counter++;
+			}
+			flag = 0;
+		}
+
+		for (int i = 0; i < ImagePlaces.length; i++) {
+
+			if (ImagePlaces[i] != null) {
+
+				mainPane.getChildren().addAll(ImagePlaces[i].getImageview());
+				mainPane.getChildren().addAll(ImagePlaces[i].getLabel());
+
+			}
+
+		}
+
+	}
+
+	@SuppressWarnings("deprecation")
+	void DrawPlaces() throws IOException, ClassNotFoundException {
+
+		Counter = 0;
+		for (int i = 0; i < ImagePlaces.length; i++) {
+
+			if (ImagePlaces[i] != null) {
+
+				mainPane.getChildren().removeAll(ImagePlaces[i].getImageview());
+				mainPane.getChildren().removeAll(ImagePlaces[i].getLabel());
+				ImagePlaces[i] = null;
+			}
+
+		}
+		ImagePlaces = new ImagePlace[10];
+		@SuppressWarnings("resource")
+		Socket socket = new Socket(Globals.IpAddress, 5555);
+		String[] array = new String[4];
+		String[] array2 = new String[2];
+		array[0] = "getPlaces";
 		// get[1] = "" + ImagePlaces[i].getPlace().getCityName();
-		array2[1] = "" + Globals.map.getId();
-		Socket socket2 = new Socket(Globals.IpAddress, 5555);
-		objectOutput = new ObjectOutputStream(socket2.getOutputStream());
-		objectOutput.writeObject(array2);
+		array[1] = "" + Globals.map.getId();
+		array[2] = "" + Globals.map.getCity();
+		array[3] = Globals.user.getType();
+		// array[3] = "viewmap";
 
-		Object data2;
-		ObjectInputStream objectInput2 = new ObjectInputStream(socket2.getInputStream());
-		data2 = objectInput2.readObject();
-		// System.out.println(((Object[]) data2)[0]);
-		UPlace[] list2 = (UPlace[]) ((Object[]) data2)[1];
+		ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
+		objectOutput.writeObject(array);
+
+		Object data;
+		ObjectInputStream objectInput = new ObjectInputStream(socket.getInputStream());
+		data = objectInput.readObject();
+		System.out.println(((Object[]) data)[0]);
+		Place[] list = (Place[]) ((Object[]) data)[1];
 
 		int counter = 0;
 		int flag = 0;
 		for (int i = 0; i < list.length; i++) {
-			for (int c = 0; c < list2.length; c++) {
-				// if (Globals.map.getId() == list2[c].getSerialID()) {
-				if (list[i].getSerialID() == list2[c].getPlaceId()) {
-					Image im = new Image("File:loc.png");
-					ImageView newLoc = new ImageView(im);
-					// newLoc.relocate((double) list2[c].getLocX(), (double) list2[c].getLocY());
-					Label label = new Label();
-					// label.relocate((double) list2[c].getLocX(), (double) list2[c].getLocY());
 
-					newLoc.relocate(list2[c].getLocX() - (im.getWidth() / 2) * aspect,
-							list2[c].getLocY() - (im.getHeight() / 2) * aspect);
-
-					label.setFont(new Font("Quicksand", 20));
-					UPlace p = new UPlace("" + Globals.map.getId(), list2[c].getCityName(), list2[c].getPlaceName(),
-							list2[c].getDescription(), list2[c].getClassification(), list2[c].getAccessibility(),
-							list2[c].getSerialID(), list2[c].getLocX(), list2[c].getLocY(), list2[c].getType(),
-							list2[c].getNumOfmaps(), list2[c].getPlaceId());
-					label.setText(p.getPlaceName());
-					Text t = new Text();
-					t.setText(label.getText());
-					t.setFont(label.getFont());
-					double width = t.getBoundsInLocal().getWidth();
-					double height = t.getBoundsInLocal().getHeight();
-
-					label.relocate(list2[c].getLocX() - (width / 2),
-							list2[c].getLocY() - (height + (im.getHeight() / 2) * aspect));
-
-					newLoc.setFitHeight(im.getHeight() * aspect);
-					newLoc.setFitWidth(im.getWidth() * aspect);
-					newLoc.setId("imv" + Counter);
-
-					ImagePlaces[counter] = new ImagePlace(counter, newLoc, label, p, list2[c].getLocX(),
-							list2[c].getLocY(), false);
-					counter++;
-					Counter++;
-					flag = 1;
-					break;
-				}
-
-				// }
-			}
 			if (flag == 0) {
-				Image im = new Image("File:loc.png");
+				Image im = new Image("File:oldloc.png");
 				ImageView newLoc = new ImageView(im);
 				double X = list[i].getLocX(), Y = list[i].getLocY();
 				// newLoc1.relocate(X, Y);
 				Label label = new Label();
 				// label.relocate(X, Y);
 
-				newLoc.relocate(list[i].getLocX() - (im.getWidth() / 2) * aspect,
-						list[i].getLocY() - (im.getHeight() / 2) * aspect);
+				newLoc.relocate(list[i].getLocX() + MainImage.getLayoutX() - (im.getWidth() / 2) * aspect,
+						list[i].getLocY() + MainImage.getLayoutY() - (im.getHeight() / 2) * aspect);
 
 				label.setFont(new Font("Quicksand", 20));
 				Place p = new Place("" + Globals.map.getId(), list[i].getCityName(), list[i].getPlaceName(),
@@ -1201,8 +1330,8 @@ public class DefPageController {
 				double width = t.getBoundsInLocal().getWidth();
 				double height = t.getBoundsInLocal().getHeight();
 
-				label.relocate(list[i].getLocX() - (width / 2),
-						list[i].getLocY() - (height + (im.getHeight() / 2) * aspect));
+				label.relocate(list[i].getLocX() - (width / 2) + MainImage.getLayoutX(),
+						list[i].getLocY() + MainImage.getLayoutY() - (height + (im.getHeight() / 2) * aspect));
 
 				newLoc.setFitHeight(im.getHeight() * aspect);
 				newLoc.setFitWidth(im.getWidth() * aspect);
@@ -1210,49 +1339,11 @@ public class DefPageController {
 
 				ImagePlaces[counter] = new ImagePlace(counter, newLoc, label, p, list[i].getLocX(), list[i].getLocY(),
 						false);
-				System.out.println(ImagePlaces[counter].getLabel().getText());
 				counter++;
 				Counter++;
-
 			}
 			flag = 0;
-		}
 
-		for (int c = 0; c < list2.length; c++) {
-			if (list2[c].getType().equals("NEW") || list2[c].getType().equals("UNEW")) {
-				Image im = new Image("File:loc.png");
-				ImageView newLoc = new ImageView(im);
-				// newLoc.relocate((double) list2[c].getLocX(), (double) list2[c].getLocY());
-				Label label = new Label();
-				// label.relocate((double) list2[c].getLocX(), (double) list2[c].getLocY());
-
-				newLoc.relocate(list2[c].getLocX() - (im.getWidth() / 2) * aspect,
-						list2[c].getLocY() - (im.getHeight() / 2) * aspect);
-
-				label.setFont(new Font("Quicksand", 20));
-				UPlace p = new UPlace("" + Globals.map.getId(), list2[c].getCityName(), list2[c].getPlaceName(),
-						list2[c].getDescription(), list2[c].getClassification(), list2[c].getAccessibility(),
-						list2[c].getSerialID(), list2[c].getLocX(), list2[c].getLocY(), list2[c].getType(),
-						list2[c].getNumOfmaps(), list2[c].getPlaceId());
-				label.setText(p.getPlaceName());
-
-				Text t = new Text();
-				t.setText(label.getText());
-				t.setFont(label.getFont());
-				double width = t.getBoundsInLocal().getWidth();
-				double height = t.getBoundsInLocal().getHeight();
-
-				label.relocate(list2[c].getLocX() - (width / 2),
-						list2[c].getLocY() - (height + (im.getHeight() / 2) * aspect));
-
-				newLoc.setFitHeight(im.getHeight() * aspect);
-				newLoc.setFitWidth(im.getWidth() * aspect);
-				newLoc.setId("imv" + Counter);
-				ImagePlaces[counter] = new ImagePlace(counter, newLoc, label, p, list2[c].getLocX(), list2[c].getLocY(),
-						false);
-				counter++;
-				Counter++;
-			}
 		}
 
 		for (int i = 0; i < ImagePlaces.length; i++) {
@@ -1265,6 +1356,8 @@ public class DefPageController {
 			}
 
 		}
+
+		// AddMethodsForIP();
 
 	}
 
@@ -1292,7 +1385,7 @@ public class DefPageController {
 
 			Date enddate = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
 			String user = Globals.user.getUserName();
-			
+
 			Date sdate = Calendar.getInstance().getTime();
 			double price = (int) Globals.city.getFixedCost();
 			String city = Globals.city.getCity();
@@ -1313,13 +1406,13 @@ public class DefPageController {
 		}
 
 	}
-	
+
 	private Object logOut() throws UnknownHostException, IOException {
 		String[] array = new String[3];
 		array[0] = "LogOut";
 		array[1] = Globals.user.getUserName();
 		array[2] = Globals.user.getPassword();
-		
+
 		@SuppressWarnings("resource")
 		Socket socket = new Socket(Globals.IpAddress, 5555);
 		try {
@@ -1328,7 +1421,7 @@ public class DefPageController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
 

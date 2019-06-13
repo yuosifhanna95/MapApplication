@@ -418,11 +418,12 @@ public class MemberFileController {
 		@SuppressWarnings("resource")
 		Socket socket = new Socket(Globals.IpAddress, 5555);
 
-		String[] get = new String[1];
+		String[] get = new String[2];
 		get[0] = "getUsers";
 		if (type.equals("place")) {
 			get[0] = "getPlaceCatalog";
 		}
+		get[1] = "member";
 
 		try {
 			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
