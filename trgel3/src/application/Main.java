@@ -48,7 +48,8 @@ public class Main extends Application {
 				Address.setVisible(true);
 
 				Globals.MODE = 0;
-				Globals.IpAddress = Address.getText();
+				if (!Address.equals("") && !Address.equals(null))
+					Globals.IpAddress = Address.getText();
 				URL url = getClass().getResource("MainPage.fxml");
 				AnchorPane pane;
 				try {
@@ -87,6 +88,25 @@ public class Main extends Application {
 
 	public static void main(String[] args) {
 		Globals.IpAddress = "127.0.0.1";
+		Globals.city = null;
+		Globals.cityName = "";
+		Globals.FixedPurchase = null;
+		Globals.Fplaces = null;
+		Globals.Fplaces1 = null;
+		Globals.Fplaces2 = null;
+		Globals.place = null;
+		Globals.places = null;
+		Globals.user = null;
+		Globals.map = null;
+		Globals.MODE = -1;
+		Globals.route = null;
+		Globals.userView = null;
+		Globals.ThereIsRouteUpdate = false;
+		Globals.ThereIsMapUpdate = false;
+		Globals.ThereIsCityUpdate = false;
+		Globals.SearchOp = "";
+		Globals.Searchfilter = "";
+
 		launch(args);
 	}
 }

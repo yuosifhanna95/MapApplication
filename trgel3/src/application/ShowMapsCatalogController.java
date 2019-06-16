@@ -36,7 +36,7 @@ public class ShowMapsCatalogController {
 	@FXML
 	private TableColumn<Map, String> DescriptionCol;
 
-	private ObservableList<Map> data = null;
+	private ObservableList<Map> data = null, data2 = null;
 
 	@FXML
 	private Button Back;
@@ -44,7 +44,7 @@ public class ShowMapsCatalogController {
 	@FXML
 	void backFunc(ActionEvent event) throws IOException {
 		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-		URL url = getClass().getResource("MyMapsCatalogScene.fxml");
+		URL url = getClass().getResource(Globals.backLink);
 		AnchorPane pane = FXMLLoader.load(url);
 
 		Scene scene = new Scene(pane);
@@ -88,7 +88,70 @@ public class ShowMapsCatalogController {
 		DescriptionCol.setCellValueFactory(new PropertyValueFactory<Map, String>("Description"));
 
 		FilteredList<Map> flCity = new FilteredList<Map>(data, p -> true);// Pass the data to a filtered list
-		mapTable.setItems(flCity);// Set the table's items using the filtered list
+
+		if (Globals.SearchOp.equals("City-Place") || Globals.SearchOp.equals("City-Place")) {
+			for (Map map : flCity) {
+				for (Place p : Globals.Fplaces2) {
+					if (Integer.parseInt(p.getMapId()) == map.getId()) {
+						data2.add(map);
+						break;
+					}
+				}
+			}
+			FilteredList<Map> flCity2 = new FilteredList<>(data2, p -> true);
+			mapTable.setItems(flCity2);
+		} else if (Globals.SearchOp.equals("City-City") || Globals.SearchOp.equals("City-Description")) {
+			mapTable.setItems(flCity);
+		} else if (Globals.SearchOp.equals("Place-City") || Globals.SearchOp.equals("Place-Description")) {
+			FilteredList<Map> flCity3 = new FilteredList<Map>(data2, p -> true);
+
+			for (Map map : flCity) {
+				for (Place p : Globals.Fplaces) {
+					if (p.getPlaceName().equals(Globals.place.getPlaceName())) {
+						if (p.getMapId().equals("" + map.getId())) {
+
+							data2.add(map);
+							break;
+						}
+					}
+				}
+
+			}
+			mapTable.setItems(flCity3);
+		} else if (Globals.SearchOp.equals("Place-Place")) {
+			FilteredList<Map> flCity3 = new FilteredList<Map>(data2, p -> true);
+
+			for (Map map : flCity) {
+				for (Place p : Globals.Fplaces) {
+					if (p.getPlaceName().equals(Globals.place.getPlaceName())) {
+						if (p.getMapId().equals("" + map.getId())) {
+							data2.add(map);
+							break;
+						}
+					}
+				}
+
+			}
+			mapTable.setItems(flCity3);
+		}
+
+		else if (Globals.SearchOp.equals("Place-City & place")) {
+			FilteredList<Map> flCity3 = new FilteredList<Map>(data2, p -> true);
+
+			for (Map map : flCity) {
+				for (Place p : Globals.Fplaces) {
+					if (p.getPlaceName().equals(Globals.place.getPlaceName())) {
+						if (p.getMapId().equals("" + map.getId())) {
+							data2.add(map);
+							break;
+						}
+					}
+				}
+
+			}
+			mapTable.setItems(flCity3);
+		}
+// Set the table's items using the filtered list
 		mapTable.getColumns().addAll(IdCol, DescriptionCol);
 
 	}
@@ -97,11 +160,27 @@ public class ShowMapsCatalogController {
 		@SuppressWarnings("resource")
 		Socket socket = new Socket(Globals.IpAddress, 5555);
 		data = FXCollections.observableArrayList();
-
-		String[] get = new String[3];
-		get[0] = "getMyMaps";
-		get[1] = Globals.city.getCity();
+		data2 = FXCollections.observableArrayList();
+		String[] get = new String[5];
 		get[2] = "0";
+		get[0] = "getMyMaps";
+		get[4] = Globals.SearchOp;
+		// get[1] = Globals.city.getCity();
+		if (Globals.SearchOp.equals("City-City")) {
+			get[1] = Globals.city.getCity();
+		} else if (Globals.SearchOp.equals("City-Place")) {
+			get[1] = Globals.city.getCity();
+			// get[3] = Globals.place.getPlaceName();
+		} else if (Globals.SearchOp.equals("City-Description")) {
+			get[1] = Globals.city.getCity();
+			// get[3] = Globals.city.getDescription();
+		} else if (Globals.SearchOp.equals("Place-City") || Globals.SearchOp.equals("Place-Description")) {
+			get[1] = Globals.cityName;
+			// get[3] = Globals.city.getDescription();
+		} else if (Globals.SearchOp.equals("Place-City & place")) {
+			get[1] = Globals.cityName;
+			// get[3] = Globals.city.getDescription();
+		}
 		try {
 			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			objectOutput.writeObject(get);
@@ -129,6 +208,8 @@ public class ShowMapsCatalogController {
 
 	private Object logOut() throws UnknownHostException, IOException {
 		String[] array = new String[3];
+		if (Globals.user == null)
+			return null;
 		array[0] = "LogOut";
 		array[1] = Globals.user.getUserName();
 		array[2] = Globals.user.getPassword();

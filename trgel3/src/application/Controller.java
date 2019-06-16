@@ -109,6 +109,9 @@ public class Controller {
 				} else if (Globals.user.getType().equals("manager")) {
 					Globals.MODE = 4;
 					url = getClass().getResource("ManagerPage.fxml");
+				} else if (Globals.user.getType().equals("CEO")) {
+					Globals.MODE = 5;
+					url = getClass().getResource("ManagerPage.fxml");
 				}
 
 				AnchorPane pane = FXMLLoader.load(url);

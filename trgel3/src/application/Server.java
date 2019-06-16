@@ -1291,6 +1291,22 @@ public class Server {
 							e.printStackTrace();
 						}
 					} else if (((String[]) (data))[0].equals("getPlaceCatalog")) {
+						ObservableList<Place> placeList = getPlaceFromDB1();
+
+						Object[] data = new Object[placeList.size() + 1];
+						data[0] = placeList.size();
+						int counter = 1;
+						for (Place tu : placeList) {
+							data[counter] = tu;
+							counter++;
+						}
+						try {
+							ObjectOutputStream objectOutput = new ObjectOutputStream(skt.getOutputStream());
+							objectOutput.writeObject(data);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					} else if (((String[]) (data))[0].equals("getOPlaceCatalog")) {
 						ObservableList<Place> placeList = getPlaceFromDB();
 
 						Object[] data = new Object[placeList.size() + 1];
@@ -1514,11 +1530,18 @@ public class Server {
 							Class.forName(JDBC_DRIVER);
 
 							conn = DriverManager.getConnection(DB_URL, USER, PASS);
+							String mapid = null, City = null;
+
 							stmt = conn.createStatement();
-							String mapid = ((String[]) (data))[1];
-							String City = ((String[]) (data))[2];
+							if (((String[]) data)[1] != null)
+								mapid = ((String[]) (data))[1];
+							if (((String[]) data)[1] != null)
+								City = ((String[]) (data))[2];
 							String type = ((String[]) (data))[3];
+
 							String sql = "SELECT * FROM places where Name='" + City + "'";
+							if (((String[]) data)[1] != null)
+								sql = "SELECT * FROM places";
 							ResultSet rs = stmt.executeQuery(sql);
 
 							int index = 0;
@@ -1555,6 +1578,8 @@ public class Server {
 
 							}
 							String sql2 = "SELECT * FROM placeMap where mapID=" + mapid;
+							if (mapid == null)
+								sql2 = "SELECT * FROM placeMap";
 							ResultSet rs2 = stmt.executeQuery(sql2);
 							index = 0;
 							while (rs2.next()) {
@@ -1932,7 +1957,7 @@ public class Server {
 				int oneTimeCost = rs.getInt("oneTimeCost");
 				int FixedCost = rs.getInt("FixedCost");
 				int Version = rs.getInt("version");
-				String places = null;
+				String places = "";
 				int NewUpdate = rs.getInt("NewUpdate");
 				String sql2 = "SELECT * FROM places WHERE Name ='" + city + "'";
 				ResultSet rs2 = stmt2.executeQuery(sql2);
@@ -2002,6 +2027,108 @@ public class Server {
 			conn.close();
 
 			return data;
+		} catch (SQLException se) {
+			se.printStackTrace();
+			System.out.println("SQLException: " + se.getMessage());
+			System.out.println("SQLState: " + se.getSQLState());
+			System.out.println("VendorError: " + se.getErrorCode());
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			}
+		}
+
+		return data;
+	}
+
+	static ObservableList<Place> getPlaceFromDB1() {
+		ObservableList<Place> data = FXCollections.observableArrayList();
+		ObservableList<Place> data3 = FXCollections.observableArrayList();
+		Place[] list2;
+		Connection conn = null;
+		Statement stmt = null;
+
+		try {
+			Class.forName(JDBC_DRIVER);
+
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			stmt = conn.createStatement();
+
+			String sql = "SELECT * FROM places";
+			ResultSet rs = stmt.executeQuery(sql);
+
+			while (rs.next()) {
+				String city = rs.getString("Name");
+				String description = rs.getString("description");
+				String place = rs.getString("Place");
+				String Classification = rs.getString("Classification");
+				int Accessibility = rs.getInt("Accessibility");
+				int numOfMaps = rs.getInt("mapsNum");
+				Place p = new Place(city, place, description, Classification, Accessibility, numOfMaps);
+				data.add(p);
+			}
+
+			String sql2 = "SELECT * FROM placeMap";
+			ResultSet rs2 = stmt.executeQuery(sql2);
+			int index = 0;
+			while (rs2.next()) {
+				index++;
+			}
+			rs2.first();
+			rs2.previous();
+			Object[] result2 = new Object[2];
+			list2 = new Place[index];
+			index = 0;
+			while (rs2.next()) {
+
+				// Connected = true;
+
+				int id = rs2.getInt("id");
+				String MapId = rs2.getString("MapId");
+				String Name = "";
+				String Place = rs2.getString("Name");
+				String description = "";
+				String classification = "";
+				int accessibility = 0;
+
+				// Point p = GetLocationFromDB(Integer.parseInt(MapId), Place);
+				int LocX = rs2.getInt("LocX");
+				int LocY = rs2.getInt("LocY");
+				// rs.getString("pathNum");
+
+				// data.add(new User(username, description, mapsnum , placesnum, pathnum ));
+				Place place = new Place(MapId, Name, Place, description, classification, accessibility, id, LocX, LocY);
+				list2[index] = (place);
+				index++;
+			}
+			Place[] list3 = new Place[list2.length];
+			for (int i = 0; i < list2.length; i++) {
+
+				for (Place place : data) {
+					if (list2[i].getPlaceName().equals(place.getPlaceName())) {
+
+						data3.add(new Place(list2[i].getMapId(), place.getCityName(), place.getPlaceName(),
+								place.getDescription(), place.getClassification(), place.getAccessibility(),
+								place.getSerialID(), list2[i].getLocX(), list2[i].getLocY()));
+					}
+
+				}
+
+			}
+
+			// result[0] = true;
+			// result[1] = list3;
+			stmt.close();
+			conn.close();
+
+			return data3;
 		} catch (SQLException se) {
 			se.printStackTrace();
 			System.out.println("SQLException: " + se.getMessage());

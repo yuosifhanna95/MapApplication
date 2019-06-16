@@ -75,6 +75,8 @@ public class CatalogController {
 
 	private ObservableList<Place> dataPlace = FXCollections.observableArrayList();
 
+	private ObservableList<Place> dataPlace2 = FXCollections.observableArrayList();
+
 	@FXML
 	private Button back;
 
@@ -95,12 +97,31 @@ public class CatalogController {
 	FilteredList<City> flCity = null;
 
 	FilteredList<Place> flPlace = null;
+	FilteredList<Place> flPlace1 = null;
+	FilteredList<Place> flPlace2 = null;
 
 	@FXML
 	void viewMaps(ActionEvent event) throws IOException {
 		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 		URL url = getClass().getResource("ShowMapsCatalogScene.fxml");
-		Globals.backLink = "MyMapsScene.fxml";
+		Globals.backLink = "catalogScene.fxml";
+		if (searchTable.isVisible()) {
+			Globals.SearchOp = "City-";
+			Globals.Searchfilter = searchText.getText();
+		} else if (searchTable1.isVisible()) {
+			Globals.SearchOp = "Place-";
+			if (comboBox.getSelectionModel().getSelectedItem().equals("City & place"))
+				Globals.Searchfilter = placeField.getText();
+			else
+				Globals.Searchfilter = searchText.getText();
+		}
+		Globals.SearchOp += comboBox.getSelectionModel().getSelectedItem();
+		if (flPlace2 != null)
+			Globals.Fplaces2 = flPlace2;
+		else
+			Globals.Fplaces2 = flPlace;
+		Globals.Fplaces = flPlace;
+		Globals.Fplaces1 = flPlace1;
 		AnchorPane pane;
 		pane = FXMLLoader.load(url);
 
@@ -123,6 +144,7 @@ public class CatalogController {
 	void searchCityBtn(ActionEvent event) {
 		searchPlace.getStyleClass().remove("addBobOk");
 		searchCity.getStyleClass().removeAll("addBobOk, focus");
+		searchCity.getStyleClass().remove("addBobOk");
 		searchCity.getStyleClass().add("addBobOk");
 
 		searchText.setPrefWidth(200);
@@ -161,8 +183,10 @@ public class CatalogController {
 	void searchPlaceBtn(ActionEvent event) throws UnknownHostException, IOException {
 		searchCity.getStyleClass().remove("addBobOk");
 		searchPlace.getStyleClass().removeAll("addBobOk, focus");
+		searchPlace.getStyleClass().remove("addBobOk");
 		searchPlace.getStyleClass().add("addBobOk");
 
+		comboBox.getItems().remove("City & place");
 		comboBox.getItems().add("City & place");
 
 		searchTable.setVisible(false);
@@ -208,8 +232,13 @@ public class CatalogController {
 			public void handle(KeyEvent ke) {
 				switch (comboBox.getValue()) {
 				case "City & place":
-					flPlace.setPredicate(
+					flPlace1.setPredicate(
 							p -> p.getPlaceName().toLowerCase().contains(placeField.getText().toLowerCase().trim()));
+					flPlace2 = new FilteredList<Place>(flPlace1, p -> true);
+					flPlace2.setPredicate(
+							p -> p.getCityName().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
+					searchTable1.setItems(flPlace2);
+					// SearchCombination();
 					break;
 				}
 			}
@@ -219,20 +248,28 @@ public class CatalogController {
 			public void handle(KeyEvent ke) {
 				switch (comboBox.getValue()) {
 				case "City":
-					flPlace.setPredicate(
+					flPlace1.setPredicate(
 							p -> p.getCityName().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
+					flPlace2 = new FilteredList<Place>(flPlace1, p -> true);
+					flPlace2.setPredicate(
+							p -> p.getPlaceName().toLowerCase().contains(placeField.getText().toLowerCase().trim()));
 					break;
 				case "Place":
-					flPlace.setPredicate(
+					flPlace1.setPredicate(
 							p -> p.getPlaceName().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
 					break;
 				case "Description":
-					flPlace.setPredicate(
+					flPlace1.setPredicate(
 							p -> p.getDescription().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
 					break;
 				case "City & place":
-					flPlace.setPredicate(
+					flPlace1.setPredicate(
 							p -> p.getCityName().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
+					flPlace2 = new FilteredList<Place>(flPlace1, p -> true);
+					flPlace2.setPredicate(
+							p -> p.getPlaceName().toLowerCase().contains(placeField.getText().toLowerCase().trim()));
+					searchTable1.setItems(flPlace2);
+
 					break;
 				}
 			}
@@ -260,6 +297,7 @@ public class CatalogController {
 
 		buildData("city");
 		buildData("place");
+		buildData("Oplace");
 
 		searchTable.setRowFactory(ctv -> {
 			TableRow<City> row = new TableRow<>();
@@ -267,6 +305,17 @@ public class CatalogController {
 				if (event.getClickCount() == 1 && (!row.isEmpty())) {
 					City cityRow = searchTable.getSelectionModel().getSelectedItem();
 					Globals.city = (City) cityRow;
+				}
+			});
+			return row;
+		});
+		searchTable1.setRowFactory(ctv -> {
+			TableRow<Place> row = new TableRow<>();
+			row.setOnMouseClicked(event -> {
+				if (event.getClickCount() == 1 && (!row.isEmpty())) {
+					Place placeRow = searchTable1.getSelectionModel().getSelectedItem();
+					Globals.place = (Place) placeRow;
+					Globals.cityName = placeRow.getCityName();
 				}
 			});
 			return row;
@@ -304,8 +353,11 @@ public class CatalogController {
 		mapCol1.setMinWidth(50);
 		mapCol1.setCellValueFactory(new PropertyValueFactory<Place, String>("numOfmaps"));
 
-		flPlace = new FilteredList<Place>(dataPlace, p -> true);// Pass the dataCity to a filtered list
-		searchTable1.setItems(flPlace);// Set the table's items using the filtered list
+		flPlace = new FilteredList<Place>(dataPlace, p -> true);
+		flPlace1 = new FilteredList<Place>(dataPlace2, p -> true);
+		// flPlace1 = new FilteredList<Place>(dataPlace, p -> true);
+		// Pass the dataCity to a filtered list
+		searchTable1.setItems(flPlace1);// Set the table's items using the filtered list
 		searchTable1.getColumns().addAll(PlaceCol1, CityCol1, DescriptionCol1, mapCol1);
 
 		searchTable1.setVisible(false);
@@ -353,10 +405,16 @@ public class CatalogController {
 				case "City":
 					flCity.setPredicate(
 							p -> p.getCity().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
+					flPlace2 = new FilteredList<Place>(dataPlace, p -> true);
+					flPlace2.setPredicate(
+							p -> p.getPlaceName().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
 					break;
 				case "Place":
 					flCity.setPredicate(
 							p -> p.getPlaces().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
+					flPlace2 = new FilteredList<Place>(dataPlace, p -> true);
+					flPlace2.setPredicate(
+							p -> p.getPlaceName().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
 					break;
 				case "Description":
 					flCity.setPredicate(
@@ -374,12 +432,22 @@ public class CatalogController {
 		@SuppressWarnings("resource")
 		Socket socket = new Socket(Globals.IpAddress, 5555);
 
-		String[] get = new String[2];
+		String[] get = new String[4];
 		get[0] = "getCatalog";
+		get[1] = "0";
 		if (type.equals("place")) {
 			get[0] = "getPlaceCatalog";
+			// get[0] = "getPlaces";
+			// get[1] = null;
+			// get[2] = null;
+			get[1] = "0";
+		} else if (type.equals("Oplace")) {
+			get[0] = "getOPlaceCatalog";
+			// get[0] = "getPlaces";
+			// get[1] = null;
+			// get[2] = null;
+			get[1] = "0";
 		}
-		get[1] = "0";
 		try {
 			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			objectOutput.writeObject(get);
@@ -391,9 +459,15 @@ public class CatalogController {
 						for (int i = 1; i <= (int) object[0]; i++) {
 							dataCity.add((City) object[i]);
 						}
-					} else {
+					} else if (type.equals("place")) {
 						for (int i = 1; i <= (int) object[0]; i++) {
 							dataPlace.add((Place) object[i]);
+
+						}
+					} else {
+						for (int i = 1; i <= (int) object[0]; i++) {
+							dataPlace2.add((Place) object[i]);
+
 						}
 					}
 
@@ -408,6 +482,21 @@ public class CatalogController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+	}
+
+	public void SearchCombination() {
+
+		String place = placeField.getText();
+		String city = searchText.getText();
+
+		flPlace1 = new FilteredList<Place>(dataPlace, p -> true);
+		flPlace1.setPredicate(p -> p.getPlaceName().toLowerCase().contains(placeField.getText().toLowerCase().trim()));
+		// searchTable1.setItems(flPlace1);
+		flPlace2 = new FilteredList<Place>(flPlace1, p -> true);
+		flPlace2.setPredicate(p -> p.getCityName().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
+		searchTable1.setItems(flPlace2);
+		System.out.println(place + "'" + city);
 
 	}
 
