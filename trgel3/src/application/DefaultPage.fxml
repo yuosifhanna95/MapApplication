@@ -8,39 +8,37 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 
-<AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.DefPageController">
+<AnchorPane fx:id="pane" prefHeight="720.0" prefWidth="1280.0" stylesheets="@CatalogStyle.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.DefPageController">
    <children>
-      <Button fx:id="btn_message" layoutX="218.0" layoutY="234.0" mnemonicParsing="false" onAction="#messageFunc" text="Messages" />
-      <Button fx:id="Back" layoutX="413.0" layoutY="131.0" mnemonicParsing="false" onAction="#backFunc" text="Back" />
-      <HBox fx:id="hbox" layoutX="490.0" layoutY="129.0" prefHeight="30.0" prefWidth="320.0">
-         <children>
-            <ComboBox fx:id="comboBox" prefWidth="130.0" promptText="Search by" />
-            <TextField fx:id="searchText" prefWidth="200.0" />
-         </children>
-      </HBox>
-      <TableView fx:id="searchTable" layoutX="390.0" layoutY="192.0" prefHeight="400.0" prefWidth="500.0">
+      <Button fx:id="btn_message" layoutX="48.0" layoutY="250.0" mnemonicParsing="false" onAction="#messageFunc" prefHeight="47.0" prefWidth="155.0" text="Messages" />
+      <Button fx:id="Back" layoutX="15.0" layoutY="14.0" mnemonicParsing="false" onAction="#backFunc" prefHeight="47.0" prefWidth="155.0" text="Back" />
+      <HBox fx:id="hbox" layoutX="490.0" layoutY="129.0" prefHeight="30.0" prefWidth="320.0" />
+ 	<TableView fx:id="searchTable" layoutX="236.0" layoutY="250" prefHeight="400.0" prefWidth="808.0">
         <columns>
-          <TableColumn fx:id="CityCol" prefWidth="75.0" text="City" />
-          <TableColumn fx:id="DescriptionCol" prefWidth="75.0" text="Desctription" />
-            <TableColumn fx:id="mapCol" prefWidth="75.0" text="#Maps" />
-             <TableColumn fx:id="placeCol" prefWidth="75.0" text="#Places" />
-             <TableColumn fx:id="pathCol" prefWidth="75.0" text="#Paths" />
+          <TableColumn fx:id="CityCol" prefWidth="150" text="City" />
+          <TableColumn fx:id="DescriptionCol" prefWidth="300" text="Description" />
+            <TableColumn fx:id="mapCol" prefWidth="120" text="#Maps" />
+             <TableColumn fx:id="placeCol" prefWidth="120" text="#Places" />
+             <TableColumn fx:id="pathCol" prefWidth="120" text="#Paths" />
         </columns>
       </TableView>
-      <Button fx:id="searchCity" layoutX="390.0" layoutY="166.0" mnemonicParsing="false" onAction="#searchCityBtn" prefHeight="26.0" prefWidth="250.0" text="Search City" />
-      <Button fx:id="searchPlace" layoutX="640.0" layoutY="166.0" mnemonicParsing="false" onAction="#searchPlaceBtn" prefHeight="26.0" prefWidth="250.0" text="Search Place" />
-      <TableView fx:id="searchTable1" layoutX="390.0" layoutY="192.0" prefHeight="400.0" prefWidth="500.0">
+      <Button fx:id="searchCity" layoutX="237.0" layoutY="183.0" mnemonicParsing="false" onAction="#searchCityBtn" prefHeight="47.0" prefWidth="394.0" text="Search City" />
+      <TableView fx:id="searchTable1" layoutX="237.0" layoutY="250" prefHeight="400.0" prefWidth="808.0">
          <columns>
-         	<TableColumn fx:id="PlaceCol1" prefWidth="100.0" text="Place" />
-            <TableColumn fx:id="CityCol1" prefWidth="100.0" text="City" />
+         	<TableColumn fx:id="PlaceCol1" prefWidth="150" text="Place" />
+            <TableColumn fx:id="CityCol1" prefWidth="150" text="City" />
             <TableColumn fx:id="DescriptionCol1" prefWidth="200.0" text="Desctription" />
             <TableColumn fx:id="mapCol1" prefWidth="100.0" text="#Maps" />
          </columns>
       </TableView>
-      <Button fx:id="myMaps" layoutX="218.0" layoutY="283.0" mnemonicParsing="false" onAction="#showMymaps" text="My maps" />
-      <Button fx:id="OneTimePurchase" layoutX="463.0" layoutY="602.0" mnemonicParsing="false" onAction="#OnePurchase" prefHeight="26.0" prefWidth="151.0" text="One time purchase" />
-      <Button fx:id="FixedTimePurchase" layoutX="672.0" layoutY="602.0" mnemonicParsing="false" onAction="#FixedPurchase" text="Fixed time purchase" />
-      <Button fx:id="editProfile" layoutX="1085.0" layoutY="71.0" mnemonicParsing="false" onAction="#editProfileButt" text="Edit Profile" />
-       <Button fx:id="view" layoutX="823.0" layoutY="602.0" mnemonicParsing="false" onAction="#viewMaps" text="View maps" />
+      <Button fx:id="myMaps" layoutX="48.0" layoutY="308.0" mnemonicParsing="false" onAction="#showMymaps" prefHeight="47.0" prefWidth="155.0" text="My maps" />
+      <Button fx:id="OneTimePurchase" layoutX="237.0" layoutY="659.0" mnemonicParsing="false" onAction="#OnePurchase" prefHeight="47.0" prefWidth="298.0" text="One time purchase" />
+      <Button fx:id="FixedTimePurchase" layoutX="555.0" layoutY="659.0" mnemonicParsing="false" onAction="#FixedPurchase" prefHeight="47.0" prefWidth="298.0" text="Fixed time purchase" />
+      <Button fx:id="editProfile" layoutX="1114.0" layoutY="14.0" mnemonicParsing="false" onAction="#editProfileButt" text="Edit Profile" />
+      <TextField fx:id="searchText" layoutX="650.0" layoutY="119.0" prefHeight="50.0" prefWidth="394.0" />
+      <TextField fx:id="placeField" layoutX="860.0" layoutY="119.0" prefHeight="50.0" prefWidth="180.0" visible="false" />	
+       <Button fx:id="searchPlace" layoutX="647.0" layoutY="183.0" mnemonicParsing="false" onAction="#searchPlaceBtn" prefHeight="47.0" prefWidth="394.0" text="Search Place" />
+      <ComboBox fx:id="comboBox" layoutX="237.0" layoutY="118.0" prefHeight="47.0" prefWidth="394.0" promptText="Search by" />
+         <Button fx:id="view" layoutX="883.0" layoutY="659.0" mnemonicParsing="false" onAction="#viewMaps" text="View maps" visible="false" />	
    </children>
 </AnchorPane>

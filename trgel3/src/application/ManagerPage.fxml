@@ -3,18 +3,18 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.ManagerPageController">
+<AnchorPane fx:id="pane" prefHeight="720.0" prefWidth="1280.0" stylesheets="@CatalogStyle.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.ManagerPageController">
    <children>
-      <Button fx:id="btn_AddMap" layoutX="701.0" layoutY="246.0" mnemonicParsing="false" onAction="#AddMapFunc" text="Add Map" />
-      <Button fx:id="btn_message" layoutX="606.0" layoutY="208.0" mnemonicParsing="false" onAction="#messageFunc" text="Messeges" />
-      <Button fx:id="Back" layoutX="614.0" layoutY="174.0" mnemonicParsing="false" onAction="#backFunc" text="Back" />
-      <Button fx:id="btn_editMaps" layoutX="684.0" layoutY="208.0" mnemonicParsing="false" onAction="#editmaps" text="Edit Maps" />
-      <Button fx:id="btn_confirmMaps" layoutX="765.0" layoutY="208.0" mnemonicParsing="false" onAction="#confirmMapsFunc" text="Confirm Maps" />
-      <Button fx:id="btn_ConfirmRoutes" layoutX="874.0" layoutY="208.0" mnemonicParsing="false" onAction="#confirmRoutesFunc" text="Confirm Routes" />      
-      <Button fx:id="memberfile" layoutX="606.0" layoutY="246.0" mnemonicParsing="false" onAction="#MembersFileFunc" text="Members File" />
-      <Button fx:id="Prices" layoutX="874.0" layoutY="246.0" mnemonicParsing="false" onAction="#changeprice" text="Change prices" />
-      <Button fx:id="Reports" layoutX="684.0" layoutY="280.0" mnemonicParsing="false" onAction="#showreportbtn" text="Show Reports" />
-      <Button fx:id="btn_AddRoute" layoutX="782.0" layoutY="246.0" mnemonicParsing="false" onAction="#AddRouteFunc" text="Add Route" />
+      <Button fx:id="btn_AddMap" layoutX="605.0" layoutY="267.0" mnemonicParsing="false" onAction="#AddMapFunc" text="Add Map" />
+      <Button fx:id="btn_message" layoutX="404.0" layoutY="208.0" mnemonicParsing="false" onAction="#messageFunc" prefHeight="47.0" prefWidth="184.0" text="Messeges" />
+      <Button fx:id="Back" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#backFunc" text="Back" />
+      <Button fx:id="btn_editMaps" layoutX="600.0" layoutY="208.0" mnemonicParsing="false" onAction="#editmaps" text="Edit Maps" />
+      <Button fx:id="btn_confirmMaps" layoutX="753.0" layoutY="208.0" mnemonicParsing="false" onAction="#confirmMapsFunc" text="Confirm Maps" />
+      <Button fx:id="btn_ConfirmRoutes" layoutX="952.0" layoutY="208.0" mnemonicParsing="false" onAction="#confirmRoutesFunc" text="Confirm Routes" />      
+      <Button fx:id="memberfile" layoutX="404.0" layoutY="267.0" mnemonicParsing="false" onAction="#MembersFileFunc" text="Members File" />
+      <Button fx:id="Prices" layoutX="952.0" layoutY="267.0" mnemonicParsing="false" onAction="#changeprice" text="Change prices" />
+      <Button fx:id="Reports" layoutX="401.0" layoutY="327.0" mnemonicParsing="false" onAction="#showreportbtn" text="Show Reports" />
+      <Button fx:id="btn_AddRoute" layoutX="753.0" layoutY="267.0" mnemonicParsing="false" onAction="#AddRouteFunc" text="Add Route" />
       
    </children>
 </AnchorPane>

@@ -35,8 +35,5 @@
             <TableColumn fx:id="mapCol1" prefWidth="140.0" text="#Maps" />
          </columns>
       </TableView>
-      <Button fx:id="OneTimePurchase" layoutX="463.0" layoutY="602.0" mnemonicParsing="false" onAction="#OnePurchase" prefHeight="26.0" prefWidth="151.0" text="One time purchase" />
-      <Button fx:id="FixedTimePurchase" layoutX="672.0" layoutY="602.0" mnemonicParsing="false" onAction="#FixedPurchase" text="Fixed time purchase" />
- 
    </children>
 </AnchorPane>

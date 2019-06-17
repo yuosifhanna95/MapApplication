@@ -19,6 +19,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Control;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
@@ -64,10 +65,57 @@ public class ShowMapsCatalogController {
 	@SuppressWarnings("unchecked")
 	@FXML
 	public void initialize() throws UnknownHostException, IOException {
+
+		if (Globals.MODE < 3)
+			Globals.backLink = "catalogScene.fxml";
+		else if (Globals.MODE < 5)
+			Globals.backLink = "EditMaps.fxml";
+		else
+			Globals.backLink = "ConfirmMaps.fxml";
+
 		buildData();
 
 		mapTable.getColumns().clear();
 		mapTable.setEditable(true);
+
+		mapTable.setRowFactory(tv -> {
+			TableRow<Map> row = new TableRow<>();
+			row.setOnMouseClicked(event -> {
+				if (event.getClickCount() == 2 && (!row.isEmpty()) && Globals.MODE >= 3) {
+					Map mapRow = mapTable.getSelectionModel().getSelectedItem();
+
+					String urll = mapRow.getLinkCustomer();
+					System.out.println(urll);
+					// Globals.backLink = urll;
+					Globals.map = mapRow;
+
+					try {
+						Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+						URL url = getClass().getResource("AddLocations.fxml");
+						Globals.backLink = "ShowMapsCatalogScene.fxml";
+						AnchorPane pane;
+						pane = FXMLLoader.load(url);
+						Scene scene = new Scene(pane);
+						scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+						primaryStage.setScene(scene);
+						primaryStage.setOnCloseRequest(e -> {
+							try {
+								logOut();
+							} catch (IOException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+						});
+						primaryStage.show();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+				}
+			});
+			return row;
+		});
 
 		IdCol.setStyle("-fx-alignment: CENTER;");
 		IdCol.setMinWidth(100);

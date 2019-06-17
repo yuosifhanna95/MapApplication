@@ -36,6 +36,9 @@ import javafx.stage.Stage;
 public class EditmapsController {
 
 	@FXML
+	private Button view;
+
+	@FXML
 	private Button btn_message;
 
 	@FXML
@@ -90,6 +93,8 @@ public class EditmapsController {
 
 	private ObservableList<Place> dataPlace = FXCollections.observableArrayList();
 
+	private ObservableList<Place> dataPlace2 = FXCollections.observableArrayList();
+
 	@FXML
 	private Button searchCity;
 
@@ -102,29 +107,72 @@ public class EditmapsController {
 
 	@FXML
 	private Button btn_AddLoc;
-	
+
 	@FXML
 	private HBox hbox;
-	
-	TextField placeField= new TextField();
 
-	
+	@FXML
+	private TextField placeField;
+
+	FilteredList<Place> flPlace1 = null;
+	FilteredList<Place> flPlace2 = null;
+
+	@FXML
+	void viewMaps(ActionEvent event) throws IOException {
+		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+		URL url = getClass().getResource("ShowMapsCatalogScene.fxml");
+		Globals.backLink = "EditMaps.fxml";
+		if (searchTable.isVisible()) {
+			Globals.SearchOp = "City-";
+			Globals.Searchfilter = searchText.getText();
+		} else if (searchTable1.isVisible()) {
+			Globals.SearchOp = "Place-";
+			if (comboBox.getSelectionModel().getSelectedItem().equals("City & place"))
+				Globals.Searchfilter = placeField.getText();
+			else
+				Globals.Searchfilter = searchText.getText();
+		}
+		Globals.SearchOp += comboBox.getSelectionModel().getSelectedItem();
+		if (flPlace2 != null)
+			Globals.Fplaces2 = flPlace2;
+		else
+			Globals.Fplaces2 = flPlace;
+		Globals.Fplaces = flPlace;
+		Globals.Fplaces1 = flPlace1;
+		AnchorPane pane;
+		pane = FXMLLoader.load(url);
+
+		Scene scene = new Scene(pane);
+		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		primaryStage.setScene(scene);
+//		primaryStage.setOnCloseRequest(e -> {
+//			try {
+//				logOut();
+//			} catch (IOException e1) {
+//				// TODO Auto-generated catch block
+//				e1.printStackTrace();
+//			}
+//		});
+		primaryStage.show();
+
+	}
+
 	@FXML
 	void searchCityBtn(ActionEvent event) {
 		searchPlace.getStyleClass().remove("addBobOk");
 		searchCity.getStyleClass().removeAll("addBobOk, focus");
+		searchCity.getStyleClass().remove("addBobOk");
 		searchCity.getStyleClass().add("addBobOk");
-		
-	    searchText.setPrefWidth(200);
-  	    hbox.getChildren().remove(placeField);
+
+		searchText.setPrefWidth(390);
+		placeField.setVisible(false);
 
 		searchTable1.setVisible(false);
 		searchTable1.setDisable(true);
 
 		searchTable.setVisible(true);
 		searchTable.setDisable(false);
-		
-	
+
 		comboBox.getItems().remove("City & place");
 
 		searchText.setOnKeyReleased(new EventHandler<KeyEvent>() {
@@ -152,8 +200,10 @@ public class EditmapsController {
 	void searchPlaceBtn(ActionEvent event) throws UnknownHostException, IOException {
 		searchCity.getStyleClass().remove("addBobOk");
 		searchPlace.getStyleClass().removeAll("addBobOk, focus");
+		searchPlace.getStyleClass().remove("addBobOk");
 		searchPlace.getStyleClass().add("addBobOk");
-		
+
+		comboBox.getItems().remove("City & place");
 		comboBox.getItems().add("City & place");
 
 		searchTable.setVisible(false);
@@ -161,75 +211,54 @@ public class EditmapsController {
 
 		searchTable1.setVisible(true);
 		searchTable1.setDisable(false);
-		
-		comboBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-		      @Override public void changed(ObservableValue<? extends String> selected, String old, String newVal) {
-		          if (newVal != null) {
-		            switch(newVal) {
-		            case "City & place": 
-		            	  hbox.getChildren().remove(placeField);
-		            	  searchText.setPrefWidth(100);
-		            	  placeField.setPrefWidth(100);
-		            	  searchText.setPromptText("City");
-		            	  placeField.setPromptText("Place");
-		            	  hbox.getChildren().addAll(placeField);
-		            	  break;
-		            case "City": 
-		            	  searchText.setPrefWidth(200);
-		            	  searchText.setPromptText("City");
-		            	  hbox.getChildren().remove(placeField);
-		            	  break;
-		            case "Description": 
-		            	  searchText.setPrefWidth(200);
-		            	  searchText.setPromptText("Description");
-		            	  hbox.getChildren().remove(placeField);
-		            	  break;
-		            case "Place": 
-		            	  searchText.setPrefWidth(200);
-		            	  searchText.setPromptText("Place");
-		            	  hbox.getChildren().remove(placeField);
-		            	  break;
-		            }
-		          }
-		        }
-		});
-		
+
 		placeField.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent ke) {
 				switch (comboBox.getValue()) {
 				case "City & place":
-					flPlace.setPredicate(
+					flPlace1.setPredicate(
 							p -> p.getPlaceName().toLowerCase().contains(placeField.getText().toLowerCase().trim()));
+					flPlace2 = new FilteredList<Place>(flPlace1, p -> true);
+					flPlace2.setPredicate(
+							p -> p.getCityName().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
+					searchTable1.setItems(flPlace2);
 					break;
 				}
 			}
 		});
-	
+
 		searchText.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent ke) {
 				switch (comboBox.getValue()) {
 				case "City":
-					flPlace.setPredicate(
+					flPlace1.setPredicate(
 							p -> p.getCityName().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
+					flPlace2 = new FilteredList<Place>(flPlace1, p -> true);
+					flPlace2.setPredicate(
+							p -> p.getPlaceName().toLowerCase().contains(placeField.getText().toLowerCase().trim()));
 					break;
 				case "Place":
-					flPlace.setPredicate(
+					flPlace1.setPredicate(
 							p -> p.getPlaceName().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
 					break;
 				case "Description":
-					flPlace.setPredicate(
+					flPlace1.setPredicate(
 							p -> p.getDescription().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
 					break;
 				case "City & place":
-					flPlace.setPredicate(
+					flPlace1.setPredicate(
 							p -> p.getCityName().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
+					flPlace2 = new FilteredList<Place>(flPlace1, p -> true);
+					flPlace2.setPredicate(
+							p -> p.getPlaceName().toLowerCase().contains(placeField.getText().toLowerCase().trim()));
+					searchTable1.setItems(flPlace2);
+
 					break;
 				}
 			}
 		});
 
 	}
-
 
 	@FXML
 	void showMymaps(ActionEvent event) throws IOException {
@@ -241,7 +270,7 @@ public class EditmapsController {
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
-		primaryStage.setOnCloseRequest(e-> {
+		primaryStage.setOnCloseRequest(e -> {
 			try {
 				logOut();
 			} catch (IOException e1) {
@@ -264,7 +293,7 @@ public class EditmapsController {
 			Scene scene = new Scene(pane);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
-			primaryStage.setOnCloseRequest(e-> {
+			primaryStage.setOnCloseRequest(e -> {
 				try {
 					logOut();
 				} catch (IOException e1) {
@@ -287,7 +316,7 @@ public class EditmapsController {
 		// {
 		// btn_AddLoc.setVisible(false);
 		// }
-		if (Globals.MODE == 4) {
+		if (Globals.MODE >= 4) {
 			Globals.backLink = "ManagerPage.fxml";
 		} else if (Globals.MODE == 3) {
 			Globals.backLink = "EmployeePage.fxml";
@@ -305,6 +334,7 @@ public class EditmapsController {
 
 		buildData("city");
 		buildData("place");
+		buildData("Oplace");
 
 		comboBox.getItems().addAll("City", "Place", "Description");
 		searchText.setPromptText("Write here");
@@ -339,7 +369,8 @@ public class EditmapsController {
 		mapCol1.setCellValueFactory(new PropertyValueFactory<Place, String>("numOfmaps"));
 
 		flPlace = new FilteredList<Place>(dataPlace, p -> true);// Pass the dataCity to a filtered list
-		searchTable1.setItems(flPlace);// Set the table's items using the filtered list
+		flPlace1 = new FilteredList<Place>(dataPlace2, p -> true);
+		searchTable1.setItems(flPlace1);// Set the table's items using the filtered list
 		searchTable1.getColumns().addAll(PlaceCol1, CityCol1, DescriptionCol1, mapCol1);
 
 		searchTable1.setVisible(false);
@@ -358,6 +389,17 @@ public class EditmapsController {
 					edit.setVisible(true);
 					edit.setDisable(false);
 
+				}
+			});
+			return row;
+		});
+		searchTable1.setRowFactory(ctv -> {
+			TableRow<Place> row = new TableRow<>();
+			row.setOnMouseClicked(event -> {
+				if (event.getClickCount() == 1 && (!row.isEmpty())) {
+					Place placeRow = searchTable1.getSelectionModel().getSelectedItem();
+					Globals.place = (Place) placeRow;
+					Globals.cityName = placeRow.getCityName();
 				}
 			});
 			return row;
@@ -402,10 +444,16 @@ public class EditmapsController {
 				case "City":
 					flCity.setPredicate(
 							p -> p.getCity().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
+					flPlace2 = new FilteredList<Place>(dataPlace, p -> true);
+					flPlace2.setPredicate(
+							p -> p.getPlaceName().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
 					break;
 				case "Place":
 					flCity.setPredicate(
 							p -> p.getPlaces().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
+					flPlace2 = new FilteredList<Place>(dataPlace, p -> true);
+					flPlace2.setPredicate(
+							p -> p.getPlaceName().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
 					break;
 				case "Description":
 					flCity.setPredicate(
@@ -414,7 +462,38 @@ public class EditmapsController {
 				}
 			}
 		});
+		comboBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> selected, String old, String newVal) {
+				if (newVal != null) {
+					switch (newVal) {
+					case "City & place":
+						placeField.setVisible(false);
+						searchText.setPrefWidth(180);
+						placeField.setPrefWidth(180);
+						placeField.setPromptText("Place");
+						placeField.setVisible(true);
 
+						break;
+					case "City":
+						searchText.setPrefWidth(390);
+						searchText.setPromptText("City");
+						placeField.setVisible(false);
+						break;
+					case "Description":
+						searchText.setPrefWidth(390);
+						searchText.setPromptText("Description");
+						placeField.setVisible(false);
+						break;
+					case "Place":
+						searchText.setPrefWidth(390);
+						searchText.setPromptText("Place");
+						placeField.setVisible(false);
+						break;
+					}
+				}
+			}
+		});
 		comboBox.getSelectionModel().selectFirst();
 	}
 
@@ -422,12 +501,22 @@ public class EditmapsController {
 		@SuppressWarnings("resource")
 		Socket socket = new Socket(Globals.IpAddress, 5555);
 
-		String[] get = new String[2];
+		String[] get = new String[4];
 		get[0] = "getCatalog";
+		get[1] = "-1";
 		if (type.equals("place")) {
 			get[0] = "getPlaceCatalog";
+			// get[0] = "getPlaces";
+			// get[1] = null;
+			// get[2] = null;
+			get[1] = "-1";
+		} else if (type.equals("Oplace")) {
+			get[0] = "getOPlaceCatalog";
+			// get[0] = "getPlaces";
+			// get[1] = null;
+			// get[2] = null;
+			get[1] = "-1";
 		}
-		get[1] = "-1";
 		try {
 			ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			objectOutput.writeObject(get);
@@ -439,9 +528,15 @@ public class EditmapsController {
 						for (int i = 1; i <= (int) object[0]; i++) {
 							dataCity.add((City) object[i]);
 						}
-					} else {
+					} else if (type.equals("place")) {
 						for (int i = 1; i <= (int) object[0]; i++) {
 							dataPlace.add((Place) object[i]);
+
+						}
+					} else {
+						for (int i = 1; i <= (int) object[0]; i++) {
+							dataPlace2.add((Place) object[i]);
+
 						}
 					}
 
@@ -469,7 +564,7 @@ public class EditmapsController {
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
-		primaryStage.setOnCloseRequest(e-> {
+		primaryStage.setOnCloseRequest(e -> {
 			try {
 				logOut();
 			} catch (IOException e1) {
@@ -490,7 +585,7 @@ public class EditmapsController {
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
-		primaryStage.setOnCloseRequest(e-> {
+		primaryStage.setOnCloseRequest(e -> {
 			try {
 				logOut();
 			} catch (IOException e1) {
@@ -511,7 +606,7 @@ public class EditmapsController {
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
-		primaryStage.setOnCloseRequest(e-> {
+		primaryStage.setOnCloseRequest(e -> {
 			try {
 				logOut();
 			} catch (IOException e1) {
@@ -522,13 +617,13 @@ public class EditmapsController {
 		primaryStage.show();
 
 	}
-	
+
 	private Object logOut() throws UnknownHostException, IOException {
 		String[] array = new String[3];
 		array[0] = "LogOut";
 		array[1] = Globals.user.getUserName();
 		array[2] = Globals.user.getPassword();
-		
+
 		@SuppressWarnings("resource")
 		Socket socket = new Socket(Globals.IpAddress, 5555);
 		try {
@@ -537,7 +632,7 @@ public class EditmapsController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
 

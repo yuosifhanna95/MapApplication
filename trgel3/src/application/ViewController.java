@@ -208,6 +208,15 @@ public class ViewController {
 				RenderedImage renderedImage = SwingFXUtils.fromFXImage(writableImage, null);
 				// Write the snapshot to the chosen file
 				ImageIO.write(renderedImage, "png", file);
+
+				@SuppressWarnings("resource")
+				Socket socket = new Socket(Globals.IpAddress, 5555);
+				String[] array = new String[2];
+				array[0] = "staticDownload";
+				array[1] = "" + Globals.map.getCity();
+				ObjectOutputStream objectOutput = new ObjectOutputStream(socket.getOutputStream());
+				objectOutput.writeObject(array);
+
 			} catch (IOException ex) {
 				ex.printStackTrace();
 			}

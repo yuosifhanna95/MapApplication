@@ -1,7 +1,6 @@
 /* JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
 #pane {
-	
-	-fx-background-image: url("mainpage.png");
+		-fx-background-image: url("catalogback.png");
 }
 .text-input {
     -fx-text-fill: white;
@@ -49,6 +48,25 @@
 }
 .label{
 	-fx-text-alignment: right;
-	-fx-font-family: Quicksand;
 	-fx-font-size: 18pt; 
+}
+.table-view {
+	-fx-background-color: transparent;
+	-fx-background-radius: 100;
+	-fx-border-color: white;
+	-fx-border-radius: 10;
+	-fx-border-width: 2 2 2 2;
+}
+.combo-box {
+	-fx-background-color: transparent;
+	-fx-background-radius: 100;
+	-fx-border-color: white;
+	-fx-text-fill: white;
+	-fx-border-radius: 10;
+	-fx-border-width: 2 2 2 2;
+}
+#comboBox .list-cell
+{
+	-fx-background-color: transparent;
+	-fx-text-fill: black;
 }

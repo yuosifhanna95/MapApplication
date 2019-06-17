@@ -22,7 +22,7 @@
       <Button fx:id="Login" layoutX="104.0" layoutY="466.0" mnemonicParsing="false" onAction="#LoginFunc" prefHeight="63.0" prefWidth="196.0" text="Log in" />
       <Button fx:id="SignUp" layoutX="328.0" layoutY="466.0" mnemonicParsing="false" onAction="#SignUpFunc" prefHeight="63.0" prefWidth="196.0" text="Sign up" />
       <Button fx:id="Catalog" layoutX="101.0" layoutY="569.0" mnemonicParsing="false" onAction="#CatalogFunc" prefHeight="63.0" prefWidth="420.0" text="Catalog" />
-      <Label fx:id="Messege" layoutX="415.0" layoutY="453.0" prefHeight="36.0" prefWidth="452.0" style="-fx-text-alignment: center;" textFill="RED" />
+      <Label fx:id="Messege" layoutX="88.0" layoutY="650.0" prefHeight="36.0" prefWidth="452.0" style="-fx-text-alignment: center;" textFill="WHITE" />
       <ImageView fitHeight="32" fitWidth="30" layoutX="60.0" layoutY="320.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@usernameicon.png" />

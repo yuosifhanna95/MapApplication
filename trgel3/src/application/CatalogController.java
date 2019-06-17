@@ -36,6 +36,9 @@ import javafx.stage.Stage;
 public class CatalogController {
 
 	@FXML
+	private AnchorPane pane;
+
+	@FXML
 	private ComboBox<String> comboBox;
 	@FXML
 	private TextField searchText = new TextField();
@@ -86,7 +89,8 @@ public class CatalogController {
 	@FXML
 	private HBox hbox;
 
-	TextField placeField = new TextField();
+	@FXML
+	private TextField placeField;
 
 	@FXML
 	private Button view;
@@ -147,8 +151,9 @@ public class CatalogController {
 		searchCity.getStyleClass().remove("addBobOk");
 		searchCity.getStyleClass().add("addBobOk");
 
-		searchText.setPrefWidth(200);
-		hbox.getChildren().remove(placeField);
+		searchText.setPrefWidth(390);
+		// hbox.getChildren().remove(placeField);
+		placeField.setVisible(false);
 
 		searchTable1.setVisible(false);
 		searchTable1.setDisable(true);
@@ -157,7 +162,6 @@ public class CatalogController {
 		searchTable.setDisable(false);
 
 		comboBox.getItems().remove("City & place");
-
 		searchText.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent ke) {
 				switch (comboBox.getValue()) {
@@ -194,39 +198,6 @@ public class CatalogController {
 
 		searchTable1.setVisible(true);
 		searchTable1.setDisable(false);
-
-		comboBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> selected, String old, String newVal) {
-				if (newVal != null) {
-					switch (newVal) {
-					case "City & place":
-						hbox.getChildren().remove(placeField);
-						searchText.setPrefWidth(100);
-						placeField.setPrefWidth(100);
-						searchText.setPromptText("City");
-						placeField.setPromptText("Place");
-						hbox.getChildren().addAll(placeField);
-						break;
-					case "City":
-						searchText.setPrefWidth(200);
-						searchText.setPromptText("City");
-						hbox.getChildren().remove(placeField);
-						break;
-					case "Description":
-						searchText.setPrefWidth(200);
-						searchText.setPromptText("Description");
-						hbox.getChildren().remove(placeField);
-						break;
-					case "Place":
-						searchText.setPrefWidth(200);
-						searchText.setPromptText("Place");
-						hbox.getChildren().remove(placeField);
-						break;
-					}
-				}
-			}
-		});
 
 		placeField.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent ke) {
@@ -285,6 +256,7 @@ public class CatalogController {
 
 		Scene scene = new Scene(pane);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+
 		primaryStage.setScene(scene);
 		primaryStage.show();
 	}
@@ -305,6 +277,7 @@ public class CatalogController {
 				if (event.getClickCount() == 1 && (!row.isEmpty())) {
 					City cityRow = searchTable.getSelectionModel().getSelectedItem();
 					Globals.city = (City) cityRow;
+					view.setVisible(true);
 				}
 			});
 			return row;
@@ -316,6 +289,7 @@ public class CatalogController {
 					Place placeRow = searchTable1.getSelectionModel().getSelectedItem();
 					Globals.place = (Place) placeRow;
 					Globals.cityName = placeRow.getCityName();
+					view.setVisible(true);
 				}
 			});
 			return row;
@@ -420,6 +394,46 @@ public class CatalogController {
 					flCity.setPredicate(
 							p -> p.getDescription().toLowerCase().contains(searchText.getText().toLowerCase().trim()));
 					break;
+				}
+			}
+		});
+
+		comboBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> selected, String old, String newVal) {
+				comboBox.getStyleClass().remove("comboBox");
+				if (newVal != null) {
+					switch (newVal) {
+					case "City & place":
+						// hbox.getChildren().remove(placeField);
+						placeField.setVisible(false);
+						searchText.setPrefWidth(180);
+						placeField.setPrefWidth(180);
+						searchText.setPromptText("City");
+						placeField.setPromptText("Place");
+						// hbox.getChildren().addAll(placeField);
+						placeField.setVisible(true);
+
+						break;
+					case "City":
+						searchText.setPrefWidth(390);
+						searchText.setPromptText("City");
+						// hbox.getChildren().remove(placeField);
+						placeField.setVisible(false);
+						break;
+					case "Description":
+						searchText.setPrefWidth(390);
+						searchText.setPromptText("Description");
+						// hbox.getChildren().remove(placeField);
+						placeField.setVisible(false);
+						break;
+					case "Place":
+						searchText.setPrefWidth(390);
+						searchText.setPromptText("Place");
+						// hbox.getChildren().remove(placeField);
+						placeField.setVisible(false);
+						break;
+					}
 				}
 			}
 		});

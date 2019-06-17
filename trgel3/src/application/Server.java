@@ -45,7 +45,7 @@ public class Server {
 
 				Date date2 = new Date();
 
-				if ((date2.getHours() == 12 || date2.getHours() == 1) && (checked == 0)) {
+				if (((date2.getHours() == 4 && date2.getMinutes() > 45) || date2.getHours() == 1) && (checked == 0)) {
 					if (checkthesystem() == 1) {
 						new Thread(new ScheduleMessage()).start();
 					}
@@ -311,6 +311,7 @@ public class Server {
 						Class.forName(JDBC_DRIVER);
 						conn = DriverManager.getConnection(DB_URL, USER, PASS);
 						statics("onepurchase", city, null);
+						statics("download", city, null);
 						AddPurchaseToHistory(city, version, user.getUserName(), "OT", date, conn);
 					}
 
@@ -690,7 +691,19 @@ public class Server {
 
 					if (((String[]) (data))[0].equals("Exit"))
 						break;
-					else if (((String) ((String[]) (data))[0]).equals("VersionUpdate")) {
+					else if (((String) ((String[]) (data))[0]).equals("staticDownload")) {
+
+						Date StartDate = Calendar.getInstance().getTime();
+						DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+						Calendar c = Calendar.getInstance();
+						String startDateAsString = df.format(StartDate);
+						c.setTime(df.parse(startDateAsString));
+						c.add(Calendar.DATE, 1);
+						startDateAsString = df.format(c.getTime());
+						statics("download", ((String) ((String[]) (data))[1]),
+								java.sql.Date.valueOf(startDateAsString));
+
+					} else if (((String) ((String[]) (data))[0]).equals("VersionUpdate")) {
 
 						System.out.println("this is version");
 						String City = ((String[]) (data))[1];
@@ -852,6 +865,7 @@ public class Server {
 													// JOptionPane.showMessageDialog(null, "thanks for Update");
 													System.out.println("thanks for confirmation");
 													AddCityNumberOfPlaces(CityName, conn);
+													AddMapNumberOfPlace(PlaceName, conn);
 													flag = true;
 												}
 											}
@@ -870,6 +884,7 @@ public class Server {
 											if (stmt2.executeUpdate(sql2) > 0) {
 												// JOptionPane.showMessageDialog(null, "thanks for Update");
 												System.out.println("thanks for confirmation");
+												AddMapNumberOfPlace(PlaceName, conn);
 												flag = true;
 											}
 										}
@@ -1174,7 +1189,7 @@ public class Server {
 								User user = new User(id, firstname, lastname, email, username, password, phonenumber,
 										payment, type, history);
 								if (online == 0) {
-									rs.updateInt("online", 0);// 1
+									rs.updateInt("online", 1);// 1
 									rs.updateRow();
 								}
 								result[2] = online;
@@ -3288,11 +3303,12 @@ public class Server {
 
 	}
 
-	static ObservableList<Message> getMyMessagesFromDB(String user) {
+	static ObservableList<Message> getMyMessagesFromDB(String user) throws SQLException {
 
 		ObservableList<Message> data = FXCollections.observableArrayList();
 		Connection conn = null;
 		Statement stmt = null;
+		Statement stmt2 = null;
 		try {
 			Class.forName(JDBC_DRIVER);
 
@@ -3308,12 +3324,32 @@ public class Server {
 		}
 		try {
 			stmt = conn.createStatement();
+			stmt2 = conn.createStatement();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		String sql = "SELECT * FROM messages where userName='" + user + "'";
+		String sql1 = "SELECT * FROM messages where userName='ALL'";
+		String sql2 = "SELECT * FROM fixedPurchase where user='" + user + "'";
+
+		ResultSet rs1 = stmt.executeQuery(sql1);
+
+		ResultSet rs2 = stmt2.executeQuery(sql2);
+		while (rs2.next()) {
+			String City = rs2.getString("city");
+			while (rs1.next()) {
+				String mss = rs1.getString("message");
+				String tmss = rs1.getString("typemessage");
+				Date d1 = rs1.getDate("Datesend");
+				if (mss.indexOf(City) >= 0)
+					data.add(new Message(user, mss, d1, tmss));
+			}
+			rs1.first();
+			rs1.previous();
+		}
+
 		try {
 			ResultSet rs = stmt.executeQuery(sql);
 			while (rs.next()) {
@@ -3356,6 +3392,31 @@ public class Server {
 				ResultSet rs = stmt.executeQuery(sql);
 				if (rs.next()) {
 					rs.updateInt("pathNum", rs.getInt("pathNum") + 1);// 1
+					rs.updateRow();
+
+				}
+
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+	}
+
+	public static void AddMapNumberOfPlace(String Place, Connection conn) {
+		Statement stmt;
+
+		// Connection conn=connecttion();
+		if (conn != null) {
+			try {
+
+				conn = DriverManager.getConnection(DB_URL, USER, PASS);
+				stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+				String sql = "SELECT * FROM places where Place='" + Place + "'";
+				ResultSet rs = stmt.executeQuery(sql);
+				if (rs.next()) {
+					rs.updateInt("mapsNum", rs.getInt("mapsNum") + 1);// 1
 					rs.updateRow();
 
 				}
@@ -3658,27 +3719,24 @@ public class Server {
 		ResultSet rs = null;
 
 		String sqlfind = "";
-		String sql = "INSERT INTO messages(`userName`, `message`, DateSend, read, `typemessage`) VALUES (?,?,?,?,?)";
+		String sql = "INSERT INTO messages(`userName`, `message`, `Datesend`, `read`, `typemessage`) VALUES (?,?,?,?,?)";
 
 		if (conn != null) {
 			try {
-				pr = conn.createStatement();
-				rs = pr.executeQuery(sqlfind);
-				if (!rs.next()) {
-					pr2 = conn.prepareStatement(sql);
-					Date date5 = new Date();
-					java.sql.Date date3 = new java.sql.Date(date5.getTime());
-					String type = "NewV," + City;
-					String us = "#";
-					String mess = "Dear member,a new version of the city" + City + "is out!";
-					pr2.setString(1, us);
-					pr2.setString(2, mess);
-					pr2.setDate(3, date3);
-					pr2.setInt(4, 0);
-					pr2.setString(5, type);
 
-					int k = pr2.executeUpdate();
-				}
+				pr2 = conn.prepareStatement(sql);
+				Date date5 = new Date();
+				java.sql.Date date3 = new java.sql.Date(date5.getTime());
+				String type = "NewV " + City;
+				String us = "ALL";
+				String mess = "Dear member a new version of the city " + City + " is out";
+				pr2.setString(1, us);
+				pr2.setString(2, mess);
+				pr2.setDate(3, date3);
+				pr2.setInt(4, 0);
+				pr2.setString(5, type);
+
+				int k = pr2.executeUpdate();
 
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
@@ -3688,4 +3746,5 @@ public class Server {
 		}
 
 	}
+
 }

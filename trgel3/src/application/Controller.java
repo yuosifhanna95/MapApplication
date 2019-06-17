@@ -50,7 +50,7 @@ public class Controller {
 
 	@FXML // This method is called by the FXMLLoader when initialization is complete
 	void initialize() throws IOException, Exception {
-
+		Globals.MODE = -1;
 		Font font = Font.loadFont(Controller.class.getResource("Quicksand.ttf").toExternalForm(), 12);
 		Password.setFont(font);
 		Username.setFont(font);

@@ -71,6 +71,9 @@ import javafx.util.Callback;
 public class DefPageController {
 
 	@FXML
+	private AnchorPane pane;
+
+	@FXML
 	private Button btn_message;
 
 	@FXML
@@ -90,6 +93,9 @@ public class DefPageController {
 
 	@FXML
 	private TextField searchText = new TextField();
+
+	@FXML
+	private TextField placeField;
 
 	@FXML
 	private TableView<City> searchTable;
@@ -174,8 +180,6 @@ public class DefPageController {
 	@FXML
 	private HBox hbox;
 
-	TextField placeField = new TextField();
-
 	@FXML
 	private Label Lab;
 
@@ -236,9 +240,9 @@ public class DefPageController {
 		searchCity.getStyleClass().removeAll("addBobOk, focus");
 		searchCity.getStyleClass().add("addBobOk");
 
-		searchText.setPrefWidth(200);
-		hbox.getChildren().remove(placeField);
-
+		searchText.setPrefWidth(390);
+		// hbox.getChildren().remove(placeField);
+		placeField.setVisible(false);
 		searchTable1.setVisible(false);
 		searchTable1.setDisable(true);
 
@@ -283,39 +287,6 @@ public class DefPageController {
 
 		searchTable1.setVisible(true);
 		searchTable1.setDisable(false);
-
-		comboBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> selected, String old, String newVal) {
-				if (newVal != null) {
-					switch (newVal) {
-					case "City & place":
-						hbox.getChildren().remove(placeField);
-						searchText.setPrefWidth(100);
-						placeField.setPrefWidth(100);
-						searchText.setPromptText("City");
-						placeField.setPromptText("Place");
-						hbox.getChildren().addAll(placeField);
-						break;
-					case "City":
-						searchText.setPrefWidth(200);
-						searchText.setPromptText("City");
-						hbox.getChildren().remove(placeField);
-						break;
-					case "Description":
-						searchText.setPrefWidth(200);
-						searchText.setPromptText("Description");
-						hbox.getChildren().remove(placeField);
-						break;
-					case "Place":
-						searchText.setPrefWidth(200);
-						searchText.setPromptText("Place");
-						hbox.getChildren().remove(placeField);
-						break;
-					}
-				}
-			}
-		});
 
 		placeField.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent ke) {
@@ -691,12 +662,14 @@ public class DefPageController {
 		searchCity.getStyleClass().removeAll("addBobOk, focus");
 		searchCity.getStyleClass().add("addBobOk");
 
+		placeField.setPromptText("Place");
+		placeField.setVisible(false);
 		buildData("city");
 		buildData("place");
 		buildData("Oplace");
 
 		comboBox.getItems().addAll("City", "Place", "Description");
-		searchText.setPromptText("Write here");
+		searchText.setPromptText("City");
 
 		searchTable1.getColumns().clear();
 		searchTable1.setEditable(true);
@@ -819,6 +792,40 @@ public class DefPageController {
 			}
 		});
 
+		comboBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> selected, String old, String newVal) {
+				if (newVal != null) {
+					switch (newVal) {
+					case "City & place":
+						searchText.setPrefWidth(180);
+						placeField.setPrefWidth(180);
+						searchText.setPromptText("City");
+						placeField.setPromptText("Place");
+						placeField.setVisible(true);
+						break;
+					case "City":
+						searchText.setPrefWidth(390);
+						searchText.setPromptText("City");
+						placeField.setVisible(false);
+						break;
+					case "Description":
+						searchText.setPrefWidth(390);
+						searchText.setPromptText("Description");
+						placeField.setVisible(false);
+
+						break;
+					case "Place":
+						searchText.setPrefWidth(390);
+						searchText.setPromptText("Place");
+						placeField.setVisible(false);
+
+						break;
+					}
+				}
+			}
+		});
+
 		comboBox.getSelectionModel().selectFirst();
 
 	}
@@ -928,7 +935,12 @@ public class DefPageController {
 
 	@FXML
 	void backFunc(ActionEvent event) throws IOException {
-
+		try {
+			logOut();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 		URL url = getClass().getResource("MainPage.fxml");
 		AnchorPane pane = FXMLLoader.load(url);
